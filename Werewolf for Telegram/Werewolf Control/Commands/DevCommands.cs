@@ -1204,7 +1204,7 @@ namespace Werewolf_Control
         [Attributes.Command(Trigger = "clearlogs", DevOnly = true)]
         public static void ClearLogs(Update u, string[] args)
         {
-            var LogPath = Path.Combine(Bot.RootDirectory, "..\\Logs\\");
+            var LogPath = Path.Combine(Bot.RootDirectory, "../Logs/");
             var files = new[] { "NodeFatalError.log", "error.log", "tcperror.log", "apireceiveerror.log", "getUpdates.log" };
             foreach (var file in files)
             {
@@ -1232,7 +1232,7 @@ namespace Werewolf_Control
         {
             try
             {
-                var LogPath = Path.Combine(Bot.RootDirectory, "..\\Logs\\");
+                var LogPath = Path.Combine(Bot.RootDirectory, "../Logs/");
 
                 var path = LogPath + "errors.zip";
                 if (File.Exists(path))

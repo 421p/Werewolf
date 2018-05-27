@@ -185,7 +185,7 @@ namespace Werewolf_Control
                 var selected = values.ElementAt(choice);
                 return String.Format(selected.Value.FormatHTML(), args).Replace("\\n", Environment.NewLine);
             }
-            catch
+            catch (Exception e)
             {
                 var strings = Bot.English.Descendants("string").FirstOrDefault(x => x.Attribute("key").Value == key);
                 var values = strings.Descendants("value");

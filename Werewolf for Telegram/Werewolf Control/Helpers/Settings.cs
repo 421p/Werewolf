@@ -164,6 +164,6 @@ namespace Werewolf_Control.Helpers
 #endif
 
             GameJoinTime = 180,
-            MaxExtend = 60;
+            MaxExtend = 180;
     }
 }

@@ -37,7 +37,7 @@ namespace Werewolf_Node
         private readonly InlineKeyboardMarkup _requestPMButton;
         public DateTime LastPlayersOutput = DateTime.Now;
         public GameTime Time;
-        public string Language = "English SFW", ChatGroup;
+        public string Language = "Goosian", ChatGroup;
         public Locale Locale;
         public Group DbGroup;
         private bool _playerListChanged = true, _silverSpread, _sandmanSleep;

@@ -39,7 +39,7 @@ namespace Werewolf_Control
             AppDomain.CurrentDomain.UnhandledException += (sender, eventArgs) =>
             {
                 //drop the error to log file and exit
-                using (var sw = new StreamWriter(Path.Combine(Bot.RootDirectory, "..\\Logs\\error.log"), true))
+                using (var sw = new StreamWriter(Path.Combine(Bot.RootDirectory, "../Logs/error.log"), true))
                 {
                     var e = (eventArgs.ExceptionObject as Exception);
                     sw.WriteLine(DateTime.UtcNow);
@@ -161,7 +161,7 @@ namespace Werewolf_Control
             //Console.WriteLine(s);
             //try
             //{
-            //    using (var sw = new StreamWriter(Path.Combine(Bot.RootDirectory, "..\\Logs\\ControlLog.log"), true))
+            //    using (var sw = new StreamWriter(Path.Combine(Bot.RootDirectory, "../Logs/ControlLog.log"), true))
             //    {
             //        sw.WriteLine($"{DateTime.UtcNow} - {s}");
             //    }
@@ -398,7 +398,9 @@ namespace Werewolf_Control
             {
                 //get the node exe in this directory
                 var file = Directory.GetFiles(dir, "Werewolf Node.exe").First();
-                Version fvi = Version.Parse(FileVersionInfo.GetVersionInfo(file).FileVersion);
+                var version = FileVersionInfo.GetVersionInfo(file).FileVersion;
+
+                Version fvi = Version.Parse("1.0.0");
                 if (fvi > currentChoice.Version)
                 {
                     currentChoice.Path = file;

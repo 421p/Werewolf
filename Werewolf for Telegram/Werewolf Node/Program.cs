@@ -47,9 +47,9 @@ namespace Werewolf_Node
 #if DEBUG
         internal static string LanguageDirectory => Path.GetFullPath(Path.Combine(RootDirectory, @"..\..\..\Languages"));
 #else
-        internal static string LanguageDirectory => Path.GetFullPath(Path.Combine(RootDirectory, @"..\..\Languages"));
+        internal static string LanguageDirectory => Path.GetFullPath(Path.Combine(RootDirectory, @"../../Languages"));
 #endif
-        internal static string TempLanguageDirectory => Path.GetFullPath(Path.Combine(RootDirectory, @"..\..\TempLanguageFiles"));
+        internal static string TempLanguageDirectory => Path.GetFullPath(Path.Combine(RootDirectory, @"../../TempLanguageFiles"));
         internal static XDocument English;
         internal static int MessagesSent = 0;
         static void Main(string[] args)
@@ -58,7 +58,7 @@ namespace Werewolf_Node
             AppDomain.CurrentDomain.UnhandledException += (sender, eventArgs) =>
             {
                 var ex = eventArgs.ExceptionObject as Exception;
-                using (var sw = new StreamWriter(Path.Combine(RootDirectory, "..\\Logs\\NodeFatalError.log"), true))
+                using (var sw = new StreamWriter(Path.Combine(RootDirectory, "../Logs/NodeFatalError.log"), true))
                 {
 
                     sw.WriteLine($"{DateTime.Now} - {Version} - {ex.Message}");

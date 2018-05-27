@@ -48,15 +48,15 @@ namespace Werewolf_Control.Helpers
                 return Path.GetDirectoryName(path);
             }
         }
-        internal static string LogDirectory = Path.Combine(RootDirectory, "..\\Logs\\");
+        internal static string LogDirectory = Path.Combine(RootDirectory, "../Logs/");
         internal delegate void ChatCommandMethod(Update u, string[] args);
         internal static List<Command> Commands = new List<Command>();
 #if DEBUG
-        internal static string LanguageDirectory => Path.GetFullPath(Path.Combine(RootDirectory, @"..\..\..\Languages"));
+        internal static string LanguageDirectory => Path.GetFullPath(Path.Combine(RootDirectory, @"../../Languages"));
 #else
-        internal static string LanguageDirectory => Path.GetFullPath(Path.Combine(RootDirectory, @"..\..\Languages"));
+        internal static string LanguageDirectory => Path.GetFullPath(Path.Combine(RootDirectory, @"../../Languages"));
 #endif
-        internal static string TempLanguageDirectory => Path.GetFullPath(Path.Combine(RootDirectory, @"..\..\TempLanguageFiles"));
+        internal static string TempLanguageDirectory => Path.GetFullPath(Path.Combine(RootDirectory, @"../../TempLanguageFiles"));
         public static void Initialize(string updateid = null)
         {
 
@@ -65,7 +65,7 @@ namespace Werewolf_Control.Helpers
                     RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64)
                         .OpenSubKey("SOFTWARE\\Werewolf");
 #if DEBUG
-            TelegramAPIKey = key.GetValue("DebugAPI").ToString();
+            TelegramAPIKey = key.GetValue("ProductionAPI").ToString();
 #elif RELEASE
             TelegramAPIKey = key.GetValue("ProductionAPI").ToString();
 #elif RELEASE2
@@ -127,7 +127,7 @@ namespace Werewolf_Control.Helpers
         //        Api.StartReceiving();// cancellationToken: new CancellationTokenSource(1000).Token);
         //    }
         //    var e = receiveGeneralErrorEventArgs.Exception;
-        //    using (var sw = new StreamWriter(Path.Combine(RootDirectory, "..\\Logs\\apireceiveerror.log"), true))
+        //    using (var sw = new StreamWriter(Path.Combine(RootDirectory, "../Logs/apireceiveerror.log"), true))
         //    {
         //        sw.WriteLine($"{DateTime.UtcNow} {e.Message} - {e.StackTrace}\n{e.Source}");
         //    }
@@ -202,7 +202,7 @@ namespace Werewolf_Control.Helpers
                 Api.StartReceiving();
             }
             var e = receiveErrorEventArgs.ApiRequestException;
-            using (var sw = new StreamWriter(Path.Combine(RootDirectory, "..\\Logs\\apireceiveerror.log"), true))
+            using (var sw = new StreamWriter(Path.Combine(RootDirectory, "../Logs/apireceiveerror.log"), true))
             {
                 sw.WriteLine($"{DateTime.UtcNow} {e.ErrorCode} - {e.Message}\n{e.Source}");
             }

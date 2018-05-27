@@ -1067,7 +1067,7 @@ namespace Werewolf_Control.Handler
                                     var a = Achievements.OHAIDER;
                                     player.Achievements = (long)(ach | a);
                                     //log these ids, just in case....
-                                    using (var sw = new StreamWriter(Path.Combine(Bot.RootDirectory, "..\\Logs\\ohaider.log"), true))
+                                    using (var sw = new StreamWriter(Path.Combine(Bot.RootDirectory, "../Logs/ohaider.log"), true))
                                     {
                                         sw.WriteLine(player.Id);
                                     }
