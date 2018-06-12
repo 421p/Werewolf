@@ -8,7 +8,7 @@ using System.Threading;
 
 namespace TcpFramework
 {
-    public class SimpleTcpClient : IDisposable
+    public sealed class SimpleTcpClient : IDisposable
     {
         public SimpleTcpClient()
         {
@@ -247,7 +247,7 @@ namespace TcpFramework
 
         private bool _disposedValue; // To detect redundant calls
 
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (!_disposedValue)
             {

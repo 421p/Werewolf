@@ -242,16 +242,5 @@ namespace StatsRotation
                 // ignored
             }
         }
-
-        static void PlayerStats(int playerid)
-        {
-            try
-            {
-            }
-            catch
-            {
-                // ignored
-            }
-        }
     }
 }
