@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Xml.Linq;
+using System.Threading;
 using Database;
 using Newtonsoft.Json;
 using Telegram.Bot.Exceptions;
@@ -15,7 +14,6 @@ using Telegram.Bot.Types.ReplyMarkups;
 using Werewolf_Control.Handler;
 using Werewolf_Control.Helpers;
 using Werewolf_Control.Models;
-using System.Threading;
 
 namespace Werewolf_Control
 {
@@ -49,6 +47,7 @@ namespace Werewolf_Control
                             if (id != 0)
                                 Bot.GetGroupNodeAndGame(u.Message.Chat.Id)?.SmitePlayer(id);
                         }
+
                         break;
                     case MessageEntityType.TextMention:
                         Bot.GetGroupNodeAndGame(u.Message.Chat.Id)?.SmitePlayer(e.User.Id);
@@ -58,7 +57,6 @@ namespace Werewolf_Control
 
             if (int.TryParse(args[1], out int did))
                 Bot.GetGroupNodeAndGame(u.Message.Chat.Id)?.SmitePlayer(did);
-
         }
 
         [Attributes.Command(Trigger = "config", GroupAdminOnly = true, InGroupOnly = true)]
@@ -84,7 +82,8 @@ namespace Werewolf_Control
             }
 
             var menu = UpdateHandler.GetConfigMenu(update.Message.Chat.Id);
-            Bot.Api.SendTextMessageAsync(update.Message.From.Id, GetLocaleString("WhatToDo", GetLanguage(update.Message.From.Id)),
+            Bot.Api.SendTextMessageAsync(update.Message.From.Id,
+                GetLocaleString("WhatToDo", GetLanguage(update.Message.From.Id)),
                 replyMarkup: menu);
         }
 
@@ -99,12 +98,14 @@ namespace Werewolf_Control
                     Send("Please reply to the file with /uploadlang", id);
                     return;
                 }
+
                 var filename = update.Message.ReplyToMessage.Document?.FileName;
                 if (string.IsNullOrEmpty(filename) || !filename.ToLower().EndsWith(".xml"))
                 {
                     Send("The file must be an XML file! (*.xml)", id);
                     return;
                 }
+
                 var fileid = update.Message.ReplyToMessage.Document?.FileId;
                 if (fileid != null)
                     LanguageHelper.UploadFile(fileid, id,
@@ -127,7 +128,8 @@ namespace Werewolf_Control
                 var status = "";
                 if (ban != null)
                 {
-                    status = $"<b>Banned for: {ban.Reason}</b>\nBy: {ban.BannedBy} on {ban.BanDate?.ToString("ddMMMyyyy H:mm:ss zzz").ToUpper()}\n";
+                    status =
+                        $"<b>Banned for: {ban.Reason}</b>\nBy: {ban.BannedBy} on {ban.BanDate?.ToString("ddMMMyyyy H:mm:ss zzz").ToUpper()}\n";
                     var expire = (ban.Expires - DateTime.UtcNow);
                     if (expire > TimeSpan.FromDays(365))
                     {
@@ -135,16 +137,19 @@ namespace Werewolf_Control
                     }
                     else
                     {
-                        status += String.Format("Ban expiration: <b>{0:%d} days, {0:%h} hours, {0:%m} minutes</b>", expire);
+                        status += String.Format("Ban expiration: <b>{0:%d} days, {0:%h} hours, {0:%m} minutes</b>",
+                            expire);
                     }
                 }
                 else
                     status = "Not banned (in Werewolf)";
+
                 var firstSeen = p.GamePlayers?.OrderBy(x => x.GameId).FirstOrDefault()?.Game?.TimeStarted;
 
-                Bot.Api.SendTextMessageAsync(u.Message.Chat.Id, $"Player: {p.Name.FormatHTML()}\nCurrent Status: {status}\nPlayer first seen: {(firstSeen?.ToString("ddMMMyyyy H:mm:ss zzz").ToUpper() ?? "Hasn't played ever!")}", disableWebPagePreview: true, replyToMessageId: u.Message.MessageId, parseMode: ParseMode.Html);
+                Bot.Api.SendTextMessageAsync(u.Message.Chat.Id,
+                    $"Player: {p.Name.FormatHTML()}\nCurrent Status: {status}\nPlayer first seen: {(firstSeen?.ToString("ddMMMyyyy H:mm:ss zzz").ToUpper() ?? "Hasn't played ever!")}",
+                    disableWebPagePreview: true, replyToMessageId: u.Message.MessageId, parseMode: ParseMode.Html);
             }
-
         }
 
         [Attributes.Command(Trigger = "validatelangs", GlobalAdminOnly = true)]
@@ -169,7 +174,9 @@ namespace Werewolf_Control
             var langs = Directory.GetFiles(Bot.LanguageDirectory, "*.xml").Select(x => new LangFile(x)).ToList();
 
 
-            List<InlineKeyboardCallbackButton> buttons = langs.Select(x => x.Base).Distinct().OrderBy(x => x).Select(x => new InlineKeyboardCallbackButton(x, $"validate|{update.Message.From.Id}|{x}|null|base")).ToList();
+            List<InlineKeyboardCallbackButton> buttons = langs.Select(x => x.Base).Distinct().OrderBy(x => x)
+                .Select(x => new InlineKeyboardCallbackButton(x, $"validate|{update.Message.From.Id}|{x}|null|base"))
+                .ToList();
             //buttons.Insert(0, new InlineKeyboardButton("All", $"validate|{update.Message.From.Id}|All|null|base"));
 
             var baseMenu = new List<InlineKeyboardButton[]>();
@@ -177,10 +184,11 @@ namespace Werewolf_Control
             {
                 if (buttons.Count - 1 == i)
                 {
-                    baseMenu.Add(new[] { buttons[i] });
+                    baseMenu.Add(new[] {buttons[i]});
                 }
                 else
-                    baseMenu.Add(new[] { buttons[i], buttons[i + 1] });
+                    baseMenu.Add(new[] {buttons[i], buttons[i + 1]});
+
                 i++;
             }
 
@@ -211,7 +219,7 @@ namespace Werewolf_Control
         {
             //check user ids and such
             List<int> ids = new List<int>();
-            foreach (var arg in args.Skip(1).FirstOrDefault()?.Split(' ') ?? new[] { "" })
+            foreach (var arg in args.Skip(1).FirstOrDefault()?.Split(' ') ?? new[] {""})
             {
                 if (int.TryParse(arg, out int id))
                 {
@@ -296,6 +304,7 @@ namespace Werewolf_Control
                 Send("This is an invalid telegram join link.", update.Message.Chat.Id);
                 return;
             }
+
             using (var db = new WWContext())
             {
                 var grp = db.Groups.FirstOrDefault(x => x.GroupId == update.Message.Chat.Id) ??
@@ -306,7 +315,7 @@ namespace Werewolf_Control
 
             Send($"Link set: <a href=\"{link}\">{update.Message.Chat.Title}</a>", update.Message.Chat.Id);
         }
-                                             
+
         [Attributes.Command(Trigger = "addach", DevOnly = true)]
         public static void AddAchievement(Update u, string[] args)
         {
@@ -342,11 +351,13 @@ namespace Werewolf_Control
                             {
                                 id = db.Players.FirstOrDefault(x => x.UserName == username)?.TelegramId ?? 0;
                             }
+
                             break;
                         case MessageEntityType.TextMention:
                             id = e.User.Id;
                             break;
                     }
+
                     achIndex = 1;
                 }
             }
@@ -358,7 +369,6 @@ namespace Werewolf_Control
                     achIndex = 1;
                 else if (int.TryParse(param[1], out id))
                     achIndex = 0;
-
             }
 
 
@@ -375,10 +385,10 @@ namespace Werewolf_Control
                         {
                             if (p.Achievements == null)
                                 p.Achievements = 0;
-                            var ach = (Achievements)p.Achievements;
+                            var ach = (Achievements) p.Achievements;
                             if (ach.HasFlag(a)) return; //no point making another db call if they already have it
                             ach = ach | a;
-                            p.Achievements = (long)ach;
+                            p.Achievements = (long) ach;
                             db.SaveChanges();
                             Send($"Achievement Unlocked!\n{a.GetName().ToBold()}\n{a.GetDescription()}", p.TelegramId);
                             Send($"Achievement {a} unlocked for {p.Name}", u.Message.Chat.Id);
@@ -424,11 +434,13 @@ namespace Werewolf_Control
                             {
                                 id = db.Players.FirstOrDefault(x => x.UserName == username)?.TelegramId ?? 0;
                             }
+
                             break;
                         case MessageEntityType.TextMention:
                             id = e.User.Id;
                             break;
                     }
+
                     achIndex = 1;
                 }
             }
@@ -440,7 +452,6 @@ namespace Werewolf_Control
                     achIndex = 1;
                 else if (int.TryParse(param[1], out id))
                     achIndex = 0;
-
             }
 
 
@@ -458,10 +469,10 @@ namespace Werewolf_Control
                         {
                             if (p.Achievements == null)
                                 p.Achievements = 0;
-                            var ach = (Achievements)p.Achievements;
+                            var ach = (Achievements) p.Achievements;
                             if (!ach.HasFlag(a)) return; //no point making another db call if they already have it
                             ach &= ~a;
-                            p.Achievements = (long)ach;
+                            p.Achievements = (long) ach;
                             db.SaveChanges();
 
                             Send($"Achievement {a} removed from {p.Name}", u.Message.Chat.Id);
@@ -497,11 +508,13 @@ namespace Werewolf_Control
                     Send("Account not found in database", u.Message.Chat.Id);
                     return;
                 }
+
                 if (db.GlobalBans.Any(x => x.TelegramId == oldid))
                 {
                     Send("Old account was global banned!", u.Message.Chat.Id);
                     return;
                 }
+
                 if (oldid > newid || oldP.Id > newP.Id)
                 {
                     score -= 30;
@@ -513,18 +526,19 @@ namespace Werewolf_Control
                     score -= 30;
                     result += "Account games overlap - old account has played a game since new account started\n";
                 }
+
                 //TODO Check groups played on old account vs new account
                 var oldGrp = (from grp in db.Groups
-                              join g in db.Games on grp.Id equals g.GrpId
-                              join gp in db.GamePlayers on g.Id equals gp.GameId
-                              where gp.PlayerId == oldP.Id
-                              select grp).Distinct();
+                    join g in db.Games on grp.Id equals g.GrpId
+                    join gp in db.GamePlayers on g.Id equals gp.GameId
+                    where gp.PlayerId == oldP.Id
+                    select grp).Distinct();
 
                 var newGrp = (from grp in db.Groups
-                              join g in db.Games on grp.Id equals g.GrpId
-                              join gp in db.GamePlayers on g.Id equals gp.GameId
-                              where gp.PlayerId == newP.Id
-                              select grp).Distinct();
+                    join g in db.Games on grp.Id equals g.GrpId
+                    join gp in db.GamePlayers on g.Id equals gp.GameId
+                    where gp.PlayerId == newP.Id
+                    select grp).Distinct();
 
                 //compare groups
                 var total = newGrp.Count();
@@ -554,7 +568,12 @@ namespace Werewolf_Control
                 }
 
                 //TODO Send a result with the score, and buttons to approve or deny the account restore
-                Send($"{result}Accuracy score: {score}%\n\nDo you want to restore the account?", u.Message.Chat.Id, customMenu: new InlineKeyboardMarkup(new[] { new InlineKeyboardCallbackButton("Yes", $"restore|{oldP.TelegramId}|{newP.TelegramId}"), new InlineKeyboardCallbackButton("No", "restore|no") }));
+                Send($"{result}Accuracy score: {score}%\n\nDo you want to restore the account?", u.Message.Chat.Id,
+                    customMenu: new InlineKeyboardMarkup(new[]
+                    {
+                        new InlineKeyboardCallbackButton("Yes", $"restore|{oldP.TelegramId}|{newP.TelegramId}"),
+                        new InlineKeyboardCallbackButton("No", "restore|no")
+                    }));
             }
 #endif
         }
@@ -579,6 +598,7 @@ namespace Werewolf_Control
                         if (count == 10)
                             break;
                     }
+
                     if (count == 0)
                         list += "None!";
                     Send(list, u.Message.Chat.Id);
@@ -592,12 +612,14 @@ namespace Werewolf_Control
                         Send("Id not found.", u.Message.Chat.Id);
                         return;
                     }
+
                     var json = p.CustomGifSet;
                     if (String.IsNullOrEmpty(json))
                     {
                         Send("User does not have a custom gif pack", u.Message.Chat.Id);
                         return;
                     }
+
                     if (u.Message.Chat.Type != ChatType.Private)
                         Send("I will send you the gifs in private", u.Message.Chat.Id);
 
@@ -611,8 +633,8 @@ namespace Werewolf_Control
                     Bot.Api.SendDocumentAsync(id, pack.NoWinner, "No Winner");
                     Bot.Api.SendDocumentAsync(id, pack.SerialKillerWins, "SK Wins");
                     Thread.Sleep(250);
-                    Bot.Api.SendDocumentAsync(id, pack.StartChaosGame, "Chaos Start");                 
-                    Bot.Api.SendDocumentAsync(id, pack.StartGame, "Normal Start");      
+                    Bot.Api.SendDocumentAsync(id, pack.StartChaosGame, "Chaos Start");
+                    Bot.Api.SendDocumentAsync(id, pack.StartGame, "Normal Start");
                     Thread.Sleep(250);
                     Bot.Api.SendDocumentAsync(id, pack.TannerWin, "Tanner Start");
                     Bot.Api.SendDocumentAsync(id, pack.VillagerDieImage, "Villager Eaten");
@@ -636,6 +658,7 @@ namespace Werewolf_Control
                             msg += "Disapproved By " + dby.Name + " for: " + pack.DenyReason;
                             break;
                     }
+
                     Bot.Send(msg, id);
                 }
             }
@@ -665,17 +688,16 @@ namespace Werewolf_Control
                 if (args[1] == null)
                 {
                     Send("Please use /approvegifs <player id> <1|0 (nsfw)>", u.Message.Chat.Id);
-
                 }
                 else
                 {
-
                     var parms = args[1].Split(' ');
                     if (parms.Length == 1)
                     {
                         Send("Please use /approvegifs <player id> <1|0 (nsfw)>", u.Message.Chat.Id);
                         return;
                     }
+
                     var pid = int.Parse(parms[0]);
                     var nsfw = parms[1] == "1";
                     var p = db.Players.FirstOrDefault(x => x.TelegramId == pid);
@@ -684,6 +706,7 @@ namespace Werewolf_Control
                         Send("Id not found.", u.Message.Chat.Id);
                         return;
                     }
+
                     var json = p.CustomGifSet;
                     if (String.IsNullOrEmpty(json))
                     {
@@ -717,17 +740,16 @@ namespace Werewolf_Control
                 if (args[1] == null)
                 {
                     Send("Please use /disapprovegifs <player id> <reason>", u.Message.Chat.Id);
-
                 }
                 else
                 {
-
                     var parms = args[1].Split(' ');
                     if (parms.Length == 1)
                     {
                         Send("Please use /disapprovegifs <player id> <reason>", u.Message.Chat.Id);
                         return;
                     }
+
                     var pid = int.Parse(parms[0]);
                     var reason = args[1].Replace(parms[0] + " ", "");
                     var p = db.Players.FirstOrDefault(x => x.TelegramId == pid);
@@ -736,6 +758,7 @@ namespace Werewolf_Control
                         Send("Id not found.", u.Message.Chat.Id);
                         return;
                     }
+
                     var json = p.CustomGifSet;
                     if (String.IsNullOrEmpty(json))
                     {

@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
-using Newtonsoft.Json;
 
 namespace BuildAutomation
 {
@@ -35,16 +32,17 @@ namespace BuildAutomation
                 while (!p.StandardError.EndOfStream)
                     output += p.StandardError.ReadLine() + Environment.NewLine;
 
-                
 
                 using (var sw = new StreamWriter(HttpContext.Current.Server.MapPath("~/App_Data/build.log")))
                 {
                     sw.WriteLine($"Git Pull\n{output}");
                 }
+
                 if (output.Contains("error"))
                 {
                     throw new HttpException("Unable to pull repo\n" + output);
                 }
+
                 p.WaitForExit();
                 //TODO: Build each version (Beta, Release, Release 2) test
                 //methinks I'm gonna need to install VS for this
@@ -63,10 +61,10 @@ namespace BuildAutomation
             }
             catch (Exception e)
             {
-
                 using (var sw = new StreamWriter(HttpContext.Current.Server.MapPath("~/App_Data/error.log"), true))
                 {
-                    sw.WriteLine($"----------------------------------------------------------\n{DateTime.Now}\n{e.Message}\n{e.StackTrace}\n");
+                    sw.WriteLine(
+                        $"----------------------------------------------------------\n{DateTime.Now}\n{e.Message}\n{e.StackTrace}\n");
                     while (e.InnerException != null)
                     {
                         e = e.InnerException;

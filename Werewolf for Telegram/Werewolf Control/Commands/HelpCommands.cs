@@ -1,19 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using Database;
-using Newtonsoft.Json;
+using System.Threading;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.InlineKeyboardButtons;
 using Telegram.Bot.Types.ReplyMarkups;
 using Werewolf_Control.Attributes;
 using Werewolf_Control.Helpers;
-using System.Threading;
-using Telegram.Bot.Types.InlineKeyboardButtons;
 
 namespace Werewolf_Control
 {
@@ -22,7 +16,6 @@ namespace Werewolf_Control
         [Command(Trigger = "grouplist")]
         public static void GroupList(Update update, string[] args)
         {
-            
             //var reply = "";
             //using (var db = new WWContext())
             //{
@@ -44,20 +37,23 @@ namespace Werewolf_Control
             //now determine what languages are available in public groups.
             try
             {
-                string[] disabledLangs = new string[] { "فارسی" }; // Language bases of which no grouplist is accessible
-                var langs = PublicGroups.GetBaseLanguages().Where(x => !disabledLangs.Contains(x)); // do not fetch disabled langs
+                string[] disabledLangs = new string[] {"فارسی"}; // Language bases of which no grouplist is accessible
+                var langs = PublicGroups.GetBaseLanguages()
+                    .Where(x => !disabledLangs.Contains(x)); // do not fetch disabled langs
                 //create a menu out of this
-                List<InlineKeyboardCallbackButton> buttons = langs.OrderBy(x => x).Select(x => new InlineKeyboardCallbackButton(x, $"groups|{update.Message.From.Id}|{x}|null")).ToList();
+                List<InlineKeyboardCallbackButton> buttons = langs.OrderBy(x => x).Select(x =>
+                    new InlineKeyboardCallbackButton(x, $"groups|{update.Message.From.Id}|{x}|null")).ToList();
 
                 var baseMenu = new List<InlineKeyboardButton[]>();
                 for (var i = 0; i < buttons.Count; i++)
                 {
                     if (buttons.Count - 1 == i)
                     {
-                        baseMenu.Add(new[] { buttons[i] });
+                        baseMenu.Add(new[] {buttons[i]});
                     }
                     else
-                        baseMenu.Add(new[] { buttons[i], buttons[i + 1] });
+                        baseMenu.Add(new[] {buttons[i], buttons[i + 1]});
+
                     i++;
                 }
 
@@ -69,7 +65,8 @@ namespace Werewolf_Control
                         GetLocaleString("WhatLangGroup", GetLanguage(update.Message.From.Id)),
                         replyMarkup: menu).Result;
                     if (update.Message.Chat.Type != ChatType.Private)
-                        Send(GetLocaleString("SentPrivate", GetLanguage(update.Message.From.Id)), update.Message.Chat.Id);
+                        Send(GetLocaleString("SentPrivate", GetLanguage(update.Message.From.Id)),
+                            update.Message.Chat.Id);
                 }
                 catch
                 {
@@ -111,6 +108,7 @@ namespace Werewolf_Control
                 RequestPM(update.Message.Chat.Id);
                 return;
             }
+
             Thread.Sleep(300);
             reply = "/aboutDetective - Detective 🕵\n";
             reply += "/aboutAppS - Apprentice Seer 🙇\n";

@@ -30,11 +30,13 @@ namespace Werewolf_Website.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+
             AspNetUser aspNetUser = await db.AspNetUsers.FindAsync(id);
             if (aspNetUser == null)
             {
                 return HttpNotFound();
             }
+
             return View(aspNetUser);
         }
 
@@ -49,7 +51,10 @@ namespace Werewolf_Website.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create([Bind(Include = "Id,Email,EmailConfirmed,PasswordHash,SecurityStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEndDateUtc,LockoutEnabled,AccessFailedCount,UserName")] AspNetUser aspNetUser)
+        public async Task<ActionResult> Create(
+            [Bind(Include =
+                "Id,Email,EmailConfirmed,PasswordHash,SecurityStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEndDateUtc,LockoutEnabled,AccessFailedCount,UserName")]
+            AspNetUser aspNetUser)
         {
             if (ModelState.IsValid)
             {
@@ -68,11 +73,13 @@ namespace Werewolf_Website.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+
             AspNetUser aspNetUser = await db.AspNetUsers.FindAsync(id);
             if (aspNetUser == null)
             {
                 return HttpNotFound();
             }
+
             aspNetUser.SelectedRoles = aspNetUser.AspNetRoles.Select(x => x.Id);
             aspNetUser.Roles = db.AspNetRoles.ToList();
             return View(aspNetUser);
@@ -84,7 +91,10 @@ namespace Werewolf_Website.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit([Bind(Include = "Id,Email,EmailConfirmed,PasswordHash,SecurityStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEndDateUtc,LockoutEnabled,AccessFailedCount,UserName,SelectedRoles")]AspNetUser aspNetUser)
+        public async Task<ActionResult> Edit(
+            [Bind(Include =
+                "Id,Email,EmailConfirmed,PasswordHash,SecurityStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEndDateUtc,LockoutEnabled,AccessFailedCount,UserName,SelectedRoles")]
+            AspNetUser aspNetUser)
         {
             if (ModelState.IsValid)
             {
@@ -97,6 +107,7 @@ namespace Werewolf_Website.Controllers
                 await db.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
+
             ViewBag.RolesList = new MultiSelectList(db.AspNetRoles, "Id", "Name", aspNetUser.SelectedRoles);
             return View(aspNetUser);
         }
@@ -108,11 +119,13 @@ namespace Werewolf_Website.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+
             AspNetUser aspNetUser = await db.AspNetUsers.FindAsync(id);
             if (aspNetUser == null)
             {
                 return HttpNotFound();
             }
+
             return View(aspNetUser);
         }
 
@@ -133,6 +146,7 @@ namespace Werewolf_Website.Controllers
             {
                 db.Dispose();
             }
+
             base.Dispose(disposing);
         }
     }

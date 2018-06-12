@@ -17,6 +17,7 @@ namespace Telegram.Bot.Args
             ChosenInlineResult = chosenInlineResult;
         }
 
-        public static implicit operator ChosenInlineResultEventArgs(UpdateEventArgs e) => new ChosenInlineResultEventArgs(e.Update);
+        public static implicit operator ChosenInlineResultEventArgs(UpdateEventArgs e) =>
+            new ChosenInlineResultEventArgs(e.Update);
     }
 }

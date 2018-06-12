@@ -23,7 +23,7 @@
         <th>
             <!--kill-->
         </th>
-        
+
     </tr>
 
     @foreach (var item in Model)
@@ -42,10 +42,10 @@
                 @Html.DisplayFor(modelItem => item.State)
             </td>
             <td>
-                <a href='@Url.Action("Game","AdminApi",new {groupid = item.GroupId})' class='btn btn-default btn-xs btn-block'>View</a>
+                <a href='@Url.Action("Game", "AdminApi", new {groupid = item.GroupId})' class='btn btn-default btn-xs btn-block'>View</a>
             </td>
             <td>
-                
+
             </td>
         </tr>
     }

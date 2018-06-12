@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Telegram.Bot.Types.InlineKeyboardButtons;
 
 namespace Werewolf_Control.Models
@@ -13,6 +10,7 @@ namespace Werewolf_Control.Models
         /// The buttons you want in your menu
         /// </summary>
         public List<InlineKeyboardButton> Buttons { get; set; }
+
         /// <summary>
         /// How many columns.  Defaults to 1.
         /// </summary>

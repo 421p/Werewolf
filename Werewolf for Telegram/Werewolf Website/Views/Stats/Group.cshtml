@@ -1,7 +1,5 @@
-﻿
-@*<h2>@ViewBag.Title</h2>*@
+﻿@*<h2>@ViewBag.Title</h2>*@
 @*<h3>@ViewBag.Message</h3>*@
-
 
 
 <section>
@@ -34,7 +32,7 @@
         $("head").append(cssLink); //IE hack: append before setting href
 
         cssLink.attr({
-            rel:  "stylesheet",
+            rel: "stylesheet",
             type: "text/css",
             href: href
         });
@@ -43,6 +41,7 @@
         var global = false;
         var id = 0;
     };
+
     var id = @ViewBag.Id;
 
 
@@ -54,11 +53,11 @@
         dataType: 'json',
         data: { groupid: id },
         url: '/Stats/GroupStats/',
-        error: function (error) {
+        error: function(error) {
             console.log(error);
             $('#groupStats').html(error);
         },
-        success: function (d) {
+        success: function(d) {
             $('#groupStats').html(d);
 
         }

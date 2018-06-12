@@ -19,17 +19,18 @@ namespace Telegram.Bot.Converters
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             long val;
-            if (value is DateTime)
+            if (value is DateTime time)
             {
                 //val = (DateTime) value == DateTime.MinValue ? -62135596800L : ((DateTime)value).ToUnixTime();
-                val = (DateTime) value == DateTime.MinValue ? -62135596800L : new DateTimeOffset((DateTime)value).ToUnixTimeSeconds();
-
+                val = time == DateTime.MinValue
+                    ? -62135596800L
+                    : new DateTimeOffset(time).ToUnixTimeSeconds();
             }
             else
             {
                 throw new Exception("Expected date object value.");
             }
-            
+
             writer.WriteValue(val);
         }
 
@@ -42,12 +43,12 @@ namespace Telegram.Bot.Converters
         /// <param name="serializer">The calling serializer.</param>
         /// <returns>The object value.</returns>
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
-                                        JsonSerializer serializer)
+            JsonSerializer serializer)
         {
             if (reader.TokenType != JsonToken.Integer)
                 throw new Exception("Wrong Token Type");
 
-            var ticks = (long)reader.Value;
+            var ticks = (long) reader.Value;
 
 #if NET45
             return ticks.FromUnixTime();

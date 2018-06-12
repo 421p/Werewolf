@@ -5,11 +5,10 @@ using System.Web;
 
 namespace Werewolf_Website.Models
 {
-
     public class TcpRequest
     {
-
     }
+
     public class GetStatusInfo : TcpRequest
     {
         public string JType { get; set; } = "GetStatusInfo";

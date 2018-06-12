@@ -12,23 +12,23 @@
 		<script type="text/javascript" src="assets/js/view/demo.layerslider_slider.js"></script>
 *************************************************** **/
 
-	jQuery(document).ready(function() {
+jQuery(document).ready(function() {
 
-		if(jQuery(".layerslider").length > 0) {
-			_layersliderInit();
-		}
+    if (jQuery(".layerslider").length > 0) {
+        _layersliderInit();
+    }
 
-	});
+});
 
 
-	/**	_layersliderInit() 
-	******************************* **/
-	function _layersliderInit() {
-	
-		if(jQuery().layerSlider && jQuery("div.layerslider").length > 0) {
-			jQuery("div.layerslider").each(function() {
-				jQuery(this).layerSlider(layer_options);
-			});
-		}
+/**	_layersliderInit() 
+******************************* **/
+function _layersliderInit() {
 
-	}
+    if (jQuery().layerSlider && jQuery("div.layerslider").length > 0) {
+        jQuery("div.layerslider").each(function() {
+            jQuery(this).layerSlider(layer_options);
+        });
+    }
+
+}

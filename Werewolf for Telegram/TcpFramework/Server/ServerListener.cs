@@ -38,7 +38,11 @@ namespace TcpFramework.Server
 
         private void StartThread()
         {
-            if (_rxThread != null) { return; }
+            if (_rxThread != null)
+            {
+                return;
+            }
+
             _rxThread = new Thread(ListenerLoop) {IsBackground = true};
             _rxThread.Start();
         }
@@ -66,6 +70,7 @@ namespace TcpFramework.Server
 
                 Thread.Sleep(ReadLoopIntervalMs);
             }
+
             _listener.Stop();
         }
 

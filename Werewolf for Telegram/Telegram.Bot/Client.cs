@@ -15,29 +15,29 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineQueryResults;
 using Telegram.Bot.Types.Payments;
 using Telegram.Bot.Types.ReplyMarkups;
-
+using File = Telegram.Bot.Types.File;
 
 namespace Telegram.Bot
 {
-    public class Client
+    public sealed class Client
     {
         private const string BaseUrl = "https://api.telegram.org/bot";
         private const string BaseFileUrl = "https://api.telegram.org/file/bot";
-        public string LogDirectory;
+        private readonly string _logDirectory;
         private Status _status = Status.Normal;
-        private string LogPath => Path.Combine(LogDirectory, "getUpdates.log");
+        private string LogPath => Path.Combine(_logDirectory, "getUpdates.log");
         private readonly string _token;
         private bool _invalidToken;
 
         /// <summary>
         /// Timeout for uploading Files/Videos/Documents etc.
         /// </summary>
-        public TimeSpan UploadTimeout { get; set; } = TimeSpan.FromMinutes(1);
+        private TimeSpan UploadTimeout { get; set; } = TimeSpan.FromMinutes(1);
 
         /// <summary>
         /// Timeout for long-polling
         /// </summary>
-        public TimeSpan PollingTimeout { get; set; } = TimeSpan.FromSeconds(2);
+        private TimeSpan PollingTimeout { get; set; } = TimeSpan.FromSeconds(2);
 
         /// <summary>
         /// Indecates if receiving updates
@@ -47,20 +47,21 @@ namespace Telegram.Bot
         /// <summary>
         /// The current message offset
         /// </summary>
-        public int MessageOffset { get; set; }
+        private int MessageOffset { get; set; }
 
         #region Events
 
-        protected virtual void OnUpdatesReceived(UpdatesReceivedEventArgs e)
+        private void OnUpdatesReceived(UpdatesReceivedEventArgs e)
         {
             UpdatesReceived?.Invoke(this, e);
         }
-        protected virtual void OnStatusChanged(StatusChangeEventArgs e)
+
+        private void OnStatusChanged(StatusChangeEventArgs e)
         {
             StatusChanged?.Invoke(this, e);
         }
 
-        protected virtual void OnUpdateReceived(UpdateEventArgs e)
+        private void OnUpdateReceived(UpdateEventArgs e)
         {
             UpdateReceived?.Invoke(this, e);
 
@@ -84,7 +85,7 @@ namespace Telegram.Bot
             }
         }
 
-        protected virtual void OnReceiveError(ReceiveErrorEventArgs e)
+        private void OnReceiveError(ReceiveErrorEventArgs e)
         {
             ReceiveError?.Invoke(this, e);
         }
@@ -132,10 +133,11 @@ namespace Telegram.Bot
         /// Creat new Telegram Bot Api Client
         /// </summary>
         /// <param name="token">API token</param>
+        /// <param name="logDirectory"></param>
         /// <exception cref="ArgumentException">Thrown if <paramref name="token"/> format is invvalid</exception>
         public Client(string token, string logDirectory)
         {
-            LogDirectory = logDirectory;
+            _logDirectory = logDirectory;
             if (!Regex.IsMatch(token, @"^\d*:[\w\d-_]{35}$"))
                 throw new ArgumentException("Invalid token format", nameof(token));
 
@@ -207,7 +209,7 @@ namespace Telegram.Bot
 
                     if (updates.Length == 0)
                     {
-                       SetStatus(Status.NotReceiving);
+                        SetStatus(Status.NotReceiving);
                     }
                     else if (updates.Length == 100)
                     {
@@ -220,20 +222,19 @@ namespace Telegram.Bot
                     {
                         using (var s = new StreamWriter(LogPath, true))
                         {
-                            s.WriteLine($"{DateTime.Now} - {sw.Elapsed.ToString("g")} - {updates.Length}");
+                            s.WriteLine($"{DateTime.Now} - {sw.Elapsed:g} - {updates.Length}");
                             s.Flush();
                         }
                     }
                     finally
                     {
-                        
                     }
+
                     foreach (var update in updates)
                     {
                         OnUpdateReceived(new UpdateEventArgs(update));
                         MessageOffset = update.Id + 1;
                     }
-
                 }
                 catch (ApiRequestException e)
                 {
@@ -243,7 +244,7 @@ namespace Telegram.Bot
                     {
                         using (var s = new StreamWriter(LogPath, true))
                         {
-                            s.WriteLine($"{DateTime.Now} - {sw.Elapsed.ToString("g")} - {e.Message}");
+                            s.WriteLine($"{DateTime.Now} - {sw.Elapsed:g} - {e.Message}");
                             s.Flush();
                         }
                     }
@@ -260,7 +261,7 @@ namespace Telegram.Bot
                     {
                         using (var s = new StreamWriter(LogPath, true))
                         {
-                            s.WriteLine($"{DateTime.Now} - {sw.Elapsed.ToString("g")} - {e.Message}");
+                            s.WriteLine($"{DateTime.Now} - {sw.Elapsed:g} - {e.Message}");
                             s.Flush();
                         }
                     }
@@ -290,9 +291,7 @@ namespace Telegram.Bot
                     {
                         // do nothing
                     }
-                    
                 }
-
             }
         }
 #pragma warning restore AsyncFixer03 // Avoid fire & forget async void methods
@@ -404,7 +403,8 @@ namespace Telegram.Bot
             IReplyMarkup replyMarkup = null,
             ParseMode parseMode = ParseMode.Default)
             =>
-                SendTextMessageAsync(chatId.ToString(), text, disableWebPagePreview, disableNotification, replyToMessageId,
+                SendTextMessageAsync(chatId.ToString(), text, disableWebPagePreview, disableNotification,
+                    replyToMessageId,
                     replyMarkup, parseMode);
 
         /// <summary>
@@ -432,7 +432,8 @@ namespace Telegram.Bot
             if (parseMode != ParseMode.Default)
                 additionalParameters.Add("parse_mode", parseMode.ToModeString());
 
-            return SendMessageAsync(MessageType.TextMessage, chatId, text, disableNotification, replyToMessageId, replyMarkup,
+            return SendMessageAsync(MessageType.TextMessage, chatId, text, disableNotification, replyToMessageId,
+                replyMarkup,
                 additionalParameters);
         }
 
@@ -593,7 +594,8 @@ namespace Telegram.Bot
             int replyToMessageId = 0,
             IReplyMarkup replyMarkup = null)
             =>
-                SendAudioAsync(chatId.ToString(), audio, duration, performer, title, disableNotification, replyToMessageId,
+                SendAudioAsync(chatId.ToString(), audio, duration, performer, title, disableNotification,
+                    replyToMessageId,
                     replyMarkup);
 
         /// <summary>
@@ -608,7 +610,8 @@ namespace Telegram.Bot
         /// <param name="replyToMessageId">Optional. If the message is a reply, ID of the original message</param>
         /// <param name="replyMarkup">Optional. Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
         /// <returns>On success, the sent Message is returned.</returns>
-        public Task<Message> SendAudioAsync(string chatId, FileToSend audio, int duration, string performer, string title,
+        public Task<Message> SendAudioAsync(string chatId, FileToSend audio, int duration, string performer,
+            string title,
             bool disableNotification = false,
             int replyToMessageId = 0,
             IReplyMarkup replyMarkup = null)
@@ -641,7 +644,8 @@ namespace Telegram.Bot
             int replyToMessageId = 0,
             IReplyMarkup replyMarkup = null)
             =>
-                SendAudioAsync(chatId.ToString(), audio, duration, performer, title, disableNotification, replyToMessageId,
+                SendAudioAsync(chatId.ToString(), audio, duration, performer, title, disableNotification,
+                    replyToMessageId,
                     replyMarkup);
 
         /// <summary>
@@ -688,7 +692,8 @@ namespace Telegram.Bot
             int replyToMessageId = 0,
             IReplyMarkup replyMarkup = null)
             =>
-                SendContactAsync(chatId.ToString(), phoneNumber, firstName, lastName, disableNotification, replyToMessageId,
+                SendContactAsync(chatId.ToString(), phoneNumber, firstName, lastName, disableNotification,
+                    replyToMessageId,
                     replyMarkup);
 
         /// <summary>
@@ -702,7 +707,8 @@ namespace Telegram.Bot
         /// <param name="replyToMessageId">If the message is a reply, ID of the original message</param>
         /// <param name="replyMarkup">Additional interface options. A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
         /// <returns>On success, the sent Message is returned.</returns>
-        public Task<Message> SendContactAsync(string chatId, string phoneNumber, string firstName, string lastName = null,
+        public Task<Message> SendContactAsync(string chatId, string phoneNumber, string firstName,
+            string lastName = null,
             bool disableNotification = false,
             int replyToMessageId = 0,
             IReplyMarkup replyMarkup = null)
@@ -715,7 +721,8 @@ namespace Telegram.Bot
             if (!string.IsNullOrWhiteSpace(lastName))
                 parameters.Add("last_name", lastName);
 
-            return SendMessageAsync(MessageType.ContactMessage, chatId, phoneNumber, disableNotification, replyToMessageId,
+            return SendMessageAsync(MessageType.ContactMessage, chatId, phoneNumber, disableNotification,
+                replyToMessageId,
                 replyMarkup, parameters);
         }
 
@@ -733,7 +740,8 @@ namespace Telegram.Bot
             bool disableNotification = false,
             int replyToMessageId = 0,
             IReplyMarkup replyMarkup = null)
-            => SendDocumentAsync(chatId.ToString(), document, caption, disableNotification, replyToMessageId, replyMarkup);
+            => SendDocumentAsync(chatId.ToString(), document, caption, disableNotification, replyToMessageId,
+                replyMarkup);
 
         /// <summary>
         /// Use this method to send general files. On success, the sent Message is returned. Bots can send files of any type of up to 50 MB in size.
@@ -755,7 +763,8 @@ namespace Telegram.Bot
                 {"caption", caption}
             };
 
-            return SendMessageAsync(MessageType.DocumentMessage, chatId, document, disableNotification, replyToMessageId,
+            return SendMessageAsync(MessageType.DocumentMessage, chatId, document, disableNotification,
+                replyToMessageId,
                 replyMarkup, additionalParameters);
         }
 
@@ -774,7 +783,8 @@ namespace Telegram.Bot
             bool disableNotification = false,
             int replyToMessageId = 0,
             IReplyMarkup replyMarkup = null)
-            => SendDocumentAsync(chatId.ToString(), document, caption, disableNotification, replyToMessageId, replyMarkup);
+            => SendDocumentAsync(chatId.ToString(), document, caption, disableNotification, replyToMessageId,
+                replyMarkup);
 
         /// <summary>
         /// Use this method to send general files. On success, the sent Message is returned. Bots can send files of any type of up to 50 MB in size.
@@ -796,7 +806,8 @@ namespace Telegram.Bot
                 {"caption", caption}
             };
 
-            return SendMessageAsync(MessageType.DocumentMessage, chatId, document, disableNotification, replyToMessageId,
+            return SendMessageAsync(MessageType.DocumentMessage, chatId, document, disableNotification,
+                replyToMessageId,
                 replyMarkup, additionalParameters);
         }
 
@@ -887,7 +898,8 @@ namespace Telegram.Bot
             int replyToMessageId = 0,
             IReplyMarkup replyMarkup = null)
             =>
-                SendVenueAsync(chatId.ToString(), latitude, longitude, title, address, foursquareId, disableNotification,
+                SendVenueAsync(chatId.ToString(), latitude, longitude, title, address, foursquareId,
+                    disableNotification,
                     replyToMessageId, replyMarkup);
 
         /// <summary>
@@ -903,7 +915,8 @@ namespace Telegram.Bot
         /// <param name="replyToMessageId">Optional. If the message is a reply, ID of the original message</param>
         /// <param name="replyMarkup">Optional. Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.</param>
         /// <returns>On success, the sent Message is returned.</returns>
-        public Task<Message> SendVenueAsync(string chatId, float latitude, float longitude, string title, string address,
+        public Task<Message> SendVenueAsync(string chatId, float latitude, float longitude, string title,
+            string address,
             string foursquareId = null,
             bool disableNotification = false,
             int replyToMessageId = 0,
@@ -1107,7 +1120,8 @@ namespace Telegram.Bot
             bool disableNotification = false,
             int replyToMessageId = 0,
             IReplyMarkup replyMarkup = null)
-            => SendLocationAsync(chatId.ToString(), latitude, longitude, disableNotification, replyToMessageId, replyMarkup);
+            => SendLocationAsync(chatId.ToString(), latitude, longitude, disableNotification, replyToMessageId,
+                replyMarkup);
 
         /// <summary>
         /// Use this method to send point on the map. On success, the sent Message is returned.
@@ -1129,7 +1143,8 @@ namespace Telegram.Bot
                 {"longitude", longitude},
             };
 
-            return SendMessageAsync(MessageType.LocationMessage, chatId, latitude, disableNotification, replyToMessageId,
+            return SendMessageAsync(MessageType.LocationMessage, chatId, latitude, disableNotification,
+                replyToMessageId,
                 replyMarkup, additionalParameters);
         }
 
@@ -1168,7 +1183,8 @@ namespace Telegram.Bot
         /// </summary>
         /// <param name="chatId">Unique identifier for the target chat</param>
         /// <returns>On success, returns an Array of ChatMember objects that contains information about all chat administrators except other bots. If the chat is a group or a supergroup and no administrators were appointed, only the creator will be returned.</returns>
-        public Task<ChatMember[]> GetChatAdministratorsAsync(long chatId) => GetChatAdministratorsAsync(chatId.ToString());
+        public Task<ChatMember[]> GetChatAdministratorsAsync(long chatId) =>
+            GetChatAdministratorsAsync(chatId.ToString());
 
         /// <summary>
         /// Use this method to get a list of administrators in a chat.
@@ -1179,7 +1195,7 @@ namespace Telegram.Bot
         {
             var parameters = new Dictionary<string, object>
             {
-                {"chat_id", chatId }
+                {"chat_id", chatId}
             };
 
             return SendWebRequestAsync<ChatMember[]>("getChatAdministrators", parameters);
@@ -1201,7 +1217,7 @@ namespace Telegram.Bot
         {
             var parameters = new Dictionary<string, object>
             {
-                {"chat_id", chatId }
+                {"chat_id", chatId}
             };
 
             return SendWebRequestAsync<int>("getChatMembersCount", parameters);
@@ -1213,7 +1229,8 @@ namespace Telegram.Bot
         /// <param name="chatId">Unique identifier for the target chat</param>
         /// <param name="userId">Unique identifier of the target user</param>
         /// <returns>Returns a ChatMember object on success.</returns>
-        public Task<ChatMember> GetChatMemberAsync(long chatId, int userId) => GetChatMemberAsync(chatId.ToString(), userId);
+        public Task<ChatMember> GetChatMemberAsync(long chatId, int userId) =>
+            GetChatMemberAsync(chatId.ToString(), userId);
 
         /// <summary>
         /// Use this method to get information about a member of a chat.
@@ -1225,7 +1242,7 @@ namespace Telegram.Bot
         {
             var parameters = new Dictionary<string, object>
             {
-                {"chat_id", chatId },
+                {"chat_id", chatId},
                 {"user_id", userId}
             };
 
@@ -1248,7 +1265,7 @@ namespace Telegram.Bot
         {
             var parameters = new Dictionary<string, object>
             {
-                {"chat_id", chatId }
+                {"chat_id", chatId}
             };
 
             return SendWebRequestAsync<Chat>("getChat", parameters);
@@ -1270,7 +1287,7 @@ namespace Telegram.Bot
         {
             var parameters = new Dictionary<string, object>
             {
-                {"chat_id", chatId }
+                {"chat_id", chatId}
             };
 
             return SendWebRequestAsync<bool>("leaveChat", parameters);
@@ -1282,7 +1299,8 @@ namespace Telegram.Bot
         /// <param name="chatId">Unique identifier for the target group</param>
         /// <param name="userId">Unique identifier of the target user</param>
         /// <returns>True on success.</returns>
-        public Task<bool> KickChatMemberAsync(long chatId, int userId) => KickChatMemberAsync(chatId.ToString(), userId);
+        public Task<bool> KickChatMemberAsync(long chatId, int userId) =>
+            KickChatMemberAsync(chatId.ToString(), userId);
 
         /// <summary>
         /// Use this method to kick a user from a group or a supergroup. In the case of supergroups, the user will not be able to return to the group on their own using invite links, etc., unless unbanned first. The bot must be an administrator in the group for this to work.
@@ -1307,7 +1325,8 @@ namespace Telegram.Bot
         /// <param name="chatId">Unique identifier for the target group</param>
         /// <param name="userId">Unique identifier of the target user</param>
         /// <returns>True on success.</returns>
-        public Task<bool> UnbanChatMemberAsync(long chatId, int userId) => UnbanChatMemberAsync(chatId.ToString(), userId);
+        public Task<bool> UnbanChatMemberAsync(long chatId, int userId) =>
+            UnbanChatMemberAsync(chatId.ToString(), userId);
 
         /// <summary>
         /// Use this method to unban a previously kicked user in a supergroup. The user will not return to the group automatically, but will be able to join via link, etc. The bot must be an administrator in the group for this to work. 
@@ -1332,8 +1351,8 @@ namespace Telegram.Bot
         {
             var parameters = new Dictionary<string, object>
             {
-                {"chat_id", chatid },
-                {"message_id", msgid }
+                {"chat_id", chatid},
+                {"message_id", msgid}
             };
 
             return SendWebRequestAsync<bool>("deleteMessage", parameters);
@@ -1368,14 +1387,14 @@ namespace Telegram.Bot
         /// <param name="fileId">File identifier</param>
         /// <param name="destination">The destination stream</param>
         /// <returns>The File object. If destination is empty stream ist embedded in the File Object</returns>
-        public async Task<Types.File> GetFileAsync(string fileId, Stream destination = null)
+        public async Task<File> GetFileAsync(string fileId, Stream destination = null)
         {
             var parameters = new Dictionary<string, object>
             {
                 {"file_id", fileId}
             };
 
-            var fileInfo = await SendWebRequestAsync<Types.File>("getFile", parameters).ConfigureAwait(false);
+            var fileInfo = await SendWebRequestAsync<File>("getFile", parameters).ConfigureAwait(false);
 
             var fileUri = new Uri(BaseFileUrl + _token + "/" + fileInfo.FilePath);
 
@@ -1388,7 +1407,7 @@ namespace Telegram.Bot
                     var response =
                         await
                             downloader.GetAsync(fileUri, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false)
-                    )
+                )
                 {
                     await response.Content.CopyToAsync(destination).ConfigureAwait(false);
                     destination.Position = 0;
@@ -1413,7 +1432,8 @@ namespace Telegram.Bot
         /// <param name="switchPmText">If passed, clients will display a button with specified text that switches the user to a private chat with the bot and sends the bot a start message with the parameter switch_pm_parameter</param>
         /// <param name="switchPmParameter">Parameter for the start message sent to the bot when user presses the switch button</param>
         /// <returns>On success, True is returned.</returns>
-        public Task<bool> AnswerInlineQueryAsync(string inlineQueryId, InlineQueryResult[] results, int? cacheTime = null,
+        public Task<bool> AnswerInlineQueryAsync(string inlineQueryId, InlineQueryResult[] results,
+            int? cacheTime = null,
             bool isPersonal = false, string nextOffset = null, string switchPmText = null,
             string switchPmParameter = null)
         {
@@ -1475,7 +1495,8 @@ namespace Telegram.Bot
         /// <param name="replyMarkup">A JSON-serialized object for an inline keyboard.</param>
         /// <returns>On success, the edited Message is returned.</returns>
         public Task<Message> EditMessageTextAsync(long chatId, int messageId, string text,
-            ParseMode parseMode = ParseMode.Default, bool disableWebPagePreview = false, IReplyMarkup replyMarkup = null)
+            ParseMode parseMode = ParseMode.Default, bool disableWebPagePreview = false,
+            IReplyMarkup replyMarkup = null)
             => EditMessageTextAsync(chatId.ToString(), messageId, text, parseMode, disableWebPagePreview, replyMarkup);
 
         /// <summary>
@@ -1489,7 +1510,8 @@ namespace Telegram.Bot
         /// <param name="replyMarkup">A JSON-serialized object for an inline keyboard.</param>
         /// <returns>On success, the edited Message is returned.</returns>
         public Task<Message> EditMessageTextAsync(string chatId, int messageId, string text,
-            ParseMode parseMode = ParseMode.Default, bool disableWebPagePreview = false, IReplyMarkup replyMarkup = null)
+            ParseMode parseMode = ParseMode.Default, bool disableWebPagePreview = false,
+            IReplyMarkup replyMarkup = null)
         {
             var parameters = new Dictionary<string, object>
             {
@@ -1516,7 +1538,8 @@ namespace Telegram.Bot
         /// <param name="replyMarkup">A JSON-serialized object for an inline keyboard.</param>
         /// <returns>On success, the edited Message is returned.</returns>
         public Task<Message> EditInlineMessageTextAsync(string inlineMessageId, string text,
-            ParseMode parseMode = ParseMode.Default, bool disableWebPagePreview = false, IReplyMarkup replyMarkup = null)
+            ParseMode parseMode = ParseMode.Default, bool disableWebPagePreview = false,
+            IReplyMarkup replyMarkup = null)
         {
             var parameters = new Dictionary<string, object>
             {
@@ -1705,7 +1728,8 @@ namespace Telegram.Bot
             if (isFlexible)
                 parameters.Add("is_flexible", true);
 
-            return SendMessageAsync(MessageType.Invoice, chatId, title, disableNotification, replyToMessageId, replyMarkup, parameters);
+            return SendMessageAsync(MessageType.Invoice, chatId, title, disableNotification, replyToMessageId,
+                replyMarkup, parameters);
         }
 
         /// <summary>
@@ -1847,10 +1871,10 @@ namespace Telegram.Bot
                                 //    client.Timeout = TimeSpan.FromSeconds((int) parameter.Value + 1);
                                 //}
 
-                                if (parameter.Value is FileToSend)
+                                if (parameter.Value is FileToSend send)
                                 {
                                     client.Timeout = UploadTimeout;
-                                    form.Add(content, parameter.Key, ((FileToSend) parameter.Value).Filename);
+                                    form.Add(content, parameter.Key, send.Filename);
                                 }
                                 else
                                     form.Add(content, parameter.Key);
@@ -1883,8 +1907,6 @@ namespace Telegram.Bot
                 {
                     error = e.Message;
                 }
-
-
 #if !NETSTANDARD1_3
                 catch (UnsupportedMediaTypeException)
                 {
@@ -1899,7 +1921,7 @@ namespace Telegram.Bot
                 //TODO: catch more exceptions
 
                 if (responseObject == null)
-                    responseObject = new ApiResponse<T> { Ok = false, Message = "No response received: " + error };
+                    responseObject = new ApiResponse<T> {Ok = false, Message = "No response received: " + error};
 
                 if (!responseObject.Ok)
                     throw new ApiRequestException(responseObject.Message, responseObject.Code);
@@ -1918,9 +1940,9 @@ namespace Telegram.Bot
                 case "Int32":
                     return new StringContent(value.ToString());
                 case "Boolean":
-                    return new StringContent((bool)value ? "true" : "false");
+                    return new StringContent((bool) value ? "true" : "false");
                 case "FileToSend":
-                    return new StreamContent(((FileToSend)value).Content);
+                    return new StreamContent(((FileToSend) value).Content);
                 default:
                     var settings = new JsonSerializerSettings
                     {
@@ -1932,7 +1954,5 @@ namespace Telegram.Bot
         }
 
         #endregion
-
-
     }
 }

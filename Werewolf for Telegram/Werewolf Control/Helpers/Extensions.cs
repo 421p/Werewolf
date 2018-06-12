@@ -1,10 +1,8 @@
-﻿using Database;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
+using Database;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineKeyboardButtons;
@@ -29,6 +27,7 @@ namespace Werewolf_Control.Helpers
         {
             return str?.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;").Replace("\"", "&quot;");
         }
+
         public static void Shuffle<T>(this IList<T> list)
         {
             RNGCryptoServiceProvider provider = new RNGCryptoServiceProvider();
@@ -126,9 +125,11 @@ namespace Werewolf_Control.Helpers
         public static string[] GetParameters(this Message m)
         {
             var input = m.Text;
-            if (String.IsNullOrEmpty(input)) return new[] { "", "" };
+            if (String.IsNullOrEmpty(input)) return new[] {"", ""};
             // ReSharper disable StringIndexOfIsCultureSpecific.1  -- It's a space, I don't care about culture.
-            var result = input.Contains(" ") ? new[] { input.Substring(1, input.IndexOf(" ")).Trim(), input.Substring(input.IndexOf(" ") + 1) } : new[] { input.Substring(1).Trim(), null };
+            var result = input.Contains(" ")
+                ? new[] {input.Substring(1, input.IndexOf(" ")).Trim(), input.Substring(input.IndexOf(" ") + 1)}
+                : new[] {input.Substring(1).Trim(), null};
             result[0] = result[0].Replace("@" + Bot.Me.Username, "");
             return result;
         }
@@ -146,10 +147,12 @@ namespace Werewolf_Control.Helpers
                 var userid = m.ForwardFrom?.Id ?? m.From.Id;
                 return db.Players.FirstOrDefault(x => x.TelegramId == userid) ?? sourceUser;
             }
+
             if (String.IsNullOrWhiteSpace(args))
             {
                 return sourceUser;
             }
+
             //check for a user mention
             var mention = message?.Entities.FirstOrDefault(x => x.Type == MessageEntityType.Mention);
             var textmention = message?.Entities.FirstOrDefault(x => x.Type == MessageEntityType.TextMention);
@@ -160,13 +163,14 @@ namespace Werewolf_Control.Helpers
                 if (!int.TryParse(args, out id))
                     username = args;
             }
-            
+
             if (mention != null)
                 username = message.Text.Substring(mention.Offset + 1, mention.Length - 1);
             else if (textmention != null)
             {
                 id = textmention.User.Id;
             }
+
             Player result = null;
             if (!String.IsNullOrEmpty(username) && id == 0)
                 result = db.Players.FirstOrDefault(
@@ -175,9 +179,10 @@ namespace Werewolf_Control.Helpers
                 result = db.Players.FirstOrDefault(x => x.TelegramId == id);
             else
                 result = db.Players.FirstOrDefault(
-                        x =>
-                            String.Equals(x.TelegramId.ToString(), args, StringComparison.InvariantCultureIgnoreCase) ||
-                            String.Equals(x.UserName?? "", args.Replace("@", ""), StringComparison.InvariantCultureIgnoreCase));
+                    x =>
+                        String.Equals(x.TelegramId.ToString(), args, StringComparison.InvariantCultureIgnoreCase) ||
+                        String.Equals(x.UserName ?? "", args.Replace("@", ""),
+                            StringComparison.InvariantCultureIgnoreCase));
             return result ?? sourceUser;
         }
 
@@ -201,10 +206,12 @@ namespace Werewolf_Control.Helpers
                     i++;
                     if (i == menu.Buttons.Count) break;
                 } while (i % (col + 1) != 0);
+
                 i--;
                 final.Add(row.ToArray());
                 if (i == menu.Buttons.Count) break;
             }
+
             return new InlineKeyboardMarkup(final.ToArray());
         }
     }

@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Telegram.Bot.Types;
 
 namespace Werewolf_Control.Models
 {
@@ -68,27 +63,83 @@ namespace Werewolf_Control.Models
     }
 
 
-
     public enum IRole
     {
-        Villager, Drunk, Harlot, Seer, Traitor, GuardianAngel, Detective, Wolf, Cursed, Gunner, Tanner, Fool, WildChild, Beholder, ApprenticeSeer, Cultist, CultistHunter, Mason, Doppelgänger, Cupid, Hunter, SerialKiller,
+        Villager,
+        Drunk,
+        Harlot,
+        Seer,
+        Traitor,
+        GuardianAngel,
+        Detective,
+        Wolf,
+        Cursed,
+        Gunner,
+        Tanner,
+        Fool,
+        WildChild,
+        Beholder,
+        ApprenticeSeer,
+        Cultist,
+        CultistHunter,
+        Mason,
+        Doppelgänger,
+        Cupid,
+        Hunter,
+        SerialKiller,
+
         //new roles
-        Sorcerer, AlphaWolf, WolfCub, Blacksmith, ClumsyGuy, Mayor, Prince,
+        Sorcerer,
+        AlphaWolf,
+        WolfCub,
+        Blacksmith,
+        ClumsyGuy,
+        Mayor,
+        Prince,
+
         //more new roles, from april fools.....
-        Lycan, Pacifist, WiseElder, Oracle, Sandman, WolfMan, Thief
+        Lycan,
+        Pacifist,
+        WiseElder,
+        Oracle,
+        Sandman,
+        WolfMan,
+        Thief
     }
 
     public enum ITeam
     {
-        Village, Cult, Wolf, Tanner,
-        Neutral, SerialKiller, Lovers,
+        Village,
+        Cult,
+        Wolf,
+        Tanner,
+        Neutral,
+        SerialKiller,
+        Lovers,
         SKHunter,
         NoOne
     }
 
     public enum KillMthd
     {
-        None, Lynch, Eat, Shoot, VisitWolf, VisitVictim, GuardWolf, Detected, Flee, Hunt, HunterShot, LoverDied, SerialKilled, HunterCult, GuardKiller, VisitKiller, Idle, Suicide
+        None,
+        Lynch,
+        Eat,
+        Shoot,
+        VisitWolf,
+        VisitVictim,
+        GuardWolf,
+        Detected,
+        Flee,
+        Hunt,
+        HunterShot,
+        LoverDied,
+        SerialKilled,
+        HunterCult,
+        GuardKiller,
+        VisitKiller,
+        Idle,
+        Suicide
     }
 
     public class QuestionAsked

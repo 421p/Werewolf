@@ -9,15 +9,15 @@
     <div class="col-md-12">
 
         <!--
-            PANEL CLASSES:
-                panel-default
-                panel-danger
-                panel-warning
-                panel-info
-                panel-success
+        PANEL CLASSES:
+        panel-default
+        panel-danger
+        panel-warning
+        panel-info
+        panel-success
 
-            INFO: 	panel collapse - stored on user localStorage (handled by app.js _panels() function).
-                    All pannels should have an unique ID or the panel collapse status will not be stored!
+        INFO: 	panel collapse - stored on user localStorage (handled by app.js _panels() function).
+        All pannels should have an unique ID or the panel collapse status will not be stored!
         -->
         <div id="panel-2" class="panel panel-default">
             <div class="panel-heading">
@@ -57,7 +57,6 @@
                 </div>
 
 
-
             </div>
             <!-- /tabs content -->
 
@@ -70,15 +69,11 @@
 </div>
 
 
-
-
-
-
 <script>
     var nodeId = '@ViewBag.ClientId';
     var grpId = '@ViewBag.GroupId';
     $(document)
-        .ready(function () {
+        .ready(function() {
             updateNodeInfo();
             //console.log('setting interval');
             //setInterval(updateNodeInfo,2000);
@@ -92,7 +87,7 @@
             type: "GET",
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
-            data: {clientid: nodeId, groupid: grpId},
+            data: { clientid: nodeId, groupid: grpId },
             url: '/AdminApi/GetGameInfo',
             error: function(error) {
                 updateNodeInfo();
@@ -103,15 +98,24 @@
                 $('#title').html(d.ChatGroup + " - " + d.Cycle + " - " + d.State);
                 $.each(d.Players,
                     function(index, value) {
-                        addRow(t, value.Id, value.Name, value.PlayerRole, value.IsDead, value.Choice, value.Votes, value.CurrentQuestion, value.LoverId, value.DonationLevel);
+                        addRow(t,
+                            value.Id,
+                            value.Name,
+                            value.PlayerRole,
+                            value.IsDead,
+                            value.Choice,
+                            value.Votes,
+                            value.CurrentQuestion,
+                            value.LoverId,
+                            value.DonationLevel);
                     });
                 updateNodeInfo();
             }
         });
     };
 
-    addRow = function (table, id, name, role, dead, choice, votes, question, lover, donation) {
-        
+    addRow = function(table, id, name, role, dead, choice, votes, question, lover, donation) {
+
         table.find('tbody')
             .append($('<tr>')
                 .append($('<td>').append(id))

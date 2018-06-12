@@ -47,7 +47,10 @@ namespace TcpFramework
 
         private void StartRxThread()
         {
-            if (_rxThread != null) { return; }
+            if (_rxThread != null)
+            {
+                return;
+            }
 
             _rxThread = new Thread(ListenerLoop) {IsBackground = true};
             _rxThread.Start();
@@ -55,7 +58,11 @@ namespace TcpFramework
 
         public SimpleTcpClient Disconnect()
         {
-            if (_client == null) { return this; }
+            if (_client == null)
+            {
+                return this;
+            }
+
             _client.Close();
             _client = null;
             return this;
@@ -84,8 +91,15 @@ namespace TcpFramework
 
         private void RunLoopStep()
         {
-            if (_client == null) { return; }
-            if (_client.Connected == false) { return; }
+            if (_client == null)
+            {
+                return;
+            }
+
+            if (_client.Connected == false)
+            {
+                return;
+            }
 
             var delimiter = Delimiter;
             var c = _client;
@@ -96,6 +110,7 @@ namespace TcpFramework
                 Thread.Sleep(10);
                 return;
             }
+
             //_queuedMsg.Clear();
             List<byte> bytesReceived = new List<byte>();
 
@@ -121,6 +136,7 @@ namespace TcpFramework
                 {
                     _queuedMsg.AddRange(nextByte);
                 }
+
                 //Thread.Sleep(75);
                 //byte[] nextByte = new byte[1];
                 //c.Client.Receive(nextByte, 0, 1, SocketFlags.None);
@@ -159,23 +175,35 @@ namespace TcpFramework
 
         public void Write(byte[] data)
         {
-            if (_client == null) { throw new Exception("Cannot send data to a null TcpClient (check to see if Connect was called)"); }
+            if (_client == null)
+            {
+                throw new Exception("Cannot send data to a null TcpClient (check to see if Connect was called)");
+            }
+
             _client.ReceiveBufferSize = Int32.MaxValue;
             _client.GetStream().Write(data, 0, data.Length);
         }
 
         public void Write(string data)
         {
-            if (data == null) { return; }
+            if (data == null)
+            {
+                return;
+            }
+
             Write(StringEncoder.GetBytes(data));
         }
 
         public void WriteLine(string data)
         {
-            if (string.IsNullOrEmpty(data)) { return; }
+            if (string.IsNullOrEmpty(data))
+            {
+                return;
+            }
+
             if (data.LastOrDefault() != Delimiter)
             {
-                Write(data + StringEncoder.GetString(new[] { Delimiter }));
+                Write(data + StringEncoder.GetString(new[] {Delimiter}));
             }
             else
             {
@@ -199,6 +227,7 @@ namespace TcpFramework
                 {
                     Thread.Sleep(10);
                 }
+
                 sw.Stop();
                 sw = null;
             }
@@ -206,15 +235,16 @@ namespace TcpFramework
             {
                 DataReceived -= handler;
             }
+
             return mReply;
         }
 
         public void ReplyReceived(object s, string e)
         {
-            
         }
 
         #region IDisposable Support
+
         private bool _disposedValue; // To detect redundant calls
 
         protected virtual void Dispose(bool disposing)
@@ -224,7 +254,6 @@ namespace TcpFramework
                 if (disposing)
                 {
                     // TODO: dispose managed state (managed objects).
-
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
@@ -240,6 +269,7 @@ namespace TcpFramework
                     {
                         // ignored
                     }
+
                     _client = null;
                 }
 
@@ -261,6 +291,7 @@ namespace TcpFramework
             // TODO: uncomment the following line if the finalizer is overridden above.
             // GC.SuppressFinalize(this);
         }
+
         #endregion
     }
 }

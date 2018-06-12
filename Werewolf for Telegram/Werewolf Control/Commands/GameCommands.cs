@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using Database;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -50,6 +47,7 @@ namespace Werewolf_Control
                     Send(GetLocaleString("JoinFromGroup", GetLanguage(update.Message.From.Id)), id);
                     return;
                 }
+
                 //check nodes to see if player is in a game
                 var node = GetPlayerNode(update.Message.From.Id);
                 var game = GetGroupNodeAndGame(update.Message.Chat.Id);
@@ -58,6 +56,7 @@ namespace Werewolf_Control
                     Thread.Sleep(50);
                     game = GetGroupNodeAndGame(update.Message.Chat.Id);
                 }
+
                 if (game == null)
                 {
                     Thread.Sleep(50);
@@ -75,7 +74,8 @@ namespace Werewolf_Control
                         {
                             //player is already in a game (in another group), and alive
                             var grp = db.Groups.FirstOrDefault(x => x.GroupId == id);
-                            Send(GetLocaleString("AlreadyInGame", grp?.Language ?? "English", game.ChatGroup.ToBold()), update.Message.Chat.Id);
+                            Send(GetLocaleString("AlreadyInGame", grp?.Language ?? "English", game.ChatGroup.ToBold()),
+                                update.Message.Chat.Id);
                             return;
                         }
                         else
@@ -90,9 +90,12 @@ namespace Werewolf_Control
 
                     game?.ShowJoinButton();
                     if (game == null)
-                        Program.Log($"{update.Message.From.FirstName} tried to join a game on node {node?.ClientId}, but game object was null", true);
+                        Program.Log(
+                            $"{update.Message.From.FirstName} tried to join a game on node {node?.ClientId}, but game object was null",
+                            true);
                     return;
                 }
+
                 if (game == null)
                 {
                     var grp = db.Groups.FirstOrDefault(x => x.GroupId == id);
@@ -102,6 +105,7 @@ namespace Werewolf_Control
                         db.Groups.Add(grp);
                         db.SaveChanges();
                     }
+
                     Send(GetLocaleString("NoGame", grp?.Language ?? "English"), id);
                 }
             }
@@ -132,7 +136,6 @@ namespace Werewolf_Control
                     Send(GetLocaleString("NoGame", grp.Language), id);
                 }
             }
-
         }
 
         [Command(Trigger = "players", Blockable = true, InGroupOnly = true)]
@@ -149,7 +152,6 @@ namespace Werewolf_Control
             {
                 game.ShowPlayers();
             }
-
         }
 
         [Command(Trigger = "flee", Blockable = true, InGroupOnly = true)]
@@ -172,6 +174,7 @@ namespace Werewolf_Control
 
                     return;
                 }
+
                 if (node != null)
                 {
                     //there is a game, but this player is not in it
@@ -192,9 +195,10 @@ namespace Werewolf_Control
             //check nodes to see if player is in a game
             var node = GetPlayerNode(update.Message.From.Id);
             var game = GetGroupNodeAndGame(update.Message.Chat.Id);
-            
 
-            if (game == null) //if this doesn't work, you'll have to get the game as node.Games.FirstOrDefault(x => x.GroupId == update.Message.Chat.Id) in the second else if block
+
+            if (game == null
+            ) //if this doesn't work, you'll have to get the game as node.Games.FirstOrDefault(x => x.GroupId == update.Message.Chat.Id) in the second else if block
                 Send(GetLocaleString("NoGame", GetLanguage(id)), id);
             else if (game != null && node == null && !isadmin) //there is a game, but this player is not in it
                 Send(GetLocaleString("NotPlaying", GetLanguage(id)), id);
@@ -202,7 +206,8 @@ namespace Werewolf_Control
             {
                 int seconds = int.TryParse(args[1], out seconds) ? seconds : 30;
                 if (seconds < 0 && !isadmin)
-                    Send(GetLocaleString("GroupAdminOnly", GetLanguage(id)), id); //otherwise we're allowing people to /forcestart
+                    Send(GetLocaleString("GroupAdminOnly", GetLanguage(id)),
+                        id); //otherwise we're allowing people to /forcestart
                 else
                     using (var db = new WWContext())
                     {
@@ -210,12 +215,13 @@ namespace Werewolf_Control
                         if (isadmin || (grp.HasFlag(GroupConfig.AllowExtend)))
                         {
                             int maxextend = grp.MaxExtend ?? Settings.MaxExtend;
-                            seconds = Math.Abs(seconds) > maxextend ? maxextend * Math.Sign(seconds) : seconds ;
+                            seconds = Math.Abs(seconds) > maxextend ? maxextend * Math.Sign(seconds) : seconds;
                             game?.ExtendTime(update.Message.From.Id, isadmin, seconds);
                         }
                         else
                             Send(GetLocaleString("GroupAdminOnly", GetLanguage(id)), id);
                     }
+
                 return;
             }
         }
@@ -230,7 +236,8 @@ namespace Werewolf_Control
                 groupid = update.Message.Chat.Id;
                 groupname = update.Message.Chat.Title;
             }
-            else if (args.Length >= 2 && !String.IsNullOrEmpty(args[1])) {
+            else if (args.Length >= 2 && !String.IsNullOrEmpty(args[1]))
+            {
                 using (var db = new WWContext())
                 {
                     var grp = GetGroup(args[1], db);
@@ -246,9 +253,11 @@ namespace Werewolf_Control
             }
 
             using (var db = new WWContext())
-                db.Database.ExecuteSqlCommand($"DELETE FROM NotifyGame WHERE GroupId = {groupid} AND UserId = {update.Message.From.Id}");
+                db.Database.ExecuteSqlCommand(
+                    $"DELETE FROM NotifyGame WHERE GroupId = {groupid} AND UserId = {update.Message.From.Id}");
 
-            Send(GetLocaleString("DeletedFromWaitList", GetLanguage(update.Message.From.Id), groupname.ToBold()), update.Message.From.Id);
+            Send(GetLocaleString("DeletedFromWaitList", GetLanguage(update.Message.From.Id), groupname.ToBold()),
+                update.Message.From.Id);
         }
     }
 }

@@ -1,18 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Telegram.Bot.Types;
-using System.IO;
 using System.Net;
 using Database;
+using Telegram.Bot.Types;
 
 namespace Werewolf_Node.Helpers
 {
     public static class ImageHelper
     {
         internal static string ImagePath = @"c:\inetpub\werewolf\Images\";
+
         public static async void GetUserImage(int userid)
         {
             using (var db = new WWContext())
@@ -23,7 +20,7 @@ namespace Werewolf_Node.Helpers
                     try
                     {
                         var photos = await Program.Bot.GetUserProfilePhotosAsync(userid, limit: 1);
-                        if (photos.Photos.Length == 0) return;//nada
+                        if (photos.Photos.Length == 0) return; //nada
                         var sizes = photos.Photos[0];
                         var id = "";
                         var largest = 0;
@@ -31,7 +28,6 @@ namespace Werewolf_Node.Helpers
                         {
                             if (s.FileSize > largest)
                                 id = s.FileId;
-
                         }
 
                         if (String.IsNullOrEmpty(id))
@@ -40,7 +36,7 @@ namespace Werewolf_Node.Helpers
                         }
 
 
-                        Telegram.Bot.Types.File file;
+                        File file;
 
                         file = await Program.Bot.GetFileAsync(id);
 
@@ -59,11 +55,10 @@ namespace Werewolf_Node.Helpers
                             {
                                 // ignored
                             }
+
                         var uri = $"https://api.telegram.org/file/bot{Program.APIToken}/{photoPath}";
 
                         //write the new info to the database
-
-
 
 
                         //now download the photo to the path
@@ -71,6 +66,7 @@ namespace Werewolf_Node.Helpers
                         {
                             client.DownloadFile(new Uri(uri), ImagePath + fileName);
                         }
+
                         p.ImageFile = fileName;
                         db.SaveChanges();
                     }

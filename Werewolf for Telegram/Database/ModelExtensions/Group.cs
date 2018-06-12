@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Database
 {
@@ -10,15 +7,16 @@ namespace Database
     {
         public bool? ShowRolesDeath
         {
-            get { return ShowRoles; }
-            set { ShowRoles = value; }
+            get => ShowRoles;
+            set => ShowRoles = value;
         }
 
         public bool? AllowFlee
         {
-            get { return DisableFlee == false; }
-            set { DisableFlee = !value; }
+            get => DisableFlee == false;
+            set => DisableFlee = !value;
         }
+
         //TODO: add properties which grab the flag enum
         public void UpdateFlags()
         {
@@ -26,6 +24,7 @@ namespace Database
             {
                 Flags = 0;
             }
+
             if (!HasFlag(GroupConfig.Update)) //special flag indicating group needs to be updated.
                 return;
             RemoveFlag(GroupConfig.Update);
@@ -33,7 +32,7 @@ namespace Database
             {
                 try
                 {
-                    if ((bool?)GetType().GetProperty(flag.ToString()).GetValue(this) == true)
+                    if ((bool?) GetType().GetProperty(flag.ToString()).GetValue(this) == true)
                         AddFlag(flag);
                     //check if the setting wasn't set before.
                     if (GetType().GetProperty(flag.ToString()).GetValue(this) == null)
@@ -42,6 +41,7 @@ namespace Database
                         if (flag.GetDefaultValue())
                             AddFlag(flag);
                     }
+
                     //GetType().GetProperty(flag.ToString()).SetValue(this, null);
                 }
                 catch (NullReferenceException)
@@ -50,31 +50,31 @@ namespace Database
                 }
             }
 
-            
+
             //RemoveFlag(GroupConfig.Update);
         }
 
         public bool HasFlag(GroupConfig flag)
         {
             if (Flags == null) Flags = 0;
-            var f = (GroupConfig)Flags;
+            var f = (GroupConfig) Flags;
             return f.HasFlag(flag);
         }
 
         public void AddFlag(GroupConfig flag)
         {
             if (Flags == null) Flags = 0;
-            var f = (GroupConfig)Flags;
+            var f = (GroupConfig) Flags;
             f = f | flag;
-            Flags = (long)f;
+            Flags = (long) f;
         }
 
         public void RemoveFlag(GroupConfig flag)
         {
             if (Flags == null) Flags = 0;
-            var f = (GroupConfig)Flags;
+            var f = (GroupConfig) Flags;
             f &= ~flag;
-            Flags = (long)f;
+            Flags = (long) f;
         }
     }
 }

@@ -8,15 +8,15 @@
     <div class="col-md-12">
 
         <!--
-            PANEL CLASSES:
-                panel-default
-                panel-danger
-                panel-warning
-                panel-info
-                panel-success
+        PANEL CLASSES:
+        panel-default
+        panel-danger
+        panel-warning
+        panel-info
+        panel-success
 
-            INFO: 	panel collapse - stored on user localStorage (handled by app.js _panels() function).
-                    All pannels should have an unique ID or the panel collapse status will not be stored!
+        INFO: 	panel collapse - stored on user localStorage (handled by app.js _panels() function).
+        All pannels should have an unique ID or the panel collapse status will not be stored!
         -->
         <div id="panel-2" class="panel panel-default">
             <div class="panel-heading">
@@ -34,13 +34,13 @@
                 <div class="table-responsive">
                     <table class="table table-striped table-hover table-bordered" id="gamesTable">
                         <thead>
-                            <tr>
-                                <th>Group Id</th>
-                                <th>Group Name</th>
-                                <th>Players</th>
-                                <th>State</th>
-                                <th></th>
-                            </tr>
+                        <tr>
+                            <th>Group Id</th>
+                            <th>Group Name</th>
+                            <th>Players</th>
+                            <th>State</th>
+                            <th></th>
+                        </tr>
                         </thead>
                         <tbody></tbody>
                     </table>
@@ -50,7 +50,6 @@
                     </a>
 
                 </div>
-
 
 
             </div>
@@ -65,35 +64,31 @@
 </div>
 
 
-
-
-
-
 <script>
     nodeId = '@ViewBag.NodeId';
     $(document)
-        .ready(function () {
+        .ready(function() {
             console.log('setting interval');
-            setInterval(updateNodeInfo,1000);
+            setInterval(updateNodeInfo, 1000);
         });
-    
+
 
     updateNodeInfo = function() {
         var t = $('#gamesTable');
-        
+
         $.ajax({
             type: "GET",
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
-            data: {clientid: nodeId},
+            data: { clientid: nodeId },
             url: '/AdminApi/GetNodeInfo',
             error: function(error) {
-                
+
             },
             success: function(d) {
-                
+
                 $("#gamesTable tbody tr").remove();
-                
+
                 $.each(d.Games,
                     function(index, value) {
                         addRow(t, value.GroupId, value.GroupName, value.PlayersAlive, value.NumPlayers, value.State);
@@ -102,13 +97,15 @@
         });
     };
 
-    addRow = function (table, grpid, grp, playersAlive, playersTotal, state) {
+    addRow = function(table, grpid, grp, playersAlive, playersTotal, state) {
         table.find('tbody').append($('<tr>')
-        .append($('<td>').append(grpid))
-        .append($('<td>').append(grp))
-        .append($('<td>').append(playersAlive + ' / ' + playersTotal))
-        .append($('<td>').append(state))
-        .append($('<td>').append("<a href='/AdminApi/Game?groupid=" + grpid + "&clientid=@ViewBag.NodeId' class='btn btn-default btn-xs btn-block'>View</a>")));
+            .append($('<td>').append(grpid))
+            .append($('<td>').append(grp))
+            .append($('<td>').append(playersAlive + ' / ' + playersTotal))
+            .append($('<td>').append(state))
+            .append($('<td>').append("<a href='/AdminApi/Game?groupid=" +
+                grpid +
+                "&clientid=@ViewBag.NodeId' class='btn btn-default btn-xs btn-block'>View</a>")));
     }
 
 </script>

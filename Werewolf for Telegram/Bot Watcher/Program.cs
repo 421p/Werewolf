@@ -1,18 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Bot_Watcher
 {
     class Program
     {
-        internal static string RootDirectory => Path.GetDirectoryName(Uri.UnescapeDataString(new UriBuilder(Assembly.GetExecutingAssembly().CodeBase).Path));
+        internal static string RootDirectory =>
+            Path.GetDirectoryName(
+                Uri.UnescapeDataString(new UriBuilder(Assembly.GetExecutingAssembly().CodeBase).Path));
 
         static void Main()
         {
@@ -29,6 +28,7 @@ namespace Bot_Watcher
                         Console.ForegroundColor = ConsoleColor.Gray;
                         continue;
                     }
+
                     Console.Clear();
                     //using a text file so it can be changed as needed
                     using (var sr = new StreamReader(RootDirectory + "\\processes.txt"))
@@ -52,15 +52,12 @@ namespace Bot_Watcher
                             //    Console.WriteLine("UPDATING");
                             //    Console.ForegroundColor = ConsoleColor.Gray;
                             //}
-                            
+
                             if (Process.GetProcessesByName(processName).Any()) continue;
-                            
+
 
                             //if (!updating)
-                                Process.Start(line);
-                            
-                                
-                            
+                            Process.Start(line);
                         }
                     }
                 }
@@ -68,8 +65,6 @@ namespace Bot_Watcher
                 {
                     //ignored
                 }
-
-                
             }
         }
     }

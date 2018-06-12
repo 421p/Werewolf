@@ -30,7 +30,9 @@ namespace Telegram.Bot.Types
         public static implicit operator KeyboardButton(string key) => new KeyboardButton(key);
         public static implicit operator KeyboardButton(InlineKeyboardButton button) => new KeyboardButton(button.Text);
 
-        public KeyboardButton() { }
+        public KeyboardButton()
+        {
+        }
 
         public KeyboardButton(string text)
         {

@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using System.Runtime.Serialization;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using System.Runtime.Serialization;
 
 namespace Telegram.Bot.Types.Enums
 {
@@ -13,20 +13,17 @@ namespace Telegram.Bot.Types.Enums
         /// <summary>
         /// Update Type is unknown
         /// </summary>
-        [EnumMember(Value = "unknown_update")]
-        UnknownUpdate = 0,
+        [EnumMember(Value = "unknown_update")] UnknownUpdate = 0,
 
         /// <summary>
         /// The <see cref="Update"/> contains a <see cref="Message"/>.
         /// </summary>
-        [EnumMember(Value = "message")]
-        MessageUpdate,
+        [EnumMember(Value = "message")] MessageUpdate,
 
         /// <summary>
         /// The <see cref="Update"/> contains an <see cref="InlineQuery"/>.
         /// </summary>
-        [EnumMember(Value = "inline_query")]
-        InlineQueryUpdate,
+        [EnumMember(Value = "inline_query")] InlineQueryUpdate,
 
         /// <summary>
         /// The <see cref="Update"/> contains a <see cref="ChosenInlineResult"/>.
@@ -37,20 +34,17 @@ namespace Telegram.Bot.Types.Enums
         /// <summary>
         /// The <see cref="Update"/> contains a <see cref="CallbackQuery"/>
         /// </summary>
-        [EnumMember(Value = "callback_query")]
-        CallbackQueryUpdate,
+        [EnumMember(Value = "callback_query")] CallbackQueryUpdate,
 
         /// <summary>
         /// The <see cref="Update"/> contains an edited <see cref="Message"/>
         /// </summary>
-        [EnumMember(Value = "edited_message")]
-        EditedMessage,
+        [EnumMember(Value = "edited_message")] EditedMessage,
 
         /// <summary>
         /// The <see cref="Update"/> contains a channel post <see cref="Message"/>
         /// </summary>
-        [EnumMember(Value = "channel_post")]
-        ChannelPost,
+        [EnumMember(Value = "channel_post")] ChannelPost,
 
         /// <summary>
         /// The <see cref="Update"/> contains an edited channel post <see cref="Message"/>
@@ -61,8 +55,7 @@ namespace Telegram.Bot.Types.Enums
         /// <summary>
         /// The <see cref="Update"/> contains an <see cref="ShippingQueryUpdate"/>
         /// </summary>
-        [EnumMember(Value = "shipping_query")]
-        ShippingQueryUpdate,
+        [EnumMember(Value = "shipping_query")] ShippingQueryUpdate,
 
         /// <summary>
         /// The <see cref="Update"/> contains an <see cref="PreCheckoutQueryUpdate"/>
@@ -73,7 +66,6 @@ namespace Telegram.Bot.Types.Enums
         /// <summary>
         /// Receive all <see cref="Update"/> Types
         /// </summary>
-        [EnumMember(Value = "")]
-        All = 255,
+        [EnumMember(Value = "")] All = 255,
     }
 }

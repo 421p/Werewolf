@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
+using Database;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
@@ -14,6 +11,7 @@ namespace Werewolf_Control.Helpers
         {
             268253251
         };
+
         internal static bool IsGroupAdmin(Update update)
         {
             return IsGroupAdmin(update.Message.From.Id, update.Message.Chat.Id);
@@ -21,7 +19,7 @@ namespace Werewolf_Control.Helpers
 
         internal static bool IsGlobalAdmin(int id)
         {
-            using (var db = new Database.WWContext())
+            using (var db = new WWContext())
             {
                 return db.Admins.Any(x => x.UserId == id);
             }

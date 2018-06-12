@@ -14,7 +14,8 @@ namespace Telegram.Bot.Types.InlineKeyboardButtons
         /// <remarks>
         /// Note: This offers a quick way for the user to open your bot in inline mode in the same chat – good for selecting something from multiple options.
         /// </remarks>
-        [JsonProperty(PropertyName = "switch_inline_query_current_chat", Required = Required.Default, DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty(PropertyName = "switch_inline_query_current_chat", Required = Required.Default,
+            DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string SwitchInlineQueryCurrentChat { get; set; }
 
         /// <summary>
@@ -22,7 +23,8 @@ namespace Telegram.Bot.Types.InlineKeyboardButtons
         /// </summary>
         /// <param name="text">Text of the button</param>
         /// <param name="switchInlineQueryCurrentChat">Pressing the button will insert the bot‘s username and the specified inline query in the current chat's input field. Can be empty, in which case only the bot’s username will be inserted.</param>
-        public InlineKeyboardSwitchInlineQueryCurrentChatButton(string text, string switchInlineQueryCurrentChat = null) : base(text)
+        public InlineKeyboardSwitchInlineQueryCurrentChatButton(string text, string switchInlineQueryCurrentChat = null)
+            : base(text)
         {
             SwitchInlineQueryCurrentChat = switchInlineQueryCurrentChat;
         }

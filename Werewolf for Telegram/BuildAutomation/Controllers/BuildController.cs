@@ -1,36 +1,31 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Threading.Tasks;
-using System.Web;
 using System.Web.Http;
 using BuildAutomation.Models;
 using BuildAutomation.Models.Build;
 using BuildAutomation.Models.Release;
-using Microsoft.Win32;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using Telegram.Bot;
 using Telegram.Bot.Exceptions;
-using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineKeyboardButtons;
 using Telegram.Bot.Types.ReplyMarkups;
-using Task = System.Threading.Tasks.Task;
+using Environment = System.Environment;
 
 namespace BuildAutomation.Controllers
 {
     public class BuildController : ApiController
     {
         public long GroupId = -1001077134233;
+
         [HttpPost]
         public HttpResponseMessage Post()
         {
             string TelegramAPIKey = ConfigurationManager.AppSettings.Get("TelegramAPIToken");
-            var bot = new Telegram.Bot.Client(TelegramAPIKey, System.Environment.CurrentDirectory);
+            var bot = new Client(TelegramAPIKey, Environment.CurrentDirectory);
             try
             {
                 var body = Request.Content.ReadAsStringAsync().Result;
@@ -44,7 +39,6 @@ namespace BuildAutomation.Controllers
                         //what was released
                         var beta = obj.resource.environment.name.Contains("Beta");
                         var node = obj.resource.environment.name.Contains("Node");
-
 
 
                         var msg = obj.detailedMessage.markdown;
@@ -74,6 +68,7 @@ namespace BuildAutomation.Controllers
                         {
                             detail = detail.Substring(0, detail.IndexOf("\r\n+ Process 'msbuild.exe'"));
                         }
+
                         detail = detail.Replace("\r\n+ ", "\r\n");
                         var msg = detail + "\n";
                         var urlPre = "https://github.com/GreyWolfDev/Werewolf/commit/";
@@ -94,8 +89,6 @@ namespace BuildAutomation.Controllers
                     msg = push.commits.Aggregate(msg,
                         (current, a) => current +
                                         $"<a href='{a.url}'>{a.id.Substring(0, 7)}</a>: {a.message} ({a.author.username})\n");
-
-
 
 
                     //string path = HttpContext.Current.Server.MapPath("~/App_Data/github.json");
@@ -122,7 +115,6 @@ namespace BuildAutomation.Controllers
                             disableWebPagePreview: true);
                         return Request.CreateResponse(HttpStatusCode.OK);
                     }
-
 
 
                     var none = new InlineKeyboardCallbackButton("No", "build|no");
@@ -173,13 +165,12 @@ namespace BuildAutomation.Controllers
                             msg += "Node only";
                         }
                     }
+
                     msg += $", on {(beta ? "Beta" : "Release")}\n";
                     msg += "Do you want to build?";
 
                     var r = bot.SendTextMessageAsync(GroupId, msg, replyMarkup: menu, parseMode: ParseMode.Html,
                         disableWebPagePreview: true).Result;
-
-
                 }
 
                 return Request.CreateResponse(HttpStatusCode.OK);
@@ -199,7 +190,7 @@ namespace BuildAutomation.Controllers
                 while (x?.InnerException != null)
                     x = x.InnerException;
                 bot.SendTextMessageAsync(GroupId, x?.Message + "\n" + x?.StackTrace);
-                return Request.CreateErrorResponse((HttpStatusCode)code, x);
+                return Request.CreateErrorResponse((HttpStatusCode) code, x);
             }
             catch (Exception e)
             {
@@ -214,8 +205,6 @@ namespace BuildAutomation.Controllers
                 //}
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
-            
-
         }
     }
 }

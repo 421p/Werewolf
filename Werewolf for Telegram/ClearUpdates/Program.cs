@@ -1,18 +1,16 @@
-﻿using Microsoft.Win32;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Database;
+using Microsoft.Win32;
 using Telegram.Bot;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InlineKeyboardButtons;
 using Telegram.Bot.Types.ReplyMarkups;
-using Database;
 
 namespace ClearUpdates
 {
@@ -21,14 +19,14 @@ namespace ClearUpdates
         static int total = 0;
         static TelegramBotClient WWAPI;
         static TelegramBotClient Api;
-        internal static int[] Devs = new[] { 129046388, 133748469, 125311351 };
+        internal static int[] Devs = new[] {129046388, 133748469, 125311351};
         static long DevGroup = -1001076212715;
+
         static void Main(string[] args)
         {
-
             var key =
-                    RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64)
-                        .OpenSubKey("SOFTWARE\\Werewolf");
+                RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64)
+                    .OpenSubKey("SOFTWARE\\Werewolf");
             string TelegramAPIKey;
 #if DEBUG
             TelegramAPIKey = key.GetValue("DebugAPI").ToString();
@@ -57,7 +55,7 @@ namespace ClearUpdates
             Api.MessageOffset = updateEventArgs.Update.Id + 1;
         }
 
-        private static void Api_OnCallbackQuery(object sender, Telegram.Bot.Args.CallbackQueryEventArgs e)
+        private static void Api_OnCallbackQuery(object sender, CallbackQueryEventArgs e)
         {
             if (!Devs.Contains(e.CallbackQuery.From.Id))
                 return;
@@ -67,6 +65,7 @@ namespace ClearUpdates
                 Api.DeleteMessageAsync(DevGroup, q.Message.MessageId);
                 return;
             }
+
             var id = int.Parse(q.Data);
             var t = Commands[id];
             var user = t[0].From;
@@ -81,14 +80,14 @@ namespace ClearUpdates
             Api.AnswerCallbackQueryAsync(q.Id);
         }
 
-        private static void Api_OnMessage(object sender, Telegram.Bot.Args.MessageEventArgs e)
+        private static void Api_OnMessage(object sender, MessageEventArgs e)
         {
             var m = e.Message;
-            
+
             if (Devs.Contains(m.From.Id))
             {
                 Console.WriteLine($"{m.MessageId} - {m.From.FirstName}: {m.Text}");
-                switch (m.Text.Replace("@wwcleanbot",""))
+                switch (m.Text.Replace("@wwcleanbot", ""))
                 {
                     case "/clearqueue":
                         if (m.Date < DateTime.Now.AddSeconds(-1))
@@ -118,6 +117,7 @@ namespace ClearUpdates
                             lastChange = DateTime.Now;
                             Console.WriteLine(lastChange + " - Detected issue.");
                         }
+
                         if ((DateTime.Now - lastChange) > TimeSpan.FromSeconds(3))
                         {
                             Console.WriteLine(DateTime.Now + " - Issue persisted, clearing.");
@@ -132,6 +132,7 @@ namespace ClearUpdates
                         lastChange = DateTime.Now;
                     }
                 }
+
                 Console.WriteLine($"Dead: {dead} - {lastChange}");
                 Thread.Sleep(1000);
             }
@@ -157,13 +158,15 @@ namespace ClearUpdates
                     CheckMessages();
                     break;
                 }
+
                 current = total;
                 Thread.Sleep(1000);
             }
+
             Thread.Sleep(1000);
         }
 
-        private static void WWAPI_OnUpdate(object sender, Telegram.Bot.Args.UpdateEventArgs e)
+        private static void WWAPI_OnUpdate(object sender, UpdateEventArgs e)
         {
             total++;
             if ((e.Update.Message?.Text ?? "").StartsWith("/"))
@@ -183,11 +186,11 @@ namespace ClearUpdates
                 if (Commands.ContainsKey(m.From.Id))
                     Commands[m.From.Id].Add(m);
                 else
-                    Commands.Add(m.From.Id, new List<Message> { m });
-
+                    Commands.Add(m.From.Id, new List<Message> {m});
             }
 
-            var top = Commands.Where(x => x.Value.Count > 15).OrderByDescending(x => x.Value.Count).Select(x => x.Value).ToList();
+            var top = Commands.Where(x => x.Value.Count > 15).OrderByDescending(x => x.Value.Count).Select(x => x.Value)
+                .ToList();
             var menu = new Menu(2);
             using (var sw = new StreamWriter("log.log"))
             {
@@ -199,7 +202,8 @@ namespace ClearUpdates
                     var ticks = (endTime - startTime).Ticks;
                     ticks /= t.Count;
                     var avg = new TimeSpan(ticks);
-                    var msg = ($"User @{user.Username} ({user.Id}): {t.Count} - Average time between commands: {avg}\r\n");
+                    var msg =
+                        ($"User @{user.Username} ({user.Id}): {t.Count} - Average time between commands: {avg}\r\n");
                     msg = t.Aggregate(msg, (a, b) => a + $"{b.Text}: {b.Date}\r\n");
                     msg += "\r\n";
                     sw.WriteLine(msg);
@@ -207,11 +211,13 @@ namespace ClearUpdates
                     menu.Buttons.Add(new InlineKeyboardCallbackButton($"{user.Id}: {t.Count}", user.Id.ToString()));
                 }
             }
+
             if (menu.Buttons.Count > 0)
             {
                 menu.Buttons.Add(new InlineKeyboardCallbackButton("Close", "close"));
                 Api.SendTextMessageAsync(DevGroup, "Here is the report:", replyMarkup: menu.CreateMarkupFromMenu());
             }
+
             using (var fs = new FileStream("log.log", FileMode.Open))
             {
                 Api.SendDocumentAsync(DevGroup, new FileToSend("Spam Log.txt", fs));
@@ -225,6 +231,7 @@ namespace ClearUpdates
         /// The buttons you want in your menu
         /// </summary>
         public List<InlineKeyboardButton> Buttons { get; set; }
+
         /// <summary>
         /// How many columns.  Defaults to 1.
         /// </summary>
@@ -249,10 +256,12 @@ namespace ClearUpdates
                     i++;
                     if (i == Buttons.Count) break;
                 } while (i % (col + 1) != 0);
+
                 i--;
                 final.Add(row.ToArray());
                 if (i == Buttons.Count) break;
             }
+
             return new InlineKeyboardMarkup(final.ToArray());
         }
     }

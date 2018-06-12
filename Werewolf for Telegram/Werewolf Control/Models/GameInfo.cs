@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Telegram.Bot.Types;
 using Werewolf_Control.Helpers;
@@ -11,7 +9,7 @@ namespace Werewolf_Control.Models
 {
     public class GameInfo
     {
-        public HashSet<int> Users { get; set; } = new HashSet<int>();  //update this to users alive
+        public HashSet<int> Users { get; set; } = new HashSet<int>(); //update this to users alive
         public long GroupId { get; set; }
         public Guid Guid { get; set; }
         public string Language { get; set; }
@@ -36,20 +34,20 @@ namespace Werewolf_Control.Models
             //var g = n.Games.FirstOrDefault(x => x.GroupId == update.Message.Chat.Id);
             //g?.
             Users.Add(update.Message.From.Id);
-            var json = JsonConvert.SerializeObject(new PlayerJoinInfo { User = update.Message.From, GroupId = GroupId });
+            var json = JsonConvert.SerializeObject(new PlayerJoinInfo {User = update.Message.From, GroupId = GroupId});
             n.Broadcast(json);
         }
 
         public void ForceStart()
         {
-            var json = JsonConvert.SerializeObject(new ForceStartInfo { GroupId = GroupId });
+            var json = JsonConvert.SerializeObject(new ForceStartInfo {GroupId = GroupId});
             var n = Bot.Nodes.FirstOrDefault(x => x.ClientId == NodeId);
             n?.Broadcast(json);
         }
 
         public void ShowPlayers()
         {
-            var json = JsonConvert.SerializeObject(new PlayerListRequestInfo { GroupId = GroupId });
+            var json = JsonConvert.SerializeObject(new PlayerListRequestInfo {GroupId = GroupId});
             var n = Bot.Nodes.FirstOrDefault(x => x.ClientId == NodeId);
             n?.Broadcast(json);
         }
@@ -60,13 +58,17 @@ namespace Werewolf_Control.Models
             if (n == null) return;
 
             Users.Remove(update.Message.From.Id);
-            var json = JsonConvert.SerializeObject(new PlayerFleeInfo { User = update.Message.From, GroupId = update.Message.Chat.Id });
+            var json = JsonConvert.SerializeObject(new PlayerFleeInfo
+            {
+                User = update.Message.From,
+                GroupId = update.Message.Chat.Id
+            });
             n.Broadcast(json);
         }
 
         public void LoadLanguage(string fileName)
         {
-            var json = JsonConvert.SerializeObject(new LoadLangInfo { GroupId = GroupId, FileName = fileName });
+            var json = JsonConvert.SerializeObject(new LoadLangInfo {GroupId = GroupId, FileName = fileName});
             var n = Bot.Nodes.FirstOrDefault(x => x.ClientId == NodeId);
             n?.Broadcast(json);
         }
@@ -76,21 +78,21 @@ namespace Werewolf_Control.Models
             var n = Bot.Nodes.FirstOrDefault(x => x.ClientId == NodeId);
             if (n == null) return;
             Users.Remove(id);
-            var json = JsonConvert.SerializeObject(new PlayerSmiteInfo { GroupId = GroupId, UserId = id });
+            var json = JsonConvert.SerializeObject(new PlayerSmiteInfo {GroupId = GroupId, UserId = id});
             n.Broadcast(json);
         }
 
         public void SkipVote()
         {
             var n = Bot.Nodes.FirstOrDefault(x => x.ClientId == NodeId);
-            var json = JsonConvert.SerializeObject(new SkipVoteInfo { GroupId = GroupId });
+            var json = JsonConvert.SerializeObject(new SkipVoteInfo {GroupId = GroupId});
             n?.Broadcast(json);
         }
 
         public void Kill()
         {
             var n = Bot.Nodes.FirstOrDefault(x => x.ClientId == NodeId);
-            var json = JsonConvert.SerializeObject(new GameKillInfo() { GroupId = GroupId });
+            var json = JsonConvert.SerializeObject(new GameKillInfo() {GroupId = GroupId});
             n?.Broadcast(json);
         }
 
@@ -98,13 +100,19 @@ namespace Werewolf_Control.Models
         {
             var n = Bot.Nodes.FirstOrDefault(x => x.ClientId == NodeId);
             if (n == null) return;
-            var json = JsonConvert.SerializeObject(new ExtendTimeInfo() { GroupId = GroupId , Admin = admin, User = id, Seconds = seconds});
+            var json = JsonConvert.SerializeObject(new ExtendTimeInfo()
+            {
+                GroupId = GroupId,
+                Admin = admin,
+                User = id,
+                Seconds = seconds
+            });
             n?.Broadcast(json);
         }
 
         public void ShowJoinButton()
         {
-            var json = JsonConvert.SerializeObject(new JoinButtonRequestInfo { GroupId = GroupId });
+            var json = JsonConvert.SerializeObject(new JoinButtonRequestInfo {GroupId = GroupId});
             var n = Bot.Nodes.FirstOrDefault(x => x.ClientId == NodeId);
             n?.Broadcast(json);
         }
@@ -112,6 +120,8 @@ namespace Werewolf_Control.Models
 
     public enum GameState
     {
-        Joining, Running, Dead
+        Joining,
+        Running,
+        Dead
     }
 }

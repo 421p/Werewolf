@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Database;
+using Newtonsoft.Json;
 using Telegram.Bot.Types;
 using Werewolf_Control.Helpers;
-using Newtonsoft.Json;
 
 namespace Werewolf_Control.Models
 {
@@ -24,7 +21,6 @@ namespace Werewolf_Control.Models
 
         public InlineCommand()
         {
-            
         }
     }
 
@@ -32,7 +28,6 @@ namespace Werewolf_Control.Models
     {
         public StatsInlineCommand(User u)
         {
-
             Description = "Get personal stats";
             Command = "stats";
             try
@@ -63,28 +58,27 @@ namespace Werewolf_Control.Models
                         ? $"{u.FirstName.FormatHTML()} the {roleInfo.OrderByDescending(x => x.times).FirstOrDefault()?.role ?? "Noob"}"
                         : $"<a href=\"https://telegram.me/{u.Username}\">{u.FirstName.FormatHTML()} the {roleInfo.OrderByDescending(x => x.times).FirstOrDefault()?.role ?? "Noob"}</a>";
                     Content += $"\n{count.Pad()}Achievements Unlocked!\n" +
-                               $"{won.Pad()}Games won ({won*100/gamesPlayed}%)\n" +
-                               $"{lost.Pad()}Games lost ({lost*100/gamesPlayed}%)\n" +
-                               $"{survived.Pad()}Games survived ({survived*100/gamesPlayed}%)\n" +
+                               $"{won.Pad()}Games won ({won * 100 / gamesPlayed}%)\n" +
+                               $"{lost.Pad()}Games lost ({lost * 100 / gamesPlayed}%)\n" +
+                               $"{survived.Pad()}Games survived ({survived * 100 / gamesPlayed}%)\n" +
                                $"{gamesPlayed.Pad()}Total Games\n" +
                                $"<code>{killed?.times}</code>\ttimes I've gleefully killed {killed?.Name.FormatHTML()}\n" +
                                $"<code>{killedby?.times}</code>\ttimes I've been slaughted by {killedby?.Name.FormatHTML()}\n";
 
                     var json = p.CustomGifSet;
-                    if (!String.IsNullOrEmpty(json))
+                    if (!string.IsNullOrEmpty(json))
                     {
                         var data = JsonConvert.DeserializeObject<CustomGifData>(json);
-                        if (data.ShowBadge)
-                        {
-                            if ((p.DonationLevel ?? 0) >= 100)
-                                Content += "Donation Level: 🥇";
-                            else if ((p.DonationLevel ?? 0) >= 50)
-                                Content += "Donation Level: 🥈";
-                            else if ((p.DonationLevel ?? 0) >= 10)
-                                Content += "Donation Level: 🥉";
-                            if (p.Founder ?? false)
-                                Content += "\n💎 FOUNDER STATUS! 💎\n<i>(This player donated at least $10USD before there was any reward for donating)</i>";
-                        }
+                        if (!data.ShowBadge) return;
+                        if ((p.DonationLevel ?? 0) >= 100)
+                            Content += "Donation Level: 🥇";
+                        else if ((p.DonationLevel ?? 0) >= 50)
+                            Content += "Donation Level: 🥈";
+                        else if ((p.DonationLevel ?? 0) >= 10)
+                            Content += "Donation Level: 🥉";
+                        if (p.Founder ?? false)
+                            Content +=
+                                "\n💎 FOUNDER STATUS! 💎\n<i>(This player donated at least $10USD before there was any reward for donating)</i>";
                     }
                     else
                     {
@@ -96,9 +90,9 @@ namespace Werewolf_Control.Models
                             Content += "Donation Level: 🥉";
 
                         if (p.Founder ?? false)
-                            Content += "\n💎 FOUNDER STATUS! 💎\n<i>(This player donated at least $10USD before there was any reward for donating</i>";
+                            Content +=
+                                "\n💎 FOUNDER STATUS! 💎\n<i>(This player donated at least $10USD before there was any reward for donating</i>";
                     }
-
                 }
             }
             catch (Exception e)
@@ -107,5 +101,4 @@ namespace Werewolf_Control.Models
             }
         }
     }
-
 }

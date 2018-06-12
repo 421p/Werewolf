@@ -7,16 +7,12 @@ namespace Telegram.Bot.Types.Enums
     /// </summary>
     public enum ChatType
     {
-        [EnumMember(Value = "private")]
-        Private,
+        [EnumMember(Value = "private")] Private,
 
-        [EnumMember(Value = "group")]
-        Group,
+        [EnumMember(Value = "group")] Group,
 
-        [EnumMember(Value = "channel")]
-        Channel,
+        [EnumMember(Value = "channel")] Channel,
 
-        [EnumMember(Value = "supergroup")]
-        Supergroup
+        [EnumMember(Value = "supergroup")] Supergroup
     }
 }

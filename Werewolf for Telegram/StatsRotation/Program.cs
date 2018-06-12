@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using Database;
 
 namespace StatsRotation
@@ -69,7 +64,6 @@ namespace StatsRotation
                 }
                 catch (Exception ex)
                 {
-
                 }
             }
         }
@@ -87,10 +81,15 @@ namespace StatsRotation
                     var counts = db.getDailyCounts();
                     db.DailyCounts.RemoveRange(db.DailyCounts);
                     foreach (var count in counts)
-                        db.DailyCounts.Add(new DailyCount { Day = count.Day.Value, Games = count.Games.Value, Groups = count.Groups.Value, Users = count.players.Value });
+                        db.DailyCounts.Add(new DailyCount
+                        {
+                            Day = count.Day.Value,
+                            Games = count.Games.Value,
+                            Groups = count.Groups.Value,
+                            Users = count.players.Value
+                        });
                     db.SaveChanges();
                     Console.WriteLine("Done");
-
                 }
 
                 using (var DB = new WWContext())
@@ -119,7 +118,7 @@ namespace StatsRotation
                     stat.TotalGroups = DB.Groups.Count();
                     stat.TotalPlayers = DB.Players.Count();
                     stat.BestSurvivor = survivor.Name;
-                    stat.BestSurvivorPercent = (int)survivor.pct;
+                    stat.BestSurvivorPercent = (int) survivor.pct;
                     stat.BestSurvivorId = survivor.TelegramId;
                     stat.GamesPlayed = gamesPlayed;
                     stat.LastRun = DateTime.Now;
@@ -145,13 +144,18 @@ namespace StatsRotation
                     var counts = db.getDailyCounts();
                     db.DailyCounts.RemoveRange(db.DailyCounts);
                     foreach (var count in counts)
-                        db.DailyCounts.Add(new DailyCount { Day = count.Day.Value, Games = count.Games.Value, Groups = count.Groups.Value, Users = count.players.Value });
+                        db.DailyCounts.Add(new DailyCount
+                        {
+                            Day = count.Day.Value,
+                            Games = count.Games.Value,
+                            Groups = count.Groups.Value,
+                            Users = count.players.Value
+                        });
                     db.SaveChanges();
                     Console.WriteLine("Done");
-
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 while (e.InnerException != null)
                     e = e.InnerException;
@@ -209,6 +213,7 @@ namespace StatsRotation
                         stat.BestSurvivor = survivor.Name;
                         stat.BestSurvivorPercent = (int) survivor.pct;
                     }
+
                     stat.GamesPlayed = gamesPlayed;
                     stat.LastRun = DateTime.Now;
                     if (day1death != null)
@@ -216,18 +221,20 @@ namespace StatsRotation
                         stat.MostDeadFirstDay = day1death.Name;
                         stat.MostDeadFirstPercent = day1death.pct;
                     }
+
                     if (night1death != null)
                     {
                         stat.MostKilledFirstNight = night1death.Name;
                         stat.MostKilledFirstPercent = night1death.pct;
                     }
+
                     if (day1lynch != null)
                     {
                         stat.MostLynchedFirstNight = day1lynch.Name;
                         stat.MostLynchFirstPercent = day1lynch.pct;
                     }
-                    db.SaveChanges();
 
+                    db.SaveChanges();
                 }
             }
             catch
@@ -240,7 +247,6 @@ namespace StatsRotation
         {
             try
             {
-
             }
             catch
             {

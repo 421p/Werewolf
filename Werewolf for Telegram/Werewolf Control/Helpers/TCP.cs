@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using TcpFramework;
 using TcpFramework.Server;
@@ -17,7 +14,7 @@ namespace Werewolf_Control.Helpers
     {
         public static SimpleTcpServer Server;
         public static SimpleTcpServer StatusServer;
-        
+
         public static void Initialize()
         {
             Server = new SimpleTcpServer {AutoTrimStrings = false};
@@ -37,7 +34,6 @@ namespace Werewolf_Control.Helpers
 
         private static void StatusServerOnDelimiterDataReceived(object sender, Message message)
         {
-            
         }
 
         private static void StatusServerOnDataReceived(object sender, Message message)
@@ -52,7 +48,7 @@ namespace Werewolf_Control.Helpers
                     dynamic m = JsonConvert.DeserializeObject(msg);
                     string t = m.JType?.ToString();
                     var nodes = Bot.Nodes.ToList();
-                    
+
                     if (t != null)
                     {
                         Console.WriteLine(t);
@@ -75,7 +71,14 @@ namespace Werewolf_Control.Helpers
                                         ClientId = n.ClientId,
                                         CurrentGames = n.CurrentGames,
                                         CurrentPlayers = n.CurrentPlayers,
-                                        Games = n.Games.Select(x => new GameListInfo { GroupId = x.GroupId, GroupName = x.ChatGroup, NumPlayers = x.PlayerCount, PlayersAlive = x.Users.Count, State = x.State }).ToList(),
+                                        Games = n.Games.Select(x => new GameListInfo
+                                        {
+                                            GroupId = x.GroupId,
+                                            GroupName = x.ChatGroup,
+                                            NumPlayers = x.PlayerCount,
+                                            PlayersAlive = x.Users.Count,
+                                            State = x.State
+                                        }).ToList(),
                                         ShuttingDown = n.ShuttingDown,
                                         Uptime = n.Uptime,
                                         Version = n.Version
@@ -95,13 +98,21 @@ namespace Werewolf_Control.Helpers
                                     message.Reply("null");
                                     return;
                                 }
+
                                 var nodeInfo = new NodeResponseInfo
                                 {
                                     MessagesSent = node.MessagesSent,
                                     ClientId = node.ClientId,
                                     CurrentGames = node.CurrentGames,
                                     CurrentPlayers = node.CurrentPlayers,
-                                    Games = node.Games.Select(x => new GameListInfo { GroupId = x.GroupId, GroupName= x.ChatGroup, NumPlayers = x.PlayerCount, PlayersAlive = x.Users.Count, State = x.State}).ToList(),
+                                    Games = node.Games.Select(x => new GameListInfo
+                                    {
+                                        GroupId = x.GroupId,
+                                        GroupName = x.ChatGroup,
+                                        NumPlayers = x.PlayerCount,
+                                        PlayersAlive = x.Users.Count,
+                                        State = x.State
+                                    }).ToList(),
                                     ShuttingDown = node.ShuttingDown,
                                     Uptime = node.Uptime,
                                     Version = node.Version
@@ -115,14 +126,16 @@ namespace Werewolf_Control.Helpers
 
                                 var gamenode = Bot.Nodes.FirstOrDefault(x => x.ClientId == ggi.ClientId);
                                 var game = gamenode?.GetGameInfo(ggi);
-                                
+
                                 if (game == null)
                                 {
                                     message.Reply("null");
                                     return;
                                 }
+
                                 var response = JsonConvert.SerializeObject(game);
-                                using (var sw = new StreamWriter(Path.Combine(Bot.RootDirectory, "..\\tcpadmin.log"), true))
+                                using (var sw = new StreamWriter(Path.Combine(Bot.RootDirectory, "..\\tcpadmin.log"),
+                                    true))
                                 {
                                     sw.WriteLine("Control Replying to GetGameInfo with:\n" + response + "\n\n");
                                 }
@@ -138,10 +151,9 @@ namespace Werewolf_Control.Helpers
                                 break;
                         }
                     }
-                    
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 // ignored
                 while (e.InnerException != null)
@@ -152,18 +164,15 @@ namespace Werewolf_Control.Helpers
             }
             finally
             {
-
             }
         }
 
         private static void StatusServerOnClientDisconnected(object sender, ConnectedClient connectedClient)
         {
-            
         }
 
         private static void StatusServerOnClientConnected(object sender, ConnectedClient connectedClient)
         {
-            
         }
 
         private static void Ping()
@@ -201,7 +210,6 @@ namespace Werewolf_Control.Helpers
                                 }
                             }
                         }
-
                     }
                 }
                 catch
@@ -246,6 +254,7 @@ namespace Werewolf_Control.Helpers
                                     //n.Broadcast("Registered");
                                     Program.Log($"Client registered: {cri.ClientId}");
                                 }
+
                                 break;
                             case "NodeInfo":
                                 var ni = JsonConvert.DeserializeObject<NodeInfo>(msg);
@@ -256,6 +265,7 @@ namespace Werewolf_Control.Helpers
                                     Bot.Nodes.Add(node);
                                     Bot.NodeConnected(node);
                                 }
+
                                 node.CurrentGames = ni.CurrentGames;
                                 node.CurrentPlayers = ni.CurrentPlayers;
                                 node.DuplicateGamesRemoved = ni.DuplicateGamesRemoved;
@@ -299,7 +309,6 @@ namespace Werewolf_Control.Helpers
         {
             try
             {
-                
                 Server.BroadcastLine(message, node.TcpClient);
             }
             catch (Exception e)
@@ -322,6 +331,7 @@ namespace Werewolf_Control.Helpers
                     Program.Log($"------------\nError sending broadcast!\n{e.Message}\n{message}\n------------", true);
                 else throw e;
             }
+
             return null;
         }
     }

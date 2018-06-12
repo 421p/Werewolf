@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -11,9 +9,9 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineKeyboardButtons;
 using Telegram.Bot.Types.ReplyMarkups;
-using Werewolf_Control.Handler;
 using Werewolf_Control.Helpers;
 using Werewolf_Control.Models;
+
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 namespace Werewolf_Control
 {
@@ -53,11 +51,11 @@ namespace Werewolf_Control
                 return;
             }
 #endif
-    
+
 
 #if RELEASE2
 
-            //retiring bot 2
+//retiring bot 2
             Send($"Bot 2 is retiring.  Please switch to @werewolfbot", update.Message.Chat.Id);
             Thread.Sleep(1000);
             Bot.Api.LeaveChat(update.Message.Chat.Id);
@@ -75,6 +73,7 @@ namespace Werewolf_Control
                     grp = MakeDefaultGroup(update.Message.Chat.Id, update.Message.Chat.Title, "StartGame");
                     db.Groups.Add(grp);
                 }
+
                 grp.Name = update.Message.Chat.Title;
                 grp.UserName = update.Message.Chat.Username;
                 grp.BotInGroup = true;
@@ -83,23 +82,28 @@ namespace Werewolf_Control
                     Bot.Api.LeaveChatAsync(grp.GroupId);
                     return;
                 }
+
                 if (!String.IsNullOrEmpty(update.Message.Chat.Username))
                     grp.GroupLink = "https://telegram.me/" + update.Message.Chat.Username;
-                else if (!(grp.GroupLink?.Contains("joinchat")??true)) //if they had a public link (username), but don't anymore, remove it
+                else if (!(grp.GroupLink?.Contains("joinchat") ?? true)
+                ) //if they had a public link (username), but don't anymore, remove it
                     grp.GroupLink = null;
 
                 //remove usernames & links from the other groups that have the same username in the db
                 if (grp.UserName != null)
                 {
-                    var sameusername = db.Groups.Where(x => x.UserName == update.Message.Chat.Username && x.GroupId != update.Message.Chat.Id);
+                    var sameusername = db.Groups.Where(x =>
+                        x.UserName == update.Message.Chat.Username && x.GroupId != update.Message.Chat.Id);
                     foreach (var g in sameusername)
                     {
                         g.UserName = null;
                         g.GroupLink = null;
                     }
                 }
+
                 db.SaveChanges();
             }
+
             //check nodes to see if player is in a game
             var node = GetPlayerNode(update.Message.From.Id);
             var game = GetGroupNodeAndGame(update.Message.Chat.Id);
@@ -124,15 +128,19 @@ namespace Werewolf_Control
                 //game?.AddPlayer(update);
                 game?.ShowJoinButton();
                 if (game == null)
-                    Program.Log($"{update.Message.From.FirstName} tried to join a game on node {node?.ClientId}, but game object was null", true);
+                    Program.Log(
+                        $"{update.Message.From.FirstName} tried to join a game on node {node?.ClientId}, but game object was null",
+                        true);
                 return;
             }
+
             //no game found, start one
             node = Bot.GetBestAvailableNode();
             if (node != null)
             {
                 node.StartGame(update, chaos);
-                Program.Analytics.TrackAsync("creategame", new { chaos = chaos, groupid = update.Message.Chat.Id }, update.Message.From.Id.ToString());
+                Program.Analytics.TrackAsync("creategame", new {chaos = chaos, groupid = update.Message.Chat.Id},
+                    update.Message.From.Id.ToString());
                 //notify waiting players
                 using (var db = new WWContext())
                 {
@@ -157,15 +165,14 @@ namespace Werewolf_Control
             else
             {
                 Send(GetLocaleString("NoNodes", grp.Language), update.Message.Chat.Id);
-
             }
         }
 
-        internal static Task<Message> Send(string message, long id, bool clearKeyboard = false, InlineKeyboardMarkup customMenu = null)
+        internal static Task<Message> Send(string message, long id, bool clearKeyboard = false,
+            InlineKeyboardMarkup customMenu = null)
         {
             return Bot.Send(message, id, clearKeyboard, customMenu);
         }
-
 
 
         private static string GetLocaleString(string key, string language, params object[] args)
@@ -179,7 +186,7 @@ namespace Werewolf_Control
                     doc = XDocument.Load(file);
                 }
                 var strings = doc.Descendants("string").FirstOrDefault(x => x.Attribute("key").Value == key) ??
-                    Bot.English.Descendants("string").FirstOrDefault(x => x.Attribute("key").Value == key);
+                              Bot.English.Descendants("string").FirstOrDefault(x => x.Attribute("key").Value == key);
                 var values = strings.Descendants("value");
                 var choice = Bot.R.Next(values.Count());
                 var selected = values.ElementAt(choice);
@@ -218,7 +225,7 @@ namespace Werewolf_Control
                 MaxExtend = 60,
                 EnableSecretLynch = false,
                 ShowRolesEnd = "All",
-                Flags = (long)(GroupDefaults.LoadDefaults())
+                Flags = (long) (GroupDefaults.LoadDefaults())
             };
         }
 
@@ -241,11 +248,14 @@ namespace Werewolf_Control
 
         private static GameInfo GetGroupNodeAndGame(long id)
         {
-            var node = Bot.Nodes.ToList().FirstOrDefault(n => n.Games.Any(g => g.GroupId == id))?.Games.FirstOrDefault(x => x.GroupId == id);
+            var node = Bot.Nodes.ToList().FirstOrDefault(n => n.Games.Any(g => g.GroupId == id))?.Games
+                .FirstOrDefault(x => x.GroupId == id);
             if (node == null)
-                node = Bot.Nodes.ToList().FirstOrDefault(n => n.Games.Any(g => g.GroupId == id))?.Games.FirstOrDefault(x => x.GroupId == id);
+                node = Bot.Nodes.ToList().FirstOrDefault(n => n.Games.Any(g => g.GroupId == id))?.Games
+                    .FirstOrDefault(x => x.GroupId == id);
             if (node == null)
-                node = Bot.Nodes.ToList().FirstOrDefault(n => n.Games.Any(g => g.GroupId == id))?.Games.FirstOrDefault(x => x.GroupId == id);
+                node = Bot.Nodes.ToList().FirstOrDefault(n => n.Games.Any(g => g.GroupId == id))?.Games
+                    .FirstOrDefault(x => x.GroupId == id);
             return node;
         }
 
@@ -267,6 +277,7 @@ namespace Werewolf_Control
                     p.Language = "English";
                     db.SaveChanges();
                 }
+
                 return grp?.Language ?? p?.Language ?? "English";
             }
         }
@@ -286,6 +297,7 @@ namespace Werewolf_Control
                     p.Language = "English";
                     db.SaveChanges();
                 }
+
                 return p?.Language ?? "English";
             }
         }
@@ -311,7 +323,8 @@ namespace Werewolf_Control
             {
                 doc = XDocument.Load(file);
             }
-            var strings = doc.Descendants("string").FirstOrDefault(x => x.Attribute("key").Value.ToLower() == args[0].ToLower());
+            var strings = doc.Descendants("string")
+                .FirstOrDefault(x => x.Attribute("key").Value.ToLower() == args[0].ToLower());
             if (strings == null)
             {
                 var efile = XDocument.Load(Path.Combine(Bot.LanguageDirectory, "English.xml"));
@@ -319,6 +332,7 @@ namespace Werewolf_Control
                     efile.Descendants("string")
                         .FirstOrDefault(x => x.Attribute("key").Value.ToLower() == args[0].ToLower());
             }
+
             if (strings == null)
                 return null;
             var values = strings.Descendants("value");
@@ -344,15 +358,15 @@ namespace Werewolf_Control
                 Thread.Sleep(500);
             }
             //status is now kicked (as it should be)
-            
+
             while (status != ChatMemberStatus.Left) //unban until status is left
             {
                 Bot.Api.UnbanChatMemberAsync(chatid, userid);
                 Thread.Sleep(500);
                 status = Bot.Api.GetChatMemberAsync(chatid, userid).Result.Status;
             }
+
             //yay unbanned
-            
         }
 
         public static int ComputeLevenshtein(string s, string t)
@@ -388,10 +402,11 @@ namespace Werewolf_Control
                     d[i, j] = Math.Min(Math.Min(min1, min2), min3);
                 }
             }
+
             return d[n, m];
         }
 
-        public static Database.Group GetGroup(string str, WWContext db)
+        public static Group GetGroup(string str, WWContext db)
         {
             //try with id
             long id = 0;

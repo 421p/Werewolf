@@ -17,6 +17,7 @@ namespace Telegram.Bot.Args
             CallbackQuery = callbackQuery;
         }
 
-        public static implicit operator CallbackQueryEventArgs(UpdateEventArgs e) => new CallbackQueryEventArgs(e.Update);
+        public static implicit operator CallbackQueryEventArgs(UpdateEventArgs e) =>
+            new CallbackQueryEventArgs(e.Update);
     }
 }

@@ -28,7 +28,8 @@ namespace Telegram.Bot.Types.InlineKeyboardButtons
         /// Performs an implicit conversion from <see cref="KeyboardButton"/> to <see cref="InlineKeyboardButton"/>.
         /// </summary>
         /// <param name="button">The <see cref="KeyboardButton"/></param>
-        public static implicit operator InlineKeyboardButton(KeyboardButton button) => new InlineKeyboardCallbackButton(button.Text, button.Text);
+        public static implicit operator InlineKeyboardButton(KeyboardButton button) =>
+            new InlineKeyboardCallbackButton(button.Text, button.Text);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InlineKeyboardButton"/> class.
@@ -84,7 +85,8 @@ namespace Telegram.Bot.Types.InlineKeyboardButtons
         /// </summary>
         /// <param name="text">Text of the button</param>
         /// <param name="switchInlineQueryCurrentChat">Pressing the button will insert the bot‘s username and the specified inline query in the current chat's input field. Can be empty, in which case only the bot’s username will be inserted.</param>
-        public static InlineKeyboardButton WithSwitchInlineQueryCurrentChat(string text, string switchInlineQueryCurrentChat = "")
+        public static InlineKeyboardButton WithSwitchInlineQueryCurrentChat(string text,
+            string switchInlineQueryCurrentChat = "")
             => new InlineKeyboardSwitchInlineQueryCurrentChatButton(text, switchInlineQueryCurrentChat);
 
         /// <summary>

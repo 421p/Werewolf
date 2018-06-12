@@ -118,7 +118,6 @@ namespace Werewolf_Node.Models
         public bool Founder { get; set; } = false;
 
         #endregion
-
     }
 
     public class QuestionAsked
@@ -152,21 +151,70 @@ namespace Werewolf_Node.Models
 
     public enum IRole
     {
-        Villager, Drunk, Harlot, Seer, Traitor, GuardianAngel, Detective, Wolf, Cursed, Gunner, Tanner, Fool, WildChild, Beholder, ApprenticeSeer, Cultist, CultistHunter, Mason, Doppelgänger, Cupid, Hunter, SerialKiller,
+        Villager,
+        Drunk,
+        Harlot,
+        Seer,
+        Traitor,
+        GuardianAngel,
+        Detective,
+        Wolf,
+        Cursed,
+        Gunner,
+        Tanner,
+        Fool,
+        WildChild,
+        Beholder,
+        ApprenticeSeer,
+        Cultist,
+        CultistHunter,
+        Mason,
+        Doppelgänger,
+        Cupid,
+        Hunter,
+        SerialKiller,
+
         //new roles
-        Sorcerer, AlphaWolf, WolfCub, Blacksmith, ClumsyGuy, Mayor, Prince
+        Sorcerer,
+        AlphaWolf,
+        WolfCub,
+        Blacksmith,
+        ClumsyGuy,
+        Mayor,
+        Prince
     }
 
     public enum ITeam
     {
-        Village, Cult, Wolf, Tanner,
-        Neutral, SerialKiller, Lovers,
+        Village,
+        Cult,
+        Wolf,
+        Tanner,
+        Neutral,
+        SerialKiller,
+        Lovers,
         SKHunter,
         NoOne
     }
 
     public enum KillMthd
     {
-        None, Lynch, Eat, Shoot, VisitWolf, VisitVictim, GuardWolf, Detected, Flee, Hunt, HunterShot, LoverDied, SerialKilled, HunterCult, GuardKiller, VisitKiller, Idle
+        None,
+        Lynch,
+        Eat,
+        Shoot,
+        VisitWolf,
+        VisitVictim,
+        GuardWolf,
+        Detected,
+        Flee,
+        Hunt,
+        HunterShot,
+        LoverDied,
+        SerialKilled,
+        HunterCult,
+        GuardKiller,
+        VisitKiller,
+        Idle
     }
 }

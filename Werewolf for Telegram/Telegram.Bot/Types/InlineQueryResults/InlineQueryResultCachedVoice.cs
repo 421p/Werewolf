@@ -14,7 +14,6 @@ namespace Telegram.Bot.Types.InlineQueryResults
         [JsonProperty("voice_file_id", Required = Required.Always)]
         public string FileId { get; set; }
 
-        [JsonIgnore]
-        public new string Caption { get; set; }
+        [JsonIgnore] public new string Caption { get; set; }
     }
 }

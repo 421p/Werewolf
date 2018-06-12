@@ -4,13 +4,10 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms.DataVisualization.Charting;
 using Database;
 using Telegram.Bot.Types;
 using Werewolf_Control.Handler;
-using Werewolf_Control.Models;
 
 namespace Werewolf_Control.Helpers
 {
@@ -24,8 +21,7 @@ namespace Werewolf_Control.Helpers
             if (!String.IsNullOrWhiteSpace(input))
             {
                 var args = input.Split(' ');
-                int amount = 0;
-                if (int.TryParse(args[0], out amount) && args.Length >= 2)
+                if (int.TryParse(args[0], out var amount) && args.Length >= 2)
                 {
                     //get the interval
                     switch (args[1])
@@ -43,18 +39,23 @@ namespace Werewolf_Control.Helpers
                             start = DateTime.UtcNow.AddHours(-amount);
                             break;
                         default:
-                            Bot.Api.SendTextMessageAsync(u.Message.Chat.Id, "Acceptable intervals are: hour(s), day(s), week(s)");
+                            Bot.Api.SendTextMessageAsync(u.Message.Chat.Id,
+                                "Acceptable intervals are: hour(s), day(s), week(s)");
                             break;
                     }
                 }
-                
-                if (args.Length == 3)
-                    mode = $"AND gm.MODE = '{args[2]}'";
 
-                if (args.Length == 1)
-                    mode = $"AND gm.MODE = '{args[0]}'";
+                switch (args.Length)
+                {
+                    case 3:
+                        mode = $"AND gm.MODE = '{args[2]}'";
+                        break;
+                    case 1:
+                        mode = $"AND gm.MODE = '{args[0]}'";
+                        break;
+                }
             }
-            
+
             var query = $@"SELECT x.Players,
  Round((COUNT (x.GameId) * 100.0 / sum (count(x.GameId)) OVER (PARTITION BY Players)), 2) AS Wins,
 sum(count(x.Gameid)) over (partition by players) as Games
@@ -63,14 +64,15 @@ sum(count(x.Gameid)) over (partition by players) as Games
  (SELECT count (gp.PlayerId) AS Players, gp.GameId, CASE WHEN gm.Winner = 'Wolves' THEN 'Wolf' ELSE gm.Winner END AS Winner
  FROM Game AS gm
  INNER JOIN GamePlayer AS gp ON gp.GameId = gm.Id
- WHERE gm.Winner is not null AND gm.TimeStarted > '{ start.ToString("yyyy-MM-dd HH:mm:ss")}' {mode}
+ WHERE gm.Winner is not null AND gm.TimeStarted > '{start:yyyy-MM-dd HH:mm:ss}' {mode}
  GROUP BY gp.GameId, gm.Winner
  HAVING COUNT (gp.PlayerId)> = 5)
  AS x 
  GROUP BY x.Winner, x.Players
  ORDER BY x.Players, Wins DESC";
 
-            var result = new List<TeamWinResult>();
+            List<TeamWinResult> result;
+            
             using (var db = new WWContext())
             {
                 result = db.Database.SqlQuery<TeamWinResult>(query).ToListAsync().Result;
@@ -84,12 +86,12 @@ sum(count(x.Gameid)) over (partition by players) as Games
             dt.Columns.Add("Wins", typeof(int));
             dt.Columns.Add("Games", typeof(int));
             dt.Columns.Add("Team", typeof(string));
-            
+
             foreach (var r in result)
             {
                 var row = dt.NewRow();
                 row[0] = r.Players;
-                row[1] = (int)r.Wins;
+                row[1] = (int) r.Wins;
                 row[2] = r.Games;
                 row[3] = r.Team;
                 dt.Rows.Add(row);
@@ -98,18 +100,22 @@ sum(count(x.Gameid)) over (partition by players) as Games
             dataSet.Tables.Add(dt);
 
             //now build the chart
-            Chart chart = new Chart();
+            var chart = new Chart
+            {
+                Width = 1000,
+                Height = 400
+            };
             //chart.DataSource = dataSet.Tables[0];
-            chart.Width = 1000;
-            chart.Height = 400;
             var legend = new Legend();
             //create serie...
-            foreach (var team in new[] { "Wolf", "Village", "Tanner", "Cult", "SerialKiller", "Lovers" })
+            foreach (var team in new[] {"Wolf", "Village", "Tanner", "Cult", "SerialKiller", "Lovers"})
             {
-                Series serie1 = new Series();
+                var serie1 = new Series
+                {
+                    LegendText = team,
+                    Name = team
+                };
                 //serie1.Label = team;
-                serie1.LegendText = team;
-                serie1.Name = team;
                 switch (team)
                 {
                     case "Wolf":
@@ -131,13 +137,12 @@ sum(count(x.Gameid)) over (partition by players) as Games
                         serie1.Color = Color.Pink;
                         break;
                 }
+
                 serie1.MarkerBorderWidth = 2;
                 serie1.BorderColor = Color.FromArgb(164, 164, 164);
                 serie1.ChartType = SeriesChartType.StackedBar100;
                 serie1.BorderDashStyle = ChartDashStyle.Solid;
                 serie1.BorderWidth = 1;
-                //serie1.ShadowColor = Color.FromArgb(128, 128, 128);
-                //serie1.ShadowOffset = 1;
                 serie1.IsValueShownAsLabel = false;
                 serie1.XValueMember = "Players";
                 serie1.YValueMembers = "Wins";
@@ -157,10 +162,12 @@ sum(count(x.Gameid)) over (partition by players) as Games
                             pl++;
                         }
                     }
+
                     serie1.Points.AddXY(r.Players, r.Wins);
                 }
+
                 //make sure we filled all the points...
-                var top = (int)(serie1.Points.OrderByDescending(x => x.XValue).FirstOrDefault()?.XValue ?? 4);
+                var top = (int) (serie1.Points.OrderByDescending(x => x.XValue).FirstOrDefault()?.XValue ?? 4);
 
                 if (top < 35)
                 {
@@ -171,9 +178,11 @@ sum(count(x.Gameid)) over (partition by players) as Games
                         top++;
                     }
                 }
+
                 //legend.CustomItems.Add(serie1.Color, team);
                 chart.Series.Add(serie1);
             }
+
             //create chartareas...
             ChartArea ca = new ChartArea();
             ca.Name = "ChartArea1";
@@ -190,12 +199,12 @@ sum(count(x.Gameid)) over (partition by players) as Games
             //save result
 
 
-
-
             var path = Path.Combine(Bot.RootDirectory, "myChart.png");
             chart.SaveImage(path, ChartImageFormat.Png);
             SendImage(path, u.Message.Chat.Id);
-            UpdateHandler.Send(result.Select(x => new {Players = x.Players, Games = x.Games}).Distinct().Aggregate("", (a, b) => $"{a}\n{b.Players}: {b.Games}"), u.Message.Chat.Id);
+            UpdateHandler.Send(
+                result.Select(x => new {Players = x.Players, Games = x.Games}).Distinct()
+                    .Aggregate("", (a, b) => $"{a}\n{b.Players}: {b.Games}"), u.Message.Chat.Id);
         }
 
         private static void SendImage(string path, long id)
@@ -207,11 +216,9 @@ sum(count(x.Gameid)) over (partition by players) as Games
 
     class TeamWinResult
     {
-
         public int Players { get; set; }
         public Decimal Wins { get; set; }
         public int Games { get; set; }
         public string Team { get; set; }
-        
     }
 }

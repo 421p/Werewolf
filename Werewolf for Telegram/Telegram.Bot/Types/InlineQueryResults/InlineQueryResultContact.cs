@@ -28,8 +28,7 @@ namespace Telegram.Bot.Types.InlineQueryResults
         /// </summary>
         [JsonProperty("last_name", Required = Required.Default)]
         public string LastName { get; set; }
-        
-        [JsonIgnore]
-        public new string Title { get; set; }
+
+        [JsonIgnore] public new string Title { get; set; }
     }
 }

@@ -11,7 +11,8 @@ namespace Telegram.Bot.Types.InlineKeyboardButtons
         /// <summary>
         /// Optional. Data to be sent in a callback query to the bot when button is pressed
         /// </summary>
-        [JsonProperty(PropertyName = "callback_data", Required = Required.Default, DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty(PropertyName = "callback_data", Required = Required.Default,
+            DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string CallbackData { get; set; }
 
         /// <summary>

@@ -13,6 +13,7 @@ namespace Telegram.Bot.Types
         /// </summary>
         [JsonProperty(PropertyName = "big_file_id", Required = Required.Default)]
         public string BigFileId { get; set; }
+
         /// <summary>
         /// File id of the small version of this <see cref="ChatPhoto"/>
         /// </summary>

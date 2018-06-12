@@ -2,23 +2,20 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 using Database;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineKeyboardButtons;
 using Telegram.Bot.Types.ReplyMarkups;
-using Werewolf_Control.Attributes;
 using Werewolf_Control.Helpers;
+using Werewolf_Control.Models;
 
 namespace Werewolf_Control
 {
     public static partial class Commands
     {
-        [Command(Trigger = "ping")]
+        [Attributes.Command(Trigger = "ping")]
         public static void Ping(Update update, string[] args)
         {
             var ts = DateTime.UtcNow - update.Message.Date;
@@ -30,7 +27,6 @@ namespace Werewolf_Control
             ts = DateTime.UtcNow - send;
             message += "\n" + GetLocaleString("Ping2", GetLanguage(update.Message.From.Id), $"{ts:mm\\:ss\\.ff}");
             Bot.Api.EditMessageTextAsync(update.Message.Chat.Id, result.MessageId, message);
-
         }
 #if (BETA || DEBUG)
         [Command(Trigger = "achv")]
@@ -39,30 +35,33 @@ namespace Werewolf_Control
             Send("Please use /stats", u.Message.Chat.Id);
         }
 #endif
-        [Command(Trigger = "help")]
+        [Attributes.Command(Trigger = "help")]
         public static void Help(Update update, string[] args)
         {
-            if (args[1] == null) //only send the message if there is no extra args (otherwise it's more likely for other bots)
+            if (args[1] == null
+            ) //only send the message if there is no extra args (otherwise it's more likely for other bots)
             {
-                Bot.Api.SendTextMessageAsync(update.Message.Chat.Id, "[Website](http://www.tgwerewolf.com/?referrer=help)\n/rolelist (don't forget to /setlang first!)\n[Telegram Werewolf Support Group](http://telegram.me/werewolfsupport)\n[Telegram Werewolf Dev Channel](https://telegram.me/werewolfdev)",
-                                                            parseMode: ParseMode.Markdown);
+                Bot.Api.SendTextMessageAsync(update.Message.Chat.Id,
+                    "[Website](http://www.tgwerewolf.com/?referrer=help)\n/rolelist (don't forget to /setlang first!)\n[Telegram Werewolf Support Group](http://telegram.me/werewolfsupport)\n[Telegram Werewolf Dev Channel](https://telegram.me/werewolfdev)",
+                    parseMode: ParseMode.Markdown);
             }
         }
 
-        [Command(Trigger = "chatid")]
+        [Attributes.Command(Trigger = "chatid")]
         public static void ChatId(Update update, string[] args)
         {
             Send(update.Message.Chat.Id.ToString(), update.Message.Chat.Id);
-
         }
 
-        [Command(Trigger = "changelog")]
+        [Attributes.Command(Trigger = "changelog")]
         public static void ChangeLog(Update update, string[] args)
         {
-            Send("Changelog moved to <a href=\"www.tgwerewolf.com/#changes?referrer=changelog\">here</a>\nAlso check out the dev channel @werewolfdev", update.Message.Chat.Id);
+            Send(
+                "Changelog moved to <a href=\"www.tgwerewolf.com/#changes?referrer=changelog\">here</a>\nAlso check out the dev channel @werewolfdev",
+                update.Message.Chat.Id);
         }
 
-        [Command(Trigger = "runinfo")]
+        [Attributes.Command(Trigger = "runinfo")]
         public static void RunInfo(Update update, string[] args)
         {
             var result = "*Run information*\n";
@@ -73,19 +72,22 @@ namespace Werewolf_Control
             Bot.Api.SendTextMessageAsync(update.Message.Chat.Id, result, parseMode: ParseMode.Markdown);
         }
 
-        [Command(Trigger = "getstatus")]
+        [Attributes.Command(Trigger = "getstatus")]
         public static void GetStatus(Update u, string[] args)
         {
             using (var db = new WWContext())
             {
                 var msg =
-                    db.BotStatus.ToList().Where(x => x.BotName != "Bot 2").Select(x => $"[{x.BotName.Replace("Bot 1", "Moderator")}](https://t.me/{x.BotLink}): *{x.BotStatus}* ").ToList()
+                    db.BotStatus.ToList().Where(x => x.BotName != "Bot 2").Select(x =>
+                            $"[{x.BotName.Replace("Bot 1", "Moderator")}](https://t.me/{x.BotLink}): *{x.BotStatus}* ")
+                        .ToList()
                         .Aggregate((a, b) => a + "\n" + b);
-                Bot.Api.SendTextMessageAsync(u.Message.Chat.Id, msg, parseMode: ParseMode.Markdown, disableWebPagePreview: true);
+                Bot.Api.SendTextMessageAsync(u.Message.Chat.Id, msg, parseMode: ParseMode.Markdown,
+                    disableWebPagePreview: true);
             }
         }
 
-        [Command(Trigger = "version")]
+        [Attributes.Command(Trigger = "version")]
         public static void Version(Update update, string[] args)
         {
             var version = Program.GetVersion();
@@ -102,10 +104,11 @@ namespace Werewolf_Control
             {
                 // ignored
             }
+
             Send(version, update.Message.Chat.Id);
         }
 
-        [Command(Trigger = "setlang")]
+        [Attributes.Command(Trigger = "setlang")]
         public static void SetLang(Update update, string[] args)
         {
             Player p = null;
@@ -115,8 +118,6 @@ namespace Werewolf_Control
 
                 if (p == null)
                 {
-
-
                     p = new Player
                     {
                         TelegramId = update.Message.From.Id,
@@ -149,24 +150,26 @@ namespace Werewolf_Control
                         return;
                     }
                 }
-
-
             }
+
             //user wants to pick personal language
             var langs = Directory.GetFiles(Bot.LanguageDirectory, "*.xml").Select(x => new LangFile(x)).ToList();
 
 
-            List<InlineKeyboardCallbackButton> buttons = langs.Select(x => x.Base).Distinct().OrderBy(x => x).Select(x => new InlineKeyboardCallbackButton(x, $"setlang|{update.Message.From.Id}|{x}|null|base")).ToList();
+            List<InlineKeyboardCallbackButton> buttons = langs.Select(x => x.Base).Distinct().OrderBy(x => x)
+                .Select(x => new InlineKeyboardCallbackButton(x, $"setlang|{update.Message.From.Id}|{x}|null|base"))
+                .ToList();
 
             var baseMenu = new List<InlineKeyboardButton[]>();
             for (var i = 0; i < buttons.Count; i++)
             {
                 if (buttons.Count - 1 == i)
                 {
-                    baseMenu.Add(new[] { buttons[i] });
+                    baseMenu.Add(new[] {buttons[i]});
                 }
                 else
-                    baseMenu.Add(new[] { buttons[i], buttons[i + 1] });
+                    baseMenu.Add(new[] {buttons[i], buttons[i + 1]});
+
                 i++;
             }
 
@@ -174,13 +177,14 @@ namespace Werewolf_Control
 
             var curLangFileName = GetLanguage(update.Message.From.Id);
             var curLang = langs.First(x => x.FileName == curLangFileName);
-            Bot.Api.SendTextMessageAsync(update.Message.From.Id, GetLocaleString("WhatLang", curLangFileName, curLang.Base),
+            Bot.Api.SendTextMessageAsync(update.Message.From.Id,
+                GetLocaleString("WhatLang", curLangFileName, curLang.Base),
                 replyMarkup: menu);
             if (update.Message.Chat.Type != ChatType.Private)
                 Send(GetLocaleString("SentPrivate", GetLanguage(update.Message.From.Id)), update.Message.Chat.Id);
         }
 
-        [Command(Trigger = "start")]
+        [Attributes.Command(Trigger = "start")]
         public static void Start(Update u, string[] args)
         {
             if (u.Message.Chat.Type == ChatType.Private && u.Message.From != null)
@@ -203,7 +207,7 @@ namespace Werewolf_Control
                         p = GetDBPlayer(u.Message.From.Id, db);
                     }
 #if RELEASE
-                        p.HasPM = true;
+                    p.HasPM = true;
 #elif RELEASE2
                         p.HasPM2 = true;
 #elif BETA
@@ -232,8 +236,8 @@ namespace Werewolf_Control
                     //okay, they are joining a game.
                     string nodeid = "";
                     string gameid = "";
-                    Models.Node node = null;
-                    Models.GameInfo game = null;
+                    Node node = null;
+                    GameInfo game = null;
                     ChatMemberStatus status = ChatMemberStatus.Creator;
                     try
                     {
@@ -246,12 +250,13 @@ namespace Werewolf_Control
                             return;
 
                         //first get the node where to search for the game
-                        
+
                         for (var i = 0; i < 3; i++)
                         {
                             node = Bot.Nodes.ToList().FirstOrDefault(x => x.ClientId == n);
                             if (node != null) break;
                         }
+
                         if (node == null)
                         {
                             //log it
@@ -260,12 +265,13 @@ namespace Werewolf_Control
                         }
 
                         //we have the node, get the game
-                        
+
                         for (var i = 0; i < 5; i++)
                         {
                             game = node.Games.ToList().FirstOrDefault(x => x.Guid == g);
                             if (game != null) break;
                         }
+
                         if (game == null)
                         {
                             //log it
@@ -303,7 +309,6 @@ namespace Werewolf_Control
                              $"Chat Member Status: {status}\n" +
                              $"{ex.Message}\n{ex.StackTrace}",
                             Settings.ErrorGroup);
-
                     }
                     catch (Exception ex)
                     {
@@ -325,7 +330,7 @@ namespace Werewolf_Control
             }
         }
 
-        [Command(Trigger = "nextgame", Blockable = true, InGroupOnly = true)]
+        [Attributes.Command(Trigger = "nextgame", Blockable = true, InGroupOnly = true)]
         public static void NextGame(Update update, string[] args)
         {
             var id = update.Message.Chat.Id;
@@ -342,7 +347,8 @@ namespace Werewolf_Control
                 //check nodes to see if player is in a game
                 //node = GetPlayerNode(update.Message.From.Id);
                 var game = GetGroupNodeAndGame(update.Message.Chat.Id);
-                if (game != null && (game?.Users.Contains(update.Message.From.Id) ?? false) && game?.GroupId != update.Message.Chat.Id)
+                if (game != null && (game?.Users.Contains(update.Message.From.Id) ?? false) &&
+                    game?.GroupId != update.Message.Chat.Id)
                 {
                     //player is already in a game, and alive
                     Send(
@@ -351,9 +357,10 @@ namespace Werewolf_Control
                     return;
                 }
 
-                var button = new InlineKeyboardMarkup(new[] {
-                        new InlineKeyboardCallbackButton(GetLocaleString("Cancel", grp.Language), $"stopwaiting|{id}")
-                    });
+                var button = new InlineKeyboardMarkup(new[]
+                {
+                    new InlineKeyboardCallbackButton(GetLocaleString("Cancel", grp.Language), $"stopwaiting|{id}")
+                });
                 if (db.NotifyGames.Any(x => x.GroupId == id && x.UserId == update.Message.From.Id))
                 {
                     Send(GetLocaleString("AlreadyOnWaitList", grp.Language, grp.Name.ToBold()),
@@ -370,30 +377,35 @@ namespace Werewolf_Control
             }
         }
 
-        [Command(Trigger = "getlang")]
+        [Attributes.Command(Trigger = "getlang")]
         public static void GetLang(Update update, string[] args)
         {
             var langs = Directory.GetFiles(Bot.LanguageDirectory, "*.xml").Select(x => new LangFile(x)).ToList();
 
-            List<InlineKeyboardCallbackButton> buttons = langs.Select(x => x.Base).Distinct().OrderBy(x => x).Select(x => new InlineKeyboardCallbackButton(x, $"getlang|{update.Message.From.Id}|{x}|null|base")).ToList();
-            buttons.Insert(0, new InlineKeyboardCallbackButton("All", $"getlang|{update.Message.From.Id}|All|null|base"));
+            List<InlineKeyboardCallbackButton> buttons = langs.Select(x => x.Base).Distinct().OrderBy(x => x)
+                .Select(x => new InlineKeyboardCallbackButton(x, $"getlang|{update.Message.From.Id}|{x}|null|base"))
+                .ToList();
+            buttons.Insert(0,
+                new InlineKeyboardCallbackButton("All", $"getlang|{update.Message.From.Id}|All|null|base"));
 
             var baseMenu = new List<InlineKeyboardButton[]>();
             for (var i = 0; i < buttons.Count; i++)
             {
                 if (buttons.Count - 1 == i)
                 {
-                    baseMenu.Add(new[] { buttons[i] });
+                    baseMenu.Add(new[] {buttons[i]});
                 }
                 else
-                    baseMenu.Add(new[] { buttons[i], buttons[i + 1] });
+                    baseMenu.Add(new[] {buttons[i], buttons[i + 1]});
+
                 i++;
             }
 
             var menu = new InlineKeyboardMarkup(baseMenu.ToArray());
             try
             {
-                Bot.Api.SendTextMessageAsync(update.Message.Chat.Id, GetLocaleString("GetLang", GetLanguage(update.Message.Chat.Id)),
+                Bot.Api.SendTextMessageAsync(update.Message.Chat.Id,
+                    GetLocaleString("GetLang", GetLanguage(update.Message.Chat.Id)),
                     replyToMessageId: update.Message.MessageId, replyMarkup: menu);
             }
             catch (AggregateException e)
@@ -411,7 +423,7 @@ namespace Werewolf_Control
             }
         }
 
-        [Command(Trigger = "stats")]
+        [Attributes.Command(Trigger = "stats")]
         public static void GetStats(Update u, string[] args)
         {
             //var reply = $"[Global Stats](www.tgwerewolf.com/Stats)\n";
@@ -432,61 +444,58 @@ namespace Werewolf_Control
                     id = m.ForwardFrom.Id;
                     name = m.ForwardFrom.FirstName;
                 }
+
                 var buttons = new List<InlineKeyboardButton[]>
                 {
                     new[]
                     {
-                    new InlineKeyboardUrlButton($"{name} Stats",
-                        "http://www.tgwerewolf.com/Stats/Player/" + id + "?referrer=stats")
-                }
-
+                        new InlineKeyboardUrlButton($"{name} Stats",
+                            "http://www.tgwerewolf.com/Stats/Player/" + id + "?referrer=stats")
+                    }
                 };
                 var menu = new InlineKeyboardMarkup(buttons.ToArray());
                 Bot.Api.SendTextMessageAsync(u.Message.Chat.Id, "Stats", replyMarkup: menu);
             }
             else
             {
-
-
                 //change this to buttons
                 var buttons = new List<InlineKeyboardButton[]>
                 {
                     new[]
                     {
                         new InlineKeyboardUrlButton("Global Stats",
-                           "http://www.tgwerewolf.com/Stats?referrer=stats")
-
+                            "http://www.tgwerewolf.com/Stats?referrer=stats")
                     }
                 };
                 if (u.Message.Chat.Type != ChatType.Private)
                     buttons.Add(new[]
                     {
-                        new InlineKeyboardUrlButton( $"{u.Message.Chat.Title} Stats",
-                        "http://www.tgwerewolf.com/Stats/Group/" + u.Message.Chat.Id + "?referrer=stats")
+                        new InlineKeyboardUrlButton($"{u.Message.Chat.Title} Stats",
+                            "http://www.tgwerewolf.com/Stats/Group/" + u.Message.Chat.Id + "?referrer=stats")
                     });
                 buttons.Add(new[]
                 {
-                    new InlineKeyboardUrlButton($"{u.Message.From.FirstName} Stats","http://www.tgwerewolf.com/Stats/Player/" + u.Message.From.Id + "?referrer=stats")
-
+                    new InlineKeyboardUrlButton($"{u.Message.From.FirstName} Stats",
+                        "http://www.tgwerewolf.com/Stats/Player/" + u.Message.From.Id + "?referrer=stats")
                 });
                 var menu = new InlineKeyboardMarkup(buttons.ToArray());
                 Bot.Api.SendTextMessageAsync(u.Message.Chat.Id, "Stats", replyMarkup: menu);
             }
         }
-        
-        [Command(Trigger = "myidles")]
+
+        [Attributes.Command(Trigger = "myidles")]
         public static void MyIdles(Update update, string[] args)
         {
             var idles = 0;
-            
+
             using (var db = new WWContext())
             {
                 idles = db.GetIdleKills24Hours(update.Message.From.Id).FirstOrDefault() ?? 0;
             }
-            
+
             var str = $"{update.Message.From.Id} ({update.Message.From.FirstName})";
             var reply = GetLocaleString("IdleCount", GetLanguage(update.Message.Chat.Id), str, idles);
-            
+
             try
             {
                 var result = Bot.Api.SendTextMessageAsync(update.Message.From.Id, reply).Result;

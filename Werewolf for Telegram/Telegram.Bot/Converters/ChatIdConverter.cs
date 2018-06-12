@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
 using Telegram.Bot.Types;
 
 namespace Telegram.Bot.Converters
@@ -9,7 +9,7 @@ namespace Telegram.Bot.Converters
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            var chatId = (ChatId)value;
+            var chatId = (ChatId) value;
 
             if (chatId.Username != null)
             {
@@ -21,7 +21,8 @@ namespace Telegram.Bot.Converters
             }
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
+            JsonSerializer serializer)
         {
             var value = JToken.ReadFrom(reader).Value<string>();
 

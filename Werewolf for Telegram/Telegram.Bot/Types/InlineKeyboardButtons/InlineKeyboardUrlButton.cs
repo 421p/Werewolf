@@ -12,7 +12,8 @@ namespace Telegram.Bot.Types.InlineKeyboardButtons
         /// <summary>
         /// Optional. HTTP url to be opened when button is pressed
         /// </summary>
-        [JsonProperty(PropertyName = "url", Required = Required.Default, DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonProperty(PropertyName = "url", Required = Required.Default,
+            DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public string Url { get; set; }
 
         /// <summary>
@@ -24,6 +25,7 @@ namespace Telegram.Bot.Types.InlineKeyboardButtons
         {
             Url = url;
         }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="InlineKeyboardButton"/> class.
         /// </summary>

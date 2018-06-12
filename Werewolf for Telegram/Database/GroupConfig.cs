@@ -12,28 +12,42 @@ namespace Database
     {
         //Group settings are now as simple as adding an enum to this list.  No more database schema changes.
         None = 0,
+
         [Editable(true), Question("tanner"), DefaultValue(true)]
         AllowTanner = 1,
+
         [Editable(true), Question("fool"), DefaultValue(true)]
         AllowFool = 2,
+
         [Editable(true), Question("cult"), DefaultValue(true)]
         AllowCult = 4,
+
         [Editable(true), Question("secretlynch", SettingQuestion.YesNo), DefaultValue(false)]
         EnableSecretLynch = 8,
-        [Editable(true), Question("randommode", SettingQuestion.YesNo), DefaultValue(false)] //WAIT WHAT IS THIS? Shhhhhhhhh
+
+        [Editable(true), Question("randommode", SettingQuestion.YesNo),
+         DefaultValue(false)]
+        //WAIT WHAT IS THIS? Shhhhhhhhh
         RandomMode = 16,
+
         [Editable(true), Question("extend"), DefaultValue(false)]
         AllowExtend = 32,
+
         [Editable(true), Question("roles", SettingQuestion.YesNo), DefaultValue(true)]
         ShowRolesDeath = 64,
+
         [Editable(true), Question("flee"), DefaultValue(true)]
         AllowFlee = 128,
+
         [Editable(true), Question("showid", SettingQuestion.ShowHide), DefaultValue(false)]
         ShowIDs = 256,
+
         [Editable(true), Question("allownsfw"), DefaultValue(false)]
         AllowNSFW = 512,
+
         [Editable(true), Question("allowthief"), DefaultValue(true)]
         AllowThief = 1024,
+
         [Editable(true), Question("thieffull", SettingQuestion.YesNo), DefaultValue(true)]
         ThiefFull = 2048,
 
@@ -52,6 +66,7 @@ namespace Database
                 if (flag.GetDefaultValue())
                     result |= flag;
             }
+
             return result;
         }
     }
@@ -71,10 +86,12 @@ namespace Database
         /// NOTE: This will also be used for the translation file.  Property will be the key for the button option, add A or Q for the answer and question asked.
         /// </summary>
         public SettingQuestion Question { get; set; }
+
         /// <summary>
         /// Used internally as part of the callback button data
         /// </summary>
         public string ShortName { get; set; }
+
         public QuestionAttribute(string shortName, SettingQuestion question = SettingQuestion.AllowDisallow)
         {
             Question = question;
@@ -90,6 +107,7 @@ namespace Database
             var dA = fi.GetCustomAttribute(typeof(EditableAttribute)) as EditableAttribute;
             return dA?.AllowEdit ?? false;
         }
+
         public static QuestionAttribute GetInfo(this GroupConfig value)
         {
             var fieldInfo = value.GetType().GetField(value.ToString());
@@ -106,9 +124,8 @@ namespace Database
             var fi = value.GetType().GetField(value.ToString());
             var dA = fi.GetCustomAttribute(typeof(DefaultValueAttribute)) as DefaultValueAttribute;
             if (dA?.Value == null) return false;
-            return ((bool)dA.Value);
+            return ((bool) dA.Value);
         }
-
 
 
         public static IEnumerable<GroupConfig> GetUniqueSettings(this Enum flags)

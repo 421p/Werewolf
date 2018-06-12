@@ -19,7 +19,6 @@ namespace Werewolf_Node.Models
         public string Version { get; set; }
         public bool ShuttingDown { get; set; }
         public int MessagesSent { get; set; }
-
     }
 
     public class ClientRegistrationInfo
@@ -96,6 +95,7 @@ namespace Werewolf_Node.Models
         public int UserId { get; set; }
         public long GroupId { get; set; }
     }
+
     public class CallbackInfo
     {
         public string JType { get; set; } = "CallbackInfo";
@@ -107,6 +107,7 @@ namespace Werewolf_Node.Models
         public string JType { get; set; } = "SkipVoteInfo";
         public long GroupId { get; set; }
     }
+
     public class GameKillInfo
     {
         public string JType { get; set; } = "GameKillInfo";

@@ -33,14 +33,10 @@ namespace Telegram.Bot.Types.InlineQueryResults
         [JsonProperty("caption", Required = Required.Default)]
         public string Caption { get; set; }
 
-        [JsonIgnore]
-        public new string ThumbUrl { get; set; }
+        [JsonIgnore] public new string ThumbUrl { get; set; }
 
-        [JsonIgnore]
-        public new string ThumbWidth { get; set; }
+        [JsonIgnore] public new string ThumbWidth { get; set; }
 
-        [JsonIgnore]
-        public new string ThumbHeight { get; set; }
-
+        [JsonIgnore] public new string ThumbHeight { get; set; }
     }
 }

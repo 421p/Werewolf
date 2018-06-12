@@ -1,12 +1,9 @@
-﻿
-
-@{
+﻿@{
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 }
 
 
 <h2>@ViewBag.BotName</h2>
-
 
 
 <div class="table-responsive">
@@ -57,7 +54,7 @@
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.2/Chart.min.js"></script>
 <script>
     count = 30;
-    
+
     updateData = function() {
         $.ajax({
             type: "GET",
@@ -118,7 +115,7 @@
     };
 
 
-    addRow = function (table, col1, col2, col3) {
+    addRow = function(table, col1, col2, col3) {
         table.find('tbody')
             .append($('<tr>')
                 .append($('<td>').append(col1))
@@ -127,9 +124,9 @@
 
     }
 
-    addNode = function (table, nodeid, games, version, shutDown, uptime, ip, port) {
+    addNode = function(table, nodeid, games, version, shutDown, uptime, ip, port) {
         var shuttingDown = '';
-        
+
         if (shutDown === true) {
             shuttingDown = '<i class="fa fa-times-circle" style="color: red;"></i>';
         }
@@ -146,7 +143,13 @@
                         nodeid +
                         "' class='btn btn-default btn-xs btn-block'>View</a>"))
                 .append($('<td>')
-                    .append("<button type='button' class='btn btn-danger btn-xs btn-block' onclick='stopNode(\"" + nodeid + "\", \"" + ip + "\"," + port + ")'>Stop</button>")));
+                    .append("<button type='button' class='btn btn-danger btn-xs btn-block' onclick='stopNode(\"" +
+                        nodeid +
+                        "\", \"" +
+                        ip +
+                        "\"," +
+                        port +
+                        ")'>Stop</button>")));
     }
 
     bot1Data = {

@@ -3,29 +3,22 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlTypes;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Forms.DataVisualization.Charting;
 using System.Xml.Linq;
 using Database;
-using Newtonsoft.Json;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineKeyboardButtons;
-using Telegram.Bot.Types.Payments;
 using Telegram.Bot.Types.ReplyMarkups;
 using Werewolf_Control.Handler;
 using Werewolf_Control.Helpers;
 using Werewolf_Control.Models;
-using Werewolf_Control.Attributes;
 using File = System.IO.File;
 using Group = Database.Group;
-using RegHelper = Werewolf_Control.Helpers.RegHelper;
 
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 namespace Werewolf_Control
@@ -55,8 +48,10 @@ namespace Werewolf_Control
                     {
                         Send(g + " - " + e.InnerExceptions.FirstOrDefault()?.Message, u.Message.Chat.Id);
                     }
+
                     Thread.Sleep(1000);
                 }
+
                 Thread.Sleep(5000);
             }
         }
@@ -114,7 +109,8 @@ namespace Werewolf_Control
         {
             if (update.Message.Date > DateTime.UtcNow.AddSeconds(-3))
             {
-                Process.Start(Path.Combine(Bot.RootDirectory, "Resources\\update.exe"), update.Message.Chat.Id.ToString());
+                Process.Start(Path.Combine(Bot.RootDirectory, "Resources\\update.exe"),
+                    update.Message.Chat.Id.ToString());
                 Bot.Running = false;
                 Program.Running = false;
                 Bot.Api.StopReceiving();
@@ -134,6 +130,7 @@ namespace Werewolf_Control
                     db.BotStatus.Find(bot).BotStatus = "Updating";
                     db.SaveChanges();
                 }
+
                 Environment.Exit(1);
             }
         }
@@ -189,7 +186,6 @@ namespace Werewolf_Control
             {
                 Send("/stopnode <node guid>", u.Message.Chat.Id);
             }
-
         }
 
         [Attributes.Command(Trigger = "killnode", GlobalAdminOnly = true)]
@@ -210,7 +206,6 @@ namespace Werewolf_Control
             {
                 Send("/killnode <node guid>", u.Message.Chat.Id);
             }
-
         }
 
         //[Command(Trigger = "sendonline", DevOnly = true)]
@@ -373,7 +368,6 @@ namespace Werewolf_Control
         //    }
 
 
-
         //    var balanced = false;
 
         //    List<IRole> rolesToAssign = new List<IRole>();
@@ -409,7 +403,6 @@ namespace Werewolf_Control
         //    }
 
 
-
         //    var msg = $"Attempts: {attempts}\n";
         //    if (balanced)
         //    {
@@ -438,11 +431,18 @@ namespace Werewolf_Control
             {
                 Bot.Send("Please hold, searching....", update.Message.Chat.Id);
 
-                var groups = db.Groups.Where(x => x.Preferred != false && x.GroupLink != null && x.GroupId != -1001030085238)
-                    .Select(x => new PossibleGroup() { GroupId = x.GroupId, GroupLink = x.GroupLink, MemberCount = x.MemberCount ?? 0, Name = x.Name }).ToList();
+                var groups = db.Groups
+                    .Where(x => x.Preferred != false && x.GroupLink != null && x.GroupId != -1001030085238)
+                    .Select(x => new PossibleGroup()
+                    {
+                        GroupId = x.GroupId,
+                        GroupLink = x.GroupLink,
+                        MemberCount = x.MemberCount ?? 0,
+                        Name = x.Name
+                    }).ToList();
 
-                var ofcSpells = new[] { "official", "offciail", "official", "oficial", "offical" };
-                var wuffSpells = new[] { "wolf", "wuff", "wulf", "lupus" };
+                var ofcSpells = new[] {"official", "offciail", "official", "oficial", "offical"};
+                var wuffSpells = new[] {"wolf", "wuff", "wulf", "lupus"};
 
                 for (var i = groups.Count - 1; i >= 0; i--)
                 {
@@ -453,8 +453,8 @@ namespace Werewolf_Control
                         if (wuffSpells.Any(x => g.Name.Contains(x)))
                             continue;
                     }
-                    groups.RemoveAt(i);
 
+                    groups.RemoveAt(i);
                 }
 
                 //groups = groups.Where(x => x.Name.Unidecode().IndexOf("Werewolf",StringComparison.InvariantCultureIgnoreCase) != -1).ToList();
@@ -465,8 +465,6 @@ namespace Werewolf_Control
                 else
                     Bot.Send("No groups found with variations on Werewolf and Official in name.",
                         update.Message.Chat.Id);
-
-
             }
         }
 
@@ -483,6 +481,7 @@ namespace Werewolf_Control
                     _name = value.Unidecode().ToLower();
                 }
             }
+
             public string GroupLink { get; set; }
             public string OriginalName { get; set; }
             public long GroupId { get; set; }
@@ -499,7 +498,6 @@ namespace Werewolf_Control
 
             public PossibleGroup()
             {
-
             }
         }
 
@@ -511,6 +509,7 @@ namespace Werewolf_Control
                 Send("You must enter a sql command...", u.Message.Chat.Id);
                 return;
             }
+
             using (var db = new WWContext())
             {
                 var conn = db.Database.Connection;
@@ -535,13 +534,17 @@ namespace Werewolf_Control
                             while (reader.Read())
                             {
                                 for (int i = 0; i < reader.FieldCount; i++)
-                                    raw += (reader.IsDBNull(i) ? "<i>NULL</i>" : reader[i]) + (i == reader.FieldCount - 1 ? "" : " - ");
+                                    raw += (reader.IsDBNull(i) ? "<i>NULL</i>" : reader[i]) +
+                                           (i == reader.FieldCount - 1 ? "" : " - ");
                                 result += raw + Environment.NewLine;
                                 raw = "";
                             }
                         }
+
                         result += reader.RecordsAffected == -1 ? "" : (reader.RecordsAffected + " records affected");
-                        result = !String.IsNullOrEmpty(result) ? result : (sql.ToLower().StartsWith("select") ? "Nothing found" : "Done.");
+                        result = !String.IsNullOrEmpty(result)
+                            ? result
+                            : (sql.ToLower().StartsWith("select") ? "Nothing found" : "Done.");
                         Send(result, u.Message.Chat.Id);
                     }
                 }
@@ -584,6 +587,7 @@ namespace Werewolf_Control
                     Send($"User: {p.Name}\nUserName: @{p.UserName}", u.Message.Chat.Id);
             }
         }
+
         [Attributes.Command(Trigger = "getcommands", DevOnly = true)]
         public static void GetCommands(Update u, string[] args)
         {
@@ -616,7 +620,8 @@ namespace Werewolf_Control
                             if (p.DonationLevel >= 10)
                                 p.GifPurchased = true;
                             db.SaveChanges();
-                            Send($"{p.Name} (@{p.UserName}) donation level is now {p.DonationLevel}", u.Message.Chat.Id);
+                            Send($"{p.Name} (@{p.UserName}) donation level is now {p.DonationLevel}",
+                                u.Message.Chat.Id);
                             var msg = "";
                             if (wasLocked)
                             {
@@ -626,6 +631,7 @@ namespace Werewolf_Control
                             {
                                 msg = "Your donation level has been updated.  New level: " + p.DonationLevel;
                             }
+
                             try
                             {
                                 var sent = Send(msg, p.TelegramId).Result;
@@ -633,7 +639,9 @@ namespace Werewolf_Control
                             }
                             catch
                             {
-                                Send("Unable to notify user (this bot not started by the user).  Please reach out to them.", u.Message.Chat.Id);
+                                Send(
+                                    "Unable to notify user (this bot not started by the user).  Please reach out to them.",
+                                    u.Message.Chat.Id);
                             }
                         }
                     }
@@ -644,7 +652,6 @@ namespace Werewolf_Control
                 }
                 else
                     Send($"Unable to determine user to add donation level to.", u.Message.Chat.Id);
-
             }
 #endif
         }
@@ -652,7 +659,8 @@ namespace Werewolf_Control
         [Attributes.Command(Trigger = "updatestatus", GlobalAdminOnly = true)]
         public static void UpdateStatus(Update u, string[] args)
         {
-            var menu = new InlineKeyboardMarkup(new[] { "Bot 1", "Bot 2", "Beta Bot", "Test Bot" }.Select(x => new InlineKeyboardCallbackButton(x, $"status|{u.Message.From.Id}|{x}|null")).ToArray());
+            var menu = new InlineKeyboardMarkup(new[] {"Bot 1", "Bot 2", "Beta Bot", "Test Bot"}
+                .Select(x => new InlineKeyboardCallbackButton(x, $"status|{u.Message.From.Id}|{x}|null")).ToArray());
 
             Bot.Api.SendTextMessageAsync(u.Message.From.Id, "Which bot?",
                 replyMarkup: menu);
@@ -674,19 +682,20 @@ namespace Werewolf_Control
                         reply += $"{id} - {p.Name} @{p.UserName}\n";
                     }
                 }
+
                 reply += "\nGlobal Bans in Database\n";
 
-                reply = UpdateHandler.BanList.Where(x => x.Expires < new DateTime(3000, 1, 1)).OrderBy(x => x.Expires).
-                    Aggregate(reply, (current, ban) =>
-                    current + $"{ban.TelegramId} - {ban.Name.FormatHTML()}: {ban.Reason}".ToBold() +
-                    $"\n{"Expires: " + TimeZoneInfo.ConvertTimeToUtc(ban.Expires, TimeZoneInfo.Local).ToString("u") + "\n"}");
+                reply = UpdateHandler.BanList.Where(x => x.Expires < new DateTime(3000, 1, 1)).OrderBy(x => x.Expires)
+                    .Aggregate(reply, (current, ban) =>
+                        current + $"{ban.TelegramId} - {ban.Name.FormatHTML()}: {ban.Reason}".ToBold() +
+                        $"\n{"Expires: " + TimeZoneInfo.ConvertTimeToUtc(ban.Expires, TimeZoneInfo.Local).ToString("u") + "\n"}");
 
                 Send(reply, u.Message.Chat.Id);
 
                 reply = "";
-                reply = UpdateHandler.BanList.Where(x => x.Expires >= new DateTime(3000, 1, 1)).OrderBy(x => x.Expires).
-                    Aggregate(reply, (current, ban) =>
-                    current + $"{ban.TelegramId} - {ban.Name.FormatHTML()}: {ban.Reason}".ToBold() + "\n");
+                reply = UpdateHandler.BanList.Where(x => x.Expires >= new DateTime(3000, 1, 1)).OrderBy(x => x.Expires)
+                    .Aggregate(reply, (current, ban) =>
+                        current + $"{ban.TelegramId} - {ban.Name.FormatHTML()}: {ban.Reason}".ToBold() + "\n");
                 Send(reply, u.Message.Chat.Id);
             }
         }
@@ -712,8 +721,10 @@ namespace Werewolf_Control
                                 //add the ban
                                 var ban = new GlobalBan
                                 {
-                                    Expires = (DateTime)SqlDateTime.MaxValue,
-                                    Reason = args[1].Split(' ').Skip(1).Aggregate((a, b) => a + " " + b), //skip the players name
+                                    Expires = (DateTime) SqlDateTime.MaxValue,
+                                    Reason =
+                                        args[1].Split(' ').Skip(1)
+                                            .Aggregate((a, b) => a + " " + b), //skip the players name
                                     TelegramId = player.TelegramId,
                                     BanDate = DateTime.UtcNow,
                                     BannedBy = u.Message.From.FirstName,
@@ -725,6 +736,7 @@ namespace Werewolf_Control
                                 Send("User has been banned", u.Message.Chat.Id);
                             }
                         }
+
                         break;
                     case MessageEntityType.TextMention:
                         using (var db = new WWContext())
@@ -737,8 +749,10 @@ namespace Werewolf_Control
                                 //add the ban
                                 var ban = new GlobalBan
                                 {
-                                    Expires = (DateTime)SqlDateTime.MaxValue,
-                                    Reason = args[1].Split(' ').Skip(1).Aggregate((a, b) => a + " " + b), //skip the players name
+                                    Expires = (DateTime) SqlDateTime.MaxValue,
+                                    Reason =
+                                        args[1].Split(' ').Skip(1)
+                                            .Aggregate((a, b) => a + " " + b), //skip the players name
                                     TelegramId = player.TelegramId,
                                     BanDate = DateTime.UtcNow,
                                     BannedBy = u.Message.From.FirstName,
@@ -750,9 +764,11 @@ namespace Werewolf_Control
                                 Send("User has been banned", u.Message.Chat.Id);
                             }
                         }
+
                         break;
                 }
             }
+
             if (args.Length < 2 || String.IsNullOrEmpty(args[1]))
                 return;
             //now check for ids
@@ -770,6 +786,7 @@ namespace Werewolf_Control
                     banReason += arg + " ";
                 }
             }
+
             banReason = banReason.Trim();
             if (toBan.Count > 0)
             {
@@ -785,8 +802,9 @@ namespace Werewolf_Control
                             //add the ban
                             var ban = new GlobalBan
                             {
-                                Expires = (DateTime)SqlDateTime.MaxValue,
-                                Reason = args[1].Split(' ').Skip(1).Aggregate((a, b) => a + " " + b), //skip the players name
+                                Expires = (DateTime) SqlDateTime.MaxValue,
+                                Reason =
+                                    args[1].Split(' ').Skip(1).Aggregate((a, b) => a + " " + b), //skip the players name
                                 TelegramId = player.TelegramId,
                                 BanDate = DateTime.UtcNow,
                                 BannedBy = u.Message.From.FirstName,
@@ -833,6 +851,7 @@ namespace Werewolf_Control
                                 }
                             }
                         }
+
                         break;
                     case MessageEntityType.TextMention:
                         using (var db = new WWContext())
@@ -852,9 +871,11 @@ namespace Werewolf_Control
                                 }
                             }
                         }
+
                         break;
                 }
             }
+
             if (args.Length > 1 && !string.IsNullOrEmpty(args[1]))
             {
                 foreach (var userid in args[1].Split(' '))
@@ -908,6 +929,7 @@ namespace Werewolf_Control
                         e = e.InnerException;
                     Send(e.Message + "\n" + e.StackTrace, u.Message.Chat.Id);
                 }
+
                 if (channel == null) return;
                 var users = channel.Users.Skip(skip).ToList();
                 Send($"Beginning kick process.  Found {users.Count} users in the group", u.Message.Chat.Id);
@@ -948,7 +970,7 @@ namespace Werewolf_Control
                             //get latest game player, check within 2 weeks
                             var gp =
                                 p?.GamePlayers.Join(db.Games.Where(x => x.GroupId == Settings.PrimaryChatId),
-                                        x => x.GameId, y => y.Id, (gamePlayer, game) => new { game.TimeStarted, game.Id })
+                                        x => x.GameId, y => y.Id, (gamePlayer, game) => new {game.TimeStarted, game.Id})
                                     .OrderByDescending(x => x.Id)
                                     .FirstOrDefault();
                             var lastPlayed = DateTime.MinValue;
@@ -989,8 +1011,10 @@ namespace Werewolf_Control
                                         else
                                             throw;
                                     }
+
                                     Thread.Sleep(500);
                                 }
+
                                 //status is now kicked (as it should be)
                                 var attempts = 0;
                                 sw.Write("|Unbanning-");
@@ -1015,10 +1039,13 @@ namespace Werewolf_Control
                                             throw;
                                     }
                                 }
+
                                 //yay unbanned
                                 sw.Write($"|Unbanned({attempts} attempts)");
                                 //let them know
-                                Send("You have been removed from the main chat as you have not played in that group in the 2 weeks.  You are always welcome to rejoin!", id);
+                                Send(
+                                    "You have been removed from the main chat as you have not played in that group in the 2 weeks.  You are always welcome to rejoin!",
+                                    id);
                             }
                             catch (AggregateException ex)
                             {
@@ -1039,10 +1066,10 @@ namespace Werewolf_Control
                                 sw.WriteLine(e.StackTrace);
                                 // ignored
                             }
+
                             sw.Flush();
                             //sleep 4 seconds to avoid API rate limiting
                             Thread.Sleep(100);
-
                         }
                         catch (AggregateException e)
                         {
@@ -1054,7 +1081,6 @@ namespace Werewolf_Control
                                 e = e.InnerException;
                             sw.Write($"{e.Message}");
                         }
-
                     }
 
 
@@ -1062,13 +1088,8 @@ namespace Werewolf_Control
                 Send(
                     $"@{u.Message.From.Username} I have removed {removed} users from the main group.\nTime to process: {DateTime.UtcNow - timeStarted}",
                     u.Message.Chat.Id);
-
-
-
-
             }
         }
-
 
 
         [Attributes.Command(Trigger = "leavegroup", GlobalAdminOnly = true)]
@@ -1080,10 +1101,10 @@ namespace Werewolf_Control
                 return;
             }
 
-            Database.Group grp;
+            Group grp;
             using (var db = new WWContext())
                 grp = GetGroup(args[1], db);
-            var grpid = grp?.GroupId ?? (long)0;
+            var grpid = grp?.GroupId ?? (long) 0;
             var grpname = grp?.Name ?? "";
 
 
@@ -1091,23 +1112,23 @@ namespace Werewolf_Control
             {
                 try
                 {
-                    Send("Para said I can't play with you guys anymore, you are a bad influence! *runs out the door*", grpid)
-                        .ContinueWith((result) =>
-                        {
-                            Bot.Api.LeaveChatAsync(grpid);
-                        });
+                    Send("Para said I can't play with you guys anymore, you are a bad influence! *runs out the door*",
+                            grpid)
+                        .ContinueWith((result) => { Bot.Api.LeaveChatAsync(grpid); });
                 }
                 catch (Exception e)
                 {
                     Send("An error occurred.\n" + e.Message, update.Message.Chat.Id);
                     return;
                 }
+
                 var msg = "Bot successfully left from group";
                 msg += String.IsNullOrEmpty(grpname) ? $" {grpname}." : ".";
                 Send(msg, update.Message.Chat.Id);
             }
             else
                 Send("Couldn't find the group. Is the id/link valid?", update.Message.Chat.Id);
+
             return;
         }
 
@@ -1118,32 +1139,40 @@ namespace Werewolf_Control
             var group = args[1];
             if (String.IsNullOrEmpty(args[1]))
             {
-                Bot.Send("Usage: `/preferred <link|username|groupid>`", update.Message.Chat.Id, parseMode: ParseMode.Markdown);
+                Bot.Send("Usage: `/preferred <link|username|groupid>`", update.Message.Chat.Id,
+                    parseMode: ParseMode.Markdown);
                 return;
             }
+
             using (var db = new WWContext())
             {
-                Database.Group grp = GetGroup(group, db);
+                Group grp = GetGroup(group, db);
                 if (grp == null)
                 {
                     Send("Group not found.", update.Message.Chat.Id);
                     return;
                 }
+
                 //get the languages which they played, make a menu out of it
                 var rankings = db.GroupRanking.Where(x => x.GroupId == grp.Id).ToList();
-                var menu = rankings.Select(x => new[] {
-                        new InlineKeyboardCallbackButton(x.Language, $"preferred|{grp.GroupId}|{x.Language}|info"),
-                        new InlineKeyboardCallbackButton(x.Show == false ? "☑️" : "✅", $"preferred|{grp.GroupId}|{x.Language}|toggle")
-                    }).ToList();
+                var menu = rankings.Select(x => new[]
+                {
+                    new InlineKeyboardCallbackButton(x.Language, $"preferred|{grp.GroupId}|{x.Language}|info"),
+                    new InlineKeyboardCallbackButton(x.Show == false ? "☑️" : "✅",
+                        $"preferred|{grp.GroupId}|{x.Language}|toggle")
+                }).ToList();
                 //add a button at the beginning and at the end
-                menu.Insert(0, new[] {
+                menu.Insert(0, new[]
+                {
                     new InlineKeyboardCallbackButton("Global", $"preferred|{grp.GroupId}|null|info"),
-                    new InlineKeyboardCallbackButton(grp.Preferred == false ? "☑️" : "✅", $"preferred|{grp.GroupId}|null|toggle")
+                    new InlineKeyboardCallbackButton(grp.Preferred == false ? "☑️" : "✅",
+                        $"preferred|{grp.GroupId}|null|toggle")
                 });
-                menu.Add(new[] { new InlineKeyboardCallbackButton("Done", "done") });
+                menu.Add(new[] {new InlineKeyboardCallbackButton("Done", "done")});
                 //send everything
                 Send(
-                    $"{grp.GroupId} | " + (grp.GroupLink == null ? grp.Name : $" <a href=\"{grp.GroupLink}\">{grp.Name}</a>") +
+                    $"{grp.GroupId} | " +
+                    (grp.GroupLink == null ? grp.Name : $" <a href=\"{grp.GroupLink}\">{grp.Name}</a>") +
                     "\n\nSelect the languages under which the group is allowed to appear in grouplist.\nNote that the first option, if disabled, overrides all the others.",
                     update.Message.Chat.Id, customMenu: new InlineKeyboardMarkup(menu.ToArray())
                 );
@@ -1162,6 +1191,7 @@ namespace Werewolf_Control
                     Send("You must run this command in PM!!", u.Message.Chat.Id);
                     return;
                 }
+
                 //#if !DEBUG
                 //                if (Bot.Me.Username != "werewolfbot")
                 //                {
@@ -1179,7 +1209,11 @@ namespace Werewolf_Control
                         if (user != null)
                         {
                             //create a menu for this
-                            var buttons = new[] { new InlineKeyboardCallbackButton("Yes", "ohai|yes|" + user.Id), new InlineKeyboardCallbackButton("No", "ohai|no") };
+                            var buttons = new[]
+                            {
+                                new InlineKeyboardCallbackButton("Yes", "ohai|yes|" + user.Id),
+                                new InlineKeyboardCallbackButton("No", "ohai|no")
+                            };
                             Send($"Update OHAIDER Achievement using player {user.Name}?", u.Message.Chat.Id,
                                 customMenu: new InlineKeyboardMarkup(buttons));
                         }
@@ -1198,26 +1232,26 @@ namespace Werewolf_Control
             {
                 Send("Unable to update OHAIDER: " + e.Message, u.Message.Chat.Id);
             }
-
         }
 
         [Attributes.Command(Trigger = "clearlogs", DevOnly = true)]
         public static void ClearLogs(Update u, string[] args)
         {
             var LogPath = Path.Combine(Bot.RootDirectory, "../Logs/");
-            var files = new[] { "NodeFatalError.log", "error.log", "tcperror.log", "apireceiveerror.log", "getUpdates.log" };
+            var files = new[]
+                {"NodeFatalError.log", "error.log", "tcperror.log", "apireceiveerror.log", "getUpdates.log"};
             foreach (var file in files)
             {
                 try
                 {
-                    System.IO.File.Delete(LogPath + file);
+                    File.Delete(LogPath + file);
                 }
                 catch
                 {
                     Thread.Sleep(50);
                     try
                     {
-                        System.IO.File.Delete(LogPath + file);
+                        File.Delete(LogPath + file);
                     }
                     catch
                     {
@@ -1239,10 +1273,15 @@ namespace Werewolf_Control
                 {
                     File.Delete(path);
                 }
+
                 var someFileExists = false;
                 using (var zip = ZipFile.Open(path, ZipArchiveMode.Create))
                 {
-                    var files = new[] { "NodeFatalError.log", "error.log", "tcperror.log", "apireceiveerror.log", $"getUpdates {DateTime.UtcNow.ToString("MMM-dd-yyyy")}.log" };
+                    var files = new[]
+                    {
+                        "NodeFatalError.log", "error.log", "tcperror.log", "apireceiveerror.log",
+                        $"getUpdates {DateTime.UtcNow.ToString("MMM-dd-yyyy")}.log"
+                    };
 
                     foreach (var file in files)
                     {
@@ -1252,6 +1291,7 @@ namespace Werewolf_Control
                         zip.CreateEntryFromFile(fp, file, CompressionLevel.Optimal);
                     }
                 }
+
                 //now send the file
                 if (someFileExists)
                 {
@@ -1275,12 +1315,15 @@ namespace Werewolf_Control
             var match = new Regex(@"([\s\S]*).xml ([\s\S]*).xml").Match(args[1] ?? "");
             if (!match.Success || match.Groups.Count != 3)
             {
-                Bot.Send("Fail. Use !movelang <oldfilename>.xml <newfilename>.xml", u.Message.Chat.Id, parseMode: ParseMode.Markdown);
+                Bot.Send("Fail. Use !movelang <oldfilename>.xml <newfilename>.xml", u.Message.Chat.Id,
+                    parseMode: ParseMode.Markdown);
                 return;
             }
+
             var oldfilename = match.Groups[1].Value;
             var newfilename = match.Groups[2].Value;
-            var langs = Directory.GetFiles(Bot.LanguageDirectory).Where(x => x.EndsWith(".xml")).Select(x => new LangFile(x)).ToList();
+            var langs = Directory.GetFiles(Bot.LanguageDirectory).Where(x => x.EndsWith(".xml"))
+                .Select(x => new LangFile(x)).ToList();
             var oldlang = langs.FirstOrDefault(x => x.FileName == oldfilename);
             var newlang = langs.FirstOrDefault(x => x.FileName == newfilename);
             if (oldlang == null || newlang == null)
@@ -1289,12 +1332,19 @@ namespace Werewolf_Control
                 return;
             }
 
-            string msg = $"OLD FILE\n_Name:_ {oldlang.Name}\n_Base:_ {oldlang.Base}\n_Variant:_ {oldlang.Variant}\n_Last updated:_ {oldlang.LatestUpdate.ToString("MMM dd")}\n\n";
-            msg += $"NEW FILE\n_Name:_ {newlang.Name}\n_Base:_ {newlang.Base}\n_Variant:_ {newlang.Variant}\n_Last updated:_ {newlang.LatestUpdate.ToString("MMM dd")}\n\n";
+            string msg =
+                $"OLD FILE\n_Name:_ {oldlang.Name}\n_Base:_ {oldlang.Base}\n_Variant:_ {oldlang.Variant}\n_Last updated:_ {oldlang.LatestUpdate.ToString("MMM dd")}\n\n";
+            msg +=
+                $"NEW FILE\n_Name:_ {newlang.Name}\n_Base:_ {newlang.Base}\n_Variant:_ {newlang.Variant}\n_Last updated:_ {newlang.LatestUpdate.ToString("MMM dd")}\n\n";
             msg += "Are you sure?";
 
-            var buttons = new[] { new InlineKeyboardCallbackButton("Yes", $"movelang|yes|{oldfilename}|{newfilename}"), new InlineKeyboardCallbackButton("No", $"movelang|no") };
-            Bot.Send(msg, u.Message.Chat.Id, customMenu: new InlineKeyboardMarkup(buttons), parseMode: ParseMode.Markdown);
+            var buttons = new[]
+            {
+                new InlineKeyboardCallbackButton("Yes", $"movelang|yes|{oldfilename}|{newfilename}"),
+                new InlineKeyboardCallbackButton("No", $"movelang|no")
+            };
+            Bot.Send(msg, u.Message.Chat.Id, customMenu: new InlineKeyboardMarkup(buttons),
+                parseMode: ParseMode.Markdown);
         }
 
         [Attributes.Command(Trigger = "resetlink", GlobalAdminOnly = true)]
@@ -1303,13 +1353,15 @@ namespace Werewolf_Control
             var link = args[1];
             if (String.IsNullOrEmpty(link))
             {
-                Send("Use /resetlink <link|id|username>. This will reset the link of the group, without affecting the Preferred status.", u.Message.Chat.Id);
+                Send(
+                    "Use /resetlink <link|id|username>. This will reset the link of the group, without affecting the Preferred status.",
+                    u.Message.Chat.Id);
             }
             else
             {
                 using (var db = new WWContext())
                 {
-                    Database.Group grp = GetGroup(link, db);
+                    Group grp = GetGroup(link, db);
 
                     if (grp == null)
                         Send($"Group not found.", u.Message.Chat.Id);
@@ -1321,6 +1373,7 @@ namespace Werewolf_Control
                     }
                 }
             }
+
             return;
         }
 
@@ -1379,7 +1432,9 @@ namespace Werewolf_Control
                     {
                         commit = match.Value.Replace("[master ", "").Replace("]", "");
                     }
-                    msg += $"\n<b>Files committed successfully.</b> {(String.IsNullOrEmpty(commit) ? "" : $"<a href=\"https://github.com/GreyWolfDev/Werewolf/commit/" + commit + $"\">{commit}</a>")}";
+
+                    msg +=
+                        $"\n<b>Files committed successfully.</b> {(String.IsNullOrEmpty(commit) ? "" : $"<a href=\"https://github.com/GreyWolfDev/Werewolf/commit/" + commit + $"\">{commit}</a>")}";
                 }
             }
             catch (Exception e)
@@ -1395,17 +1450,18 @@ namespace Werewolf_Control
         {
             using (var db = new WWContext())
             {
-
                 var t = u.GetTarget(db);
                 if (t == null)
                 {
                     Send("Not Found", u.Message.Chat.Id);
                     return;
                 }
+
                 var result = $"<b>{t.Name.FormatHTML()}</b>\n";
                 if (!String.IsNullOrEmpty(t.UserName))
                     result += $"@{t.UserName}\n";
-                result += $"------------------\nGames Played: {t.GamePlayers.Count}\nLanguage: {t.Language.FormatHTML()}\nDonation Level: {t.DonationLevel ?? 0}\n";
+                result +=
+                    $"------------------\nGames Played: {t.GamePlayers.Count}\nLanguage: {t.Language.FormatHTML()}\nDonation Level: {t.DonationLevel ?? 0}\n";
                 if (t.GamePlayers.Any())
                     result += $"Played first game: {t.GamePlayers.OrderBy(x => x.Id).First().Game.TimeStarted}\n";
                 var spamBans = t.TempBanCount;
@@ -1413,15 +1469,18 @@ namespace Werewolf_Control
                 {
                     result += $"Player has been temp banned {t.TempBanCount} times\n";
                 }
+
                 //check if currently banned
                 var banned = db.GlobalBans.FirstOrDefault(x => x.TelegramId == t.TelegramId);
                 if (banned != null)
                 {
-                    result += $"\n------------------\n<b>PLAYER IS CURRENTLY BANNED</b>\nReason: {banned.Reason}\nBanned on: {banned.BanDate}\nBanned by: {banned.BannedBy}\n";
+                    result +=
+                        $"\n------------------\n<b>PLAYER IS CURRENTLY BANNED</b>\nReason: {banned.Reason}\nBanned on: {banned.BanDate}\nBanned by: {banned.BannedBy}\n";
                     if (banned.Expires < DateTime.UtcNow.AddYears(1))
                     {
                         var expiry = (banned.Expires - DateTime.UtcNow);
-                        result += $"Ban will be lifted in {expiry.Days} days, {expiry.Hours} hours, and {expiry.Minutes} minutes\n";
+                        result +=
+                            $"Ban will be lifted in {expiry.Days} days, {expiry.Hours} hours, and {expiry.Minutes} minutes\n";
                     }
                     else
                         result += $"This ban is permanent.\n";
@@ -1434,8 +1493,5 @@ namespace Werewolf_Control
                 Bot.Api.SendTextMessageAsync(u.Message.Chat.Id, result, parseMode: ParseMode.Html);
             }
         }
-
     }
-
-
 }

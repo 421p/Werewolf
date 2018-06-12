@@ -24,7 +24,6 @@ namespace Werewolf_Website.Helpers
             Client.DataReceived += ClientOnDataReceived;
             Client.DelimiterDataReceived += ClientOnDelimiterDataReceived;
             //connection lost, let's try to reconnect
-            
         }
 
         private void Connect()
@@ -42,6 +41,7 @@ namespace Werewolf_Website.Helpers
                         ex = ex.InnerException;
                     Console.WriteLine($"Error in reconnect: {ex.Message}\n{ex.StackTrace}\n");
                 }
+
                 Thread.Sleep(100);
             }
         }
@@ -72,6 +72,7 @@ namespace Werewolf_Website.Helpers
                 // ignored
                 return;
             }
+
             Client.TcpClient.ReceiveBufferSize = Int32.MaxValue;
             Client.WriteLine(JsonConvert.SerializeObject(req));
         }
@@ -80,20 +81,20 @@ namespace Werewolf_Website.Helpers
         {
             var stat = GetResponse(new GetStatusInfo());
             if (String.IsNullOrWhiteSpace(stat))
-                return new StatusResponseInfo{BotName = "NO RESPONSE"};
+                return new StatusResponseInfo {BotName = "NO RESPONSE"};
             StatusResponseInfo response;
             try
             {
                 response = JsonConvert.DeserializeObject<StatusResponseInfo>(stat);
-                
             }
             catch
             {
                 response = new StatusResponseInfo {Status = stat};
             }
+
             response.IP = _ip;
-                response.Port = _port;
-                return response;
+            response.Port = _port;
+            return response;
         }
 
         public NodeResponseInfo GetNodeInfo(Guid id)
@@ -115,30 +116,28 @@ namespace Werewolf_Website.Helpers
                 if (Client.TcpClient == null || !Client.TcpClient.Connected)
                     Client.Connect(_ip, _port);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 while (e.InnerException != null)
                     e = e.InnerException;
                 return e.Message;
             }
+
             Client.TcpClient.ReceiveBufferSize = Int32.MaxValue;
-            
+
             var response = Client.WriteLineAndGetReply(JsonConvert.SerializeObject(request), TimeSpan.FromSeconds(30))?
-                    .MessageString;
-            
+                .MessageString;
+
             return response;
         }
 
 
-
         private void ClientOnDelimiterDataReceived(object sender, Message e)
         {
-            
         }
 
         private void ClientOnDataReceived(object sender, Message e)
         {
-            
         }
     }
 }

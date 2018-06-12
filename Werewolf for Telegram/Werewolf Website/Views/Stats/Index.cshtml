@@ -1,23 +1,23 @@
 ﻿@*<h3>@ViewBag.Message</h3>*@
-<link rel="stylesheet" href="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.css" />
+<link rel="stylesheet" href="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.css"/>
 <script src="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.js"></script>
-<link rel="stylesheet" href="/Scripts/Chartist/chartist-plugin-tooltip.css" />
+<link rel="stylesheet" href="/Scripts/Chartist/chartist-plugin-tooltip.css"/>
 <script src="/Scripts/Chartist/chartist-plugin-tooltip.min.js"></script>
 
 <section>
-    
-        <div class="box-static box-border-top padding-0">
-            <div class="box-title margin-bottom-30">
-                <h2 class="size-20">Global Stats</h2>
-                <p>
-                    (<b>NOTE</b> - <i>you must play at least 100 games to be included</i>)
-                </p>
-            </div>
-            <div id="groupStats" class="table-responsive">
-                Loading...
-            </div>
+
+    <div class="box-static box-border-top padding-0">
+        <div class="box-title margin-bottom-30">
+            <h2 class="size-20">Global Stats</h2>
+            <p>
+                (<b>NOTE</b> - <i>you must play at least 100 games to be included</i>)
+            </p>
         </div>
-    
+        <div id="groupStats" class="table-responsive">
+            Loading...
+        </div>
+    </div>
+
 </section>
 
 @*<div class="row">
@@ -86,7 +86,6 @@
     };
 
 
-
     $('#groupStats').html('Loading...');
 
     $.ajax({
@@ -95,11 +94,11 @@
         dataType: 'json',
         data: {},
         url: '/Stats/GlobalStats/',
-        error: function (error) {
+        error: function(error) {
             console.log(error);
             $('#groupStats').html(error);
         },
-        success: function (d) {
+        success: function(d) {
             $('#groupStats').html(d);
 
         }
@@ -111,11 +110,11 @@
         dataType: 'json',
         data: {},
         url: '/Stats/DailyCounts/',
-        error: function (error) {
+        error: function(error) {
             console.log(error);
 
         },
-        success: function (d) {
+        success: function(d) {
 
             this.chartdata = d;
             var dates = [];
@@ -124,25 +123,28 @@
             var users = [];
 
 
-            $.each(d, function (i, o) {
+            $.each(d,
+                function(i, o) {
 
-                dates[i] = o.Day;
-                games[i] = { meta: 'Games', value: o.Games };
-                groups[i] = o.Groups;
-                users[i] = { meta: 'Users', value: o.Users };
-            });
+                    dates[i] = o.Day;
+                    games[i] = { meta: 'Games', value: o.Games };
+                    groups[i] = o.Groups;
+                    users[i] = { meta: 'Users', value: o.Users };
+                });
 
 
-
-            new Chartist.Line('#dailyGames', {
-                labels: dates,
-                series: [games],
-                plugins: [Chartist.plugins.tooltip({
-                    appendToBody: true
-                })]
-            }, {
-
-            });
+            new Chartist.Line('#dailyGames',
+                {
+                    labels: dates,
+                    series: [games],
+                    plugins: [
+                        Chartist.plugins.tooltip({
+                            appendToBody: true
+                        })
+                    ]
+                },
+                {
+                });
 
             //new Chartist.Line('#dailyGroups', {
             //    labels: dates,

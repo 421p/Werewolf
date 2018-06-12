@@ -4,35 +4,41 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Timers;
-using System.Windows.Forms;
+using BotanIO.Api;
 using Database;
 using Werewolf_Control.Handler;
 using Werewolf_Control.Helpers;
+using RegHelper = Werewolf_Control.Helpers.RegHelper;
+using Timer = System.Timers.Timer;
 
 namespace Werewolf_Control
 {
-    class Program
+    internal static class Program
     {
         internal static bool Running = true;
-        private static bool _writingInfo = false;
-        internal static PerformanceCounter CpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
+        private static bool _writingInfo;
+
+        internal static PerformanceCounter CpuCounter =
+            new PerformanceCounter("Processor", "% Processor Time", "_Total");
+
         internal static float AvgCpuTime;
+
         ///private static List<float> CpuTimes = new List<float>();
-        internal static List<long> MessagesReceived = new List<long>();
-        internal static List<long> MessagesProcessed = new List<long>();
-        internal static List<long> MessagesSent = new List<long>();
+        internal static readonly List<long> MessagesReceived = new List<long>();
+
+        internal static readonly List<long> MessagesProcessed = new List<long>();
+        internal static readonly List<long> MessagesSent = new List<long>();
         private static long _previousMessages, _previousMessagesTx, _previousMessagesRx;
         internal static float MessagePxPerSecond, MessageRxPerSecond, MessageTxPerSecond;
-        internal static int NodeMessagesSent = 0;
-        private static System.Timers.Timer _timer;
+        private static int _nodeMessagesSent;
+        private static Timer _timer;
         public static int MaxGames;
         public static DateTime MaxTime = DateTime.MinValue;
         public static bool MaintMode = false;
-        internal static BotanIO.Api.Botan Analytics;
+        internal static Botan Analytics;
+
         static void Main(string[] args)
         {
 #if !DEBUG
@@ -52,9 +58,9 @@ namespace Werewolf_Control
 #endif
 
             //get the version of the bot and set the window title
-            Assembly assembly = Assembly.GetExecutingAssembly();
-            FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
-            string version = fvi.FileVersion;
+            var assembly = Assembly.GetExecutingAssembly();
+            var fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
+            var version = fvi.FileVersion;
             Console.Title = $"Werewolf Moderator {version}";
 
 
@@ -76,9 +82,9 @@ namespace Werewolf_Control
 #if BETA || DEBUG
             var aToken = Helpers.RegHelper.GetRegValue("BotanBetaAPI");
 #else
-            var aToken = Helpers.RegHelper.GetRegValue("BotanReleaseAPI");
+            var aToken = RegHelper.GetRegValue("BotanReleaseAPI");
 #endif
-            Analytics = new BotanIO.Api.Botan(aToken);
+            Analytics = new Botan(aToken);
 
             //Initialize the TCP connections
             TCP.Initialize();
@@ -99,15 +105,14 @@ namespace Werewolf_Control
             new Thread(UpdateHandler.SpamDetection).Start();
             new Thread(UpdateHandler.BanMonitor).Start();
             //new Thread(MessageMonitor).Start();
-            _timer = new System.Timers.Timer();
-            _timer.Elapsed += new ElapsedEventHandler(TimerOnTick);
+            _timer = new Timer();
+            _timer.Elapsed += TimerOnTick;
             _timer.Interval = 1000;
             _timer.Enabled = true;
 
             //now pause the main thread to let everything else run
             Thread.Sleep(-1);
         }
-
 
 
         private static void TimerOnTick(object sender, EventArgs eventArgs)
@@ -121,8 +126,8 @@ namespace Werewolf_Control
                     MessagesProcessed.RemoveAt(60);
                 MessagePxPerSecond = MessagesProcessed.Max();
 
-                newMessages = (Bot.MessagesSent + NodeMessagesSent) - _previousMessagesTx;
-                _previousMessagesTx = (Bot.MessagesSent + NodeMessagesSent);
+                newMessages = (Bot.MessagesSent + _nodeMessagesSent) - _previousMessagesTx;
+                _previousMessagesTx = (Bot.MessagesSent + _nodeMessagesSent);
                 MessagesSent.Insert(0, newMessages);
                 if (MessagesSent.Count > 60)
                     MessagesSent.RemoveAt(60);
@@ -143,33 +148,16 @@ namespace Werewolf_Control
 
         internal static string GetVersion()
         {
-            Assembly assembly = Assembly.GetExecutingAssembly();
-            FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
-            string version = fvi.FileVersion;
-            DateTime dt = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Local).AddDays(fvi.ProductBuildPart).AddSeconds(fvi.ProductPrivatePart * 2).ToLocalTime();
+            var assembly = Assembly.GetExecutingAssembly();
+            var fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
+            var version = fvi.FileVersion;
+            var dt = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Local).AddDays(fvi.ProductBuildPart)
+                .AddSeconds(fvi.ProductPrivatePart * 2).ToLocalTime();
             return "Current Version: " + version + Environment.NewLine + "Build time: " + dt + " (Central)";
         }
 
         public static void Log(string s, bool error = false)
         {
-            //while (_writingInfo)
-            //    Thread.Sleep(50);
-            //Console.CursorTop = Math.Max(Console.CursorTop, 6 + Bot.Nodes.Count + 1);
-            //if (Console.CursorTop >= 30)
-            //    Console.CursorTop = 19;
-            //Console.ForegroundColor = error ? ConsoleColor.Red : ConsoleColor.Gray;
-            //Console.WriteLine(s);
-            //try
-            //{
-            //    using (var sw = new StreamWriter(Path.Combine(Bot.RootDirectory, "../Logs/ControlLog.log"), true))
-            //    {
-            //        sw.WriteLine($"{DateTime.UtcNow} - {s}");
-            //    }
-            //}
-            //catch
-            //{
-            //    // ignored
-            //}
         }
 
         private static void MessageMonitor()
@@ -183,14 +171,14 @@ namespace Werewolf_Control
                     MessagesProcessed.Insert(0, newMessages);
                     if (MessagesProcessed.Count > 10)
                         MessagesProcessed.RemoveAt(10);
-                    MessagePxPerSecond = (float)MessagesProcessed.Average() / 10;
+                    MessagePxPerSecond = (float) MessagesProcessed.Average() / 10;
 
-                    newMessages = (Bot.MessagesSent + NodeMessagesSent) - _previousMessagesTx;
-                    _previousMessagesTx = (Bot.MessagesSent + NodeMessagesSent);
+                    newMessages = (Bot.MessagesSent + _nodeMessagesSent) - _previousMessagesTx;
+                    _previousMessagesTx = (Bot.MessagesSent + _nodeMessagesSent);
                     MessagesSent.Insert(0, newMessages);
                     if (MessagesSent.Count > 10)
                         MessagesSent.RemoveAt(10);
-                    MessageTxPerSecond = (float)MessagesSent.Average() / 10;
+                    MessageTxPerSecond = (float) MessagesSent.Average() / 10;
                 }
                 catch
                 {
@@ -201,31 +189,10 @@ namespace Werewolf_Control
             }
         }
 
-        //private static void CpuMonitor()
-        //{
-        //    while (Running)
-        //    {
-        //        try
-        //        {
-        //            CpuTimes.Insert(0, CpuCounter.NextValue());
-        //            if (CpuTimes.Count > 10)
-        //                CpuTimes.RemoveAt(10);
-        //            AvgCpuTime = CpuTimes.Average();
-
-        //        }
-        //        catch
-        //        {
-        //            // ignored
-        //        }
-
-        //        Thread.Sleep(1000);
-        //    }
-        //}
-
         internal static string GetFullInfo()
         {
             var nodes = Bot.Nodes.OrderBy(x => x.Version).ToList();
-            NodeMessagesSent = nodes.Sum(x => x.MessagesSent);
+            _nodeMessagesSent = nodes.Sum(x => x.MessagesSent);
             var currentPlayers = nodes.Sum(x => x.CurrentPlayers);
             var currentGames = nodes.Sum(x => x.CurrentGames);
             //var NumThreads = Process.GetCurrentProcess().Threads.Count;
@@ -239,8 +206,9 @@ namespace Werewolf_Control
                 MaxGames = currentGames;
                 MaxTime = DateTime.UtcNow;
             }
+
             //Threads: {NumThreads}\t
-            var msg = 
+            var msg =
                 $"`Uptime   : {uptime}`\n" +
                 $"`Nodes    : {nodes.Count}`\n" +
                 $"`Players  : {currentPlayers}`\n" +
@@ -279,37 +247,38 @@ namespace Werewolf_Control
             {
                 try
                 {
-                    var Nodes = Bot.Nodes.OrderBy(x => x.Version).ToList();
-                    NodeMessagesSent = Nodes.Sum(x => x.MessagesSent);
-                    var CurrentPlayers = Nodes.Sum(x => x.CurrentPlayers);
-                    var CurrentGames = Nodes.Sum(x => x.CurrentGames);
-                    var TotalPlayers = Nodes.Sum(x => x.TotalPlayers);
-                    var TotalGames = Nodes.Sum(x => x.TotalGames);
+                    var nodes = Bot.Nodes.OrderBy(x => x.Version).ToList();
+                    _nodeMessagesSent = nodes.Sum(x => x.MessagesSent);
+                    var currentPlayers = nodes.Sum(x => x.CurrentPlayers);
+                    var currentGames = nodes.Sum(x => x.CurrentGames);
+                    var totalPlayers = nodes.Sum(x => x.TotalPlayers);
+                    var totalGames = nodes.Sum(x => x.TotalGames);
                     //var NumThreads = Process.GetCurrentProcess().Threads.Count;
-                    var Uptime = DateTime.UtcNow - Bot.StartTime;
-                    var MessagesRx = Bot.MessagesProcessed;
-                    var CommandsRx = Bot.CommandsReceived;
-                    var MessagesTx = Nodes.Sum(x => x.MessagesSent) + Bot.MessagesSent;
+                    var uptime = DateTime.UtcNow - Bot.StartTime;
+                    var messagesRx = Bot.MessagesProcessed;
+                    var commandsRx = Bot.CommandsReceived;
+                    var messagesTx = nodes.Sum(x => x.MessagesSent) + Bot.MessagesSent;
 
-                    if (CurrentGames > MaxGames)
+                    if (currentGames > MaxGames)
                     {
-                        MaxGames = CurrentGames;
+                        MaxGames = currentGames;
                         MaxTime = DateTime.UtcNow;
                     }
+
                     //Threads: {NumThreads}\t
                     var msg =
-                        $"Connected Nodes: {Nodes.Count}  \n" +
-                        $"Current Players: {CurrentPlayers}  \tCurrent Games: {CurrentGames}  \n" +
+                        $"Connected Nodes: {nodes.Count}  \n" +
+                        $"Current Players: {currentPlayers}  \tCurrent Games: {currentGames}  \n" +
                         //$"Total Players: {TotalPlayers}  \tTotal Games: {TotalGames}  \n" +
-                        $"Uptime: {Uptime}\n" +
-                        $"Messages Rx: {MessagesRx}\tCommands Rx: {CommandsRx}\tMessages Tx: {MessagesTx}\n" +
+                        $"Uptime: {uptime}\n" +
+                        $"Messages Rx: {messagesRx}\tCommands Rx: {commandsRx}\tMessages Tx: {messagesTx}\n" +
                         $"Messages Per Second (IN): {MessagePxPerSecond}\tMessage Per Second (OUT): {MessageTxPerSecond}\t\n" +
                         $"Max Games: {MaxGames} at {MaxTime.ToString("T")}\t\n\n";
 
 
                     try
                     {
-                        msg = Nodes.Aggregate(msg,
+                        msg = nodes.Aggregate(msg,
                             (current, n) =>
                                 current +
                                 $"{(n.ShuttingDown ? "X " : "  ")}{n.ClientId} - {n.Version} - Games: {n.Games.Count}\t\n");
@@ -318,28 +287,10 @@ namespace Werewolf_Control
                     {
                         // ignored
                     }
+
                     msg += new string(' ', Console.WindowWidth);
                     msg += Environment.NewLine + new string(' ', Console.WindowWidth);
 
-                    //for (var i = 0; i < 12; i++)
-                    //    msg += new string(' ', Console.WindowWidth);
-
-                    //we don't need this anymore, but keeping code just in case
-                    //try
-                    //{
-                    //    var top = UpdateHandler.UserMessages.OrderByDescending(x => x.Value.Messages.Count()).Take(10);
-                    //    msg += "\nSPAM DETECTION\n" +
-                    //           top.Aggregate("", (a, b) => a + b.Key + ":\t" + b.Value.Messages.Count() + "\t\n");
-                    //    msg += new string(' ', Console.WindowWidth);
-                    //}
-                    //catch
-                    //{
-                    //    // ignored
-                    //}
-
-
-                    //now dump all this to the console
-                    //first get our current caret position
                     _writingInfo = true;
                     //var ypos = Math.Max(Console.CursorTop, 30);
                     //if (ypos >= 60)
@@ -358,21 +309,21 @@ namespace Werewolf_Control
 
 #if !DEBUG
                     //now, let's manage our nodes.
-                    if (Nodes.All(x => x.Games.Count <= Settings.ShutDownNodesAt & !x.ShuttingDown) && Nodes.Count > 1)
+                    if (nodes.All(x => x.Games.Count <= Settings.ShutDownNodesAt & !x.ShuttingDown) && nodes.Count > 1)
                     {
                         //we have too many nodes running, kill one.
-                        Nodes.First().ShutDown();
+                        nodes.First().ShutDown();
                     }
 
                     if (!MaintMode)
                     {
-                        if (Nodes.Where(x => !x.ShuttingDown).All(x => x.Games.Count >= Settings.NewNodeThreshhold))
+                        if (nodes.Where(x => !x.ShuttingDown).All(x => x.Games.Count >= Settings.NewNodeThreshhold))
                         {
                             NewNode();
                             Thread.Sleep(5000); //give the node time to register
                         }
 
-                        if (Nodes.All(x => x.ShuttingDown)) //replace nodes
+                        if (nodes.All(x => x.ShuttingDown)) //replace nodes
                         {
                             NewNode();
                             Thread.Sleep(5000); //give the node time to register
@@ -384,6 +335,7 @@ namespace Werewolf_Control
                 {
                     _writingInfo = false;
                 }
+
                 Thread.Sleep(1000);
             }
         }
@@ -394,6 +346,7 @@ namespace Werewolf_Control
             //this is a bit more tricky, we need to figure out which node folder has the latest version...
             var baseDirectory = Path.Combine(Bot.RootDirectory, ".."); //go up one directory
             var currentChoice = new NodeChoice();
+            
             foreach (var dir in Directory.GetDirectories(baseDirectory, "*Node*"))
             {
                 //get the node exe in this directory
@@ -413,10 +366,9 @@ namespace Werewolf_Control
         }
     }
 
-    class NodeChoice
+    internal class NodeChoice
     {
         public string Path { get; set; }
         public Version Version { get; set; } = Version.Parse("0.0.0.0");
     }
-    
 }

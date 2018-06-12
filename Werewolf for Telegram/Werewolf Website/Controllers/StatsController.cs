@@ -30,10 +30,11 @@ namespace Werewolf_Web.Controllers
                 ViewBag.Description = $"Werewolf for Telegram. Stats for {groupName}";
                 ViewBag.Title = groupName;
             }
+
             return View();
         }
 
-        public ActionResult Player(int id, bool json=false)
+        public ActionResult Player(int id, bool json = false)
         {
             if (json)
             {
@@ -43,6 +44,7 @@ namespace Werewolf_Web.Controllers
                     return Json(user);
                 }
             }
+
             ViewBag.Id = id;
             using (var DB = new WWContext())
             {
@@ -53,47 +55,78 @@ namespace Werewolf_Web.Controllers
                 ViewBag.Title = userName;
                 ViewBag.ImagePath = "/Images/" + userImage;
             }
+
             return View();
         }
-
 
 
         #region Stats
 
         [HttpGet]
-        public JsonResult GlobalStats(bool json=false)
+        public JsonResult GlobalStats(bool json = false)
         {
             using (var DB = new WWContext())
             {
                 var stat = DB.GlobalStats.First();
-                var night1dielink = $"<a href='/Stats/Player/{stat.MostKilledFirstNightId}'>{stat.MostKilledFirstNight}</a>";
-                var day1lynchlink = $"<a href='/Stats/Player/{stat.MostLynchedFirstDayId}'>{stat.MostLynchedFirstDay}</a>";
+                var night1dielink =
+                    $"<a href='/Stats/Player/{stat.MostKilledFirstNightId}'>{stat.MostKilledFirstNight}</a>";
+                var day1lynchlink =
+                    $"<a href='/Stats/Player/{stat.MostLynchedFirstDayId}'>{stat.MostLynchedFirstDay}</a>";
                 var day1dielink = $"<a href='/Stats/Player/{stat.MostKilledFirstDayId}'>{stat.MostKilledFirstDay}</a>";
                 var survivorlink = $"<a href='/Stats/Player/{stat.BestSurvivorId}'>{stat.BestSurvivor}</a>";
                 if (!json)
                 {
                     var statReply = "<table class=\"table table-hover\"><tbody>" +
-                        $"<tr><td>Games played total</td><td><b>{stat.GamesPlayed}</b></td></tr>" +
-                        $"<tr><td>Total player deaths</td><td><b>{stat.PlayersKilled}</b></td></tr>" +
-                        $"<tr><td>Total player survivals</td><td><b>{stat.PlayersSurvived}</b></td></tr>" +
-                        $"<tr><td>Total players in database</td><td><b>{stat.TotalPlayers}</b></td></tr>" +
-                        $"<tr><td>Total groups in database</td><td><b>{stat.TotalGroups}</b></td></tr>" +
-                        $"<tr><td>Most likely to die first night</td><td><b>{night1dielink}</td><td>{stat.MostKilledFirstPercent}%</b></td></tr>" +
-                        $"<tr><td>Most likely to get lynched first day</td><td><b>{day1lynchlink}</td><td>{stat.MostLynchedFirstPercent}%</b></td></tr>" +
-                        $"<tr><td>Most likely to die first 24 hours</td><td><b>{day1dielink}</td><td>{stat.MostKilledFirstDayPercent}%</b></td></tr>" +
-                        $"<tr><td>Best survivor</td><td><b>{survivorlink}</td><td>{stat.BestSurvivorPercent}%</b></td></tr>" +
-                        $"<tr><td>Last time global stats calculated</td><td><b>{stat.LastRun} (Central US)</b></td></tr>" +
-                        "</tbody></table>";
+                                    $"<tr><td>Games played total</td><td><b>{stat.GamesPlayed}</b></td></tr>" +
+                                    $"<tr><td>Total player deaths</td><td><b>{stat.PlayersKilled}</b></td></tr>" +
+                                    $"<tr><td>Total player survivals</td><td><b>{stat.PlayersSurvived}</b></td></tr>" +
+                                    $"<tr><td>Total players in database</td><td><b>{stat.TotalPlayers}</b></td></tr>" +
+                                    $"<tr><td>Total groups in database</td><td><b>{stat.TotalGroups}</b></td></tr>" +
+                                    $"<tr><td>Most likely to die first night</td><td><b>{night1dielink}</td><td>{stat.MostKilledFirstPercent}%</b></td></tr>" +
+                                    $"<tr><td>Most likely to get lynched first day</td><td><b>{day1lynchlink}</td><td>{stat.MostLynchedFirstPercent}%</b></td></tr>" +
+                                    $"<tr><td>Most likely to die first 24 hours</td><td><b>{day1dielink}</td><td>{stat.MostKilledFirstDayPercent}%</b></td></tr>" +
+                                    $"<tr><td>Best survivor</td><td><b>{survivorlink}</td><td>{stat.BestSurvivorPercent}%</b></td></tr>" +
+                                    $"<tr><td>Last time global stats calculated</td><td><b>{stat.LastRun} (Central US)</b></td></tr>" +
+                                    "</tbody></table>";
                     return Json(statReply, JsonRequestBehavior.AllowGet);
                 }
                 else
                 {
-                    var statReply = new { gamesPlayed = stat.GamesPlayed, playersKilled = stat.PlayersKilled, playersSurvived = stat.PlayersSurvived,
-                        totalPlayers = stat.TotalPlayers, totalGroups = stat.TotalGroups,
-                        mostKilledFirstNight = new { name = stat.MostKilledFirstNight, id = stat.MostKilledFirstNightId, link = night1dielink, percent = stat.MostKilledFirstPercent },
-                        mostLynchedFirstDay = new { name = stat.MostLynchedFirstDay, id = stat.MostLynchedFirstDayId, link = day1lynchlink, percent = stat.MostLynchedFirstPercent },
-                        mostKilledFirstDay = new { name = stat.MostKilledFirstDay, id = stat.MostKilledFirstDayId, link = day1dielink, percent = stat.MostKilledFirstDayPercent },
-                        bestSurvivor = new { name = stat.BestSurvivor, id = stat.BestSurvivorId, link = survivorlink, percent = stat.BestSurvivorPercent },
+                    var statReply = new
+                    {
+                        gamesPlayed = stat.GamesPlayed,
+                        playersKilled = stat.PlayersKilled,
+                        playersSurvived = stat.PlayersSurvived,
+                        totalPlayers = stat.TotalPlayers,
+                        totalGroups = stat.TotalGroups,
+                        mostKilledFirstNight = new
+                        {
+                            name = stat.MostKilledFirstNight,
+                            id = stat.MostKilledFirstNightId,
+                            link = night1dielink,
+                            percent = stat.MostKilledFirstPercent
+                        },
+                        mostLynchedFirstDay = new
+                        {
+                            name = stat.MostLynchedFirstDay,
+                            id = stat.MostLynchedFirstDayId,
+                            link = day1lynchlink,
+                            percent = stat.MostLynchedFirstPercent
+                        },
+                        mostKilledFirstDay = new
+                        {
+                            name = stat.MostKilledFirstDay,
+                            id = stat.MostKilledFirstDayId,
+                            link = day1dielink,
+                            percent = stat.MostKilledFirstDayPercent
+                        },
+                        bestSurvivor = new
+                        {
+                            name = stat.BestSurvivor,
+                            id = stat.BestSurvivorId,
+                            link = survivorlink,
+                            percent = stat.BestSurvivorPercent
+                        },
                         lastCalculated = stat.LastRun.ToString()
                     };
                     return Json(statReply, JsonRequestBehavior.AllowGet);
@@ -106,14 +139,14 @@ namespace Werewolf_Web.Controllers
         {
             using (var db = new WWContext())
             {
-                var counts = db.DailyCounts.OrderByDescending(x => x.Day).Take(30).ToList().Select(x => new { Day = x.Day.Day.ToString(), Groups = x.Groups, Games = x.Games, Users = x.Users }).Reverse();
+                var counts = db.DailyCounts.OrderByDescending(x => x.Day).Take(30).ToList().Select(x =>
+                    new {Day = x.Day.Day.ToString(), Groups = x.Groups, Games = x.Games, Users = x.Users}).Reverse();
                 return Json(counts.ToList(), JsonRequestBehavior.AllowGet);
             }
-
         }
 
         [HttpGet]
-        public JsonResult GroupStats(long groupid, bool json=false)
+        public JsonResult GroupStats(long groupid, bool json = false)
         {
             var gStatReply = "";
             using (var DB = new WWContext())
@@ -168,11 +201,12 @@ namespace Werewolf_Web.Controllers
                 //night1dielink = night1DieInfo != null ? $"<a href='../Player/{night1DieInfo.TelegramId}'>{night1DieInfo.Name}</a>" : "Not enough games";
                 //day1lynchlink = day1LynchInfo != null ? $"<a href='../Player/{day1LynchInfo.TelegramId}'>{day1LynchInfo.Name}</a>" : "Not enough games";
                 //day1dielink = day1DieInfo != null ? $"<a href='../Player/{day1DieInfo.TelegramId}'>{day1DieInfo.Name}</a>" : "Not enough games";
-                survivorlink = surviverInfo != null ? $"<a href='../Player/{surviverInfo.TelegramId}'>{surviverInfo.Name}</a>" : "Not enough games";
+                survivorlink = surviverInfo != null
+                    ? $"<a href='../Player/{surviverInfo.TelegramId}'>{surviverInfo.Name}</a>"
+                    : "Not enough games";
                 if (!json)
                 {
                     gStatReply +=
-
                         "<table class=\"table table-hover\"><tbody>" +
                         $"<tr><td>Games played total</td><td><b>{DB.Games.Count(x => x.GroupId == groupid)}</b></td></tr>" +
                         // $"<tr><td>Times Wolf / Wolves have won</td><td><b>{timesWolfsWon}</b></td></tr>" +
@@ -184,18 +218,25 @@ namespace Werewolf_Web.Controllers
                         $"<tr><td>Best survivor</td><td><b>{survivorlink}</td><td>{surviverInfo?.pct ?? 0}%</b></td></tr>" +
                         //$"<tr><td>Most common villager</td><td><b>{commonVillagerInfo?.name.Name}</td><td>{(commonVillagerInfo?.count ?? 0) * 100 / commonVillagerInfo?.games ?? 1}%</b></td></tr>" +
                         //$"<tr><td>Most common wolf</td><td><b>{commonWolfInfo?.name.Name}</td><td>{(commonWolfInfo?.count ?? 0) * 100 / commonWolfInfo?.games ?? 1}%</b></td></tr>" +
-
                         "</tbody></table>";
                 }
                 else
                 {
-                    var jgStatReply = new { gamesPlayedTotal = DB.Games.Count(x => x.GroupId == groupid),
-                        bestSurvivor = new { name = surviverInfo?.Name ?? "Not enough games", id = surviverInfo?.TelegramId ?? 0,
-                            link = survivorlink, survivedPercent = surviverInfo?.pct ?? 0 }
+                    var jgStatReply = new
+                    {
+                        gamesPlayedTotal = DB.Games.Count(x => x.GroupId == groupid),
+                        bestSurvivor = new
+                        {
+                            name = surviverInfo?.Name ?? "Not enough games",
+                            id = surviverInfo?.TelegramId ?? 0,
+                            link = survivorlink,
+                            survivedPercent = surviverInfo?.pct ?? 0
+                        }
                     };
                     return Json(jgStatReply, JsonRequestBehavior.AllowGet);
                 }
             }
+
             return Json(gStatReply, JsonRequestBehavior.AllowGet);
         }
 
@@ -209,6 +250,7 @@ namespace Werewolf_Web.Controllers
                 {
                     return Json("", JsonRequestBehavior.AllowGet);
                 }
+
                 var gamesPlayed = p.GamePlayers.Count();
                 var won = p.GamePlayers.Count(x => x.Won);
                 var lost = gamesPlayed - won;
@@ -216,11 +258,14 @@ namespace Werewolf_Web.Controllers
                 var roleInfo = DB.PlayerRoles(pid).ToList();
                 var killed = DB.PlayerMostKilled(pid).FirstOrDefault();
                 var killedby = DB.PlayerMostKilledBy(pid).FirstOrDefault();
-                var killedlink = killed != null ? $"<a href='../Player/{killed.TelegramId}'>{killed.Name}</a>" : "No kills?";
-                var killedbylink = killedby != null ? $"<a href='../Player/{killedby.TelegramId}'>{killedby.Name}</a>" : "Not killed?";
+                var killedlink = killed != null
+                    ? $"<a href='../Player/{killed.TelegramId}'>{killed.Name}</a>"
+                    : "No kills?";
+                var killedbylink = killedby != null
+                    ? $"<a href='../Player/{killedby.TelegramId}'>{killedby.Name}</a>"
+                    : "Not killed?";
                 if (!json)
                 {
-
                     var reply =
                         "<table class=\"table table-hover\"><tbody>" +
                         $"<tr><td>Games played total</td><td><b>{gamesPlayed}</b></td></tr>" +
@@ -235,24 +280,37 @@ namespace Werewolf_Web.Controllers
                 }
                 else
                 {
-                    var reply = new { gamesPlayed = gamesPlayed,
-                        won = new { total = won, percent = won * 100 / gamesPlayed },
-                        lost = new { total = lost, percent = lost * 100 / gamesPlayed },
-                        survived = new { total = survived, percent = survived * 100 / gamesPlayed },
-                        mostCommonRole = roleInfo.OrderByDescending(x => x.times).FirstOrDefault()?.role ?? "WHAT? YOU HAVEN'T PLAYED?",
-                        mostKilled = new { name = killed.Name, id = killed.TelegramId, link = killedlink, times = killed.times },
-                        mostKilledBy = new { name = killedby.Name, id = killedby.TelegramId, link = killedbylink, times = killedby.times },
+                    var reply = new
+                    {
+                        gamesPlayed = gamesPlayed,
+                        won = new {total = won, percent = won * 100 / gamesPlayed},
+                        lost = new {total = lost, percent = lost * 100 / gamesPlayed},
+                        survived = new {total = survived, percent = survived * 100 / gamesPlayed},
+                        mostCommonRole = roleInfo.OrderByDescending(x => x.times).FirstOrDefault()?.role ??
+                                         "WHAT? YOU HAVEN'T PLAYED?",
+                        mostKilled = new
+                        {
+                            name = killed.Name,
+                            id = killed.TelegramId,
+                            link = killedlink,
+                            times = killed.times
+                        },
+                        mostKilledBy = new
+                        {
+                            name = killedby.Name,
+                            id = killedby.TelegramId,
+                            link = killedbylink,
+                            times = killedby.times
+                        },
                         achievements = p.Achievements
                     };
                     return Json(reply, JsonRequestBehavior.AllowGet);
                 }
-
-
             }
         }
 
         [HttpGet]
-        public JsonResult PlayerAchievements(int pid, bool json=false)
+        public JsonResult PlayerAchievements(int pid, bool json = false)
         {
             using (var DB = new WWContext())
             {
@@ -261,9 +319,10 @@ namespace Werewolf_Web.Controllers
                 {
                     return Json("", JsonRequestBehavior.AllowGet);
                 }
+
                 if (p.Achievements == null)
                     p.Achievements = 0;
-                var ach = (Achievements)p.Achievements;
+                var ach = (Achievements) p.Achievements;
                 if (!json)
                 {
                     var reply = "<br/><table class=\"table table-hover\"><tbody>";
@@ -276,7 +335,7 @@ namespace Werewolf_Web.Controllers
                 {
                     List<object> reply = new List<object>();
                     foreach (var a in ach.GetUniqueFlags())
-                        reply.Add(new { name = a.GetName(), description = a.GetDescription() });
+                        reply.Add(new {name = a.GetName(), description = a.GetDescription()});
                     return Json(reply, JsonRequestBehavior.AllowGet);
                 }
             }
@@ -293,12 +352,8 @@ namespace Werewolf_Web.Controllers
 
                 return Json("/Images/" + p.ImageFile, JsonRequestBehavior.AllowGet);
             }
-
         }
+
         #endregion
-
-
     }
-
-
 }

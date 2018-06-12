@@ -2,17 +2,18 @@
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
-using TcpFramework.Server;
+using System.Text;
 
 namespace TcpFramework
 {
     public class Message
     {
-        public TcpClient TcpClient;
-        private readonly System.Text.Encoding _encoder;
+        public readonly TcpClient TcpClient;
+        private readonly Encoding _encoder;
         private readonly byte _writeLineDelimiter;
         private readonly bool _autoTrim;
-        internal Message(byte[] data, TcpClient tcpClient, System.Text.Encoding stringEncoder, byte lineDelimiter)
+
+        internal Message(byte[] data, TcpClient tcpClient, Encoding stringEncoder, byte lineDelimiter)
         {
             Data = data;
             TcpClient = tcpClient;
@@ -20,7 +21,8 @@ namespace TcpFramework
             _writeLineDelimiter = lineDelimiter;
         }
 
-        internal Message(byte[] data, TcpClient tcpClient, System.Text.Encoding stringEncoder, byte lineDelimiter, bool autoTrim)
+        internal Message(byte[] data, TcpClient tcpClient, Encoding stringEncoder, byte lineDelimiter,
+            bool autoTrim)
         {
             Data = data;
             TcpClient = tcpClient;
@@ -30,6 +32,7 @@ namespace TcpFramework
         }
 
         public byte[] Data { get; }
+
         public string MessageString
         {
             get
@@ -51,19 +54,28 @@ namespace TcpFramework
 
         public void Reply(string data)
         {
-            if (string.IsNullOrEmpty(data)) { return; }
+            if (string.IsNullOrEmpty(data))
+            {
+                return;
+            }
+
             var bytes = _encoder.GetBytes(data);
             using (var sw = new StreamWriter("reply.log"))
-                sw.WriteLine($"Original data length: {data.Length}\nBytes length: {bytes.Length}\nData: {data}\n\nBytes: {bytes}");
+                sw.WriteLine(
+                    $"Original data length: {data.Length}\nBytes length: {bytes.Length}\nData: {data}\n\nBytes: {bytes}");
             Reply(bytes);
         }
 
         public void ReplyLine(string data)
         {
-            if (string.IsNullOrEmpty(data)) { return; }
+            if (string.IsNullOrEmpty(data))
+            {
+                return;
+            }
+
             if (data.LastOrDefault() != _writeLineDelimiter)
             {
-                Reply(data + _encoder.GetString(new[] { _writeLineDelimiter }));
+                Reply(data + _encoder.GetString(new[] {_writeLineDelimiter}));
             }
             else
             {

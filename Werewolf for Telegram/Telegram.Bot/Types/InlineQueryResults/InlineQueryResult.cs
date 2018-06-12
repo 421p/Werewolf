@@ -24,14 +24,14 @@ namespace Telegram.Bot.Types.InlineQueryResults
                 {typeof(InlineQueryResultVideo), InlineQueryResultType.Video},
                 {typeof(InlineQueryResultVoice), InlineQueryResultType.Voice},
 
-                {typeof(InlineQueryResultCachedAudio), InlineQueryResultType.CachedAudio },
-                {typeof(InlineQueryResultCachedDocument), InlineQueryResultType.CachedDocument },
-                {typeof(InlineQueryResultCachedGif), InlineQueryResultType.CachedGif },
-                {typeof(InlineQueryResultCachedMpeg4Gif), InlineQueryResultType.CachedMpeg4Gif },
-                {typeof(InlineQueryResultCachedPhoto), InlineQueryResultType.CachedPhoto },
-                {typeof(InlineQueryResultCachedSticker), InlineQueryResultType.CachedSticker },
-                {typeof(InlineQueryResultCachedVideo), InlineQueryResultType.CachedVideo },
-                {typeof(InlineQueryResultCachedVoice), InlineQueryResultType.CachedVoice },
+                {typeof(InlineQueryResultCachedAudio), InlineQueryResultType.CachedAudio},
+                {typeof(InlineQueryResultCachedDocument), InlineQueryResultType.CachedDocument},
+                {typeof(InlineQueryResultCachedGif), InlineQueryResultType.CachedGif},
+                {typeof(InlineQueryResultCachedMpeg4Gif), InlineQueryResultType.CachedMpeg4Gif},
+                {typeof(InlineQueryResultCachedPhoto), InlineQueryResultType.CachedPhoto},
+                {typeof(InlineQueryResultCachedSticker), InlineQueryResultType.CachedSticker},
+                {typeof(InlineQueryResultCachedVideo), InlineQueryResultType.CachedVideo},
+                {typeof(InlineQueryResultCachedVoice), InlineQueryResultType.CachedVoice},
             };
 
         /// <summary>

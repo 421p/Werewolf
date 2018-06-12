@@ -60,7 +60,6 @@
     <Content Include="$(MSBuildThisFileDirectory)ItalianStorytale.xml" />
     <Content Include="$(MSBuildThisFileDirectory)Javanese.xml" />
     <Content Include="$(MSBuildThisFileDirectory)Korean.xml" />
-    <Content Include="$(MSBuildThisFileDirectory)MalaysianNSFW.xml" />
     <Content Include="$(MSBuildThisFileDirectory)Nederlands.xml" />
     <Content Include="$(MSBuildThisFileDirectory)Persian GOT.xml" />
     <Content Include="$(MSBuildThisFileDirectory)Persian Mafia.xml" />

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading;
 using Telegram.Bot.Types.Enums;
 
 namespace Werewolf_Node.Helpers
@@ -19,23 +14,23 @@ namespace Werewolf_Node.Helpers
             //kick
             Program.Bot.KickChatMemberAsync(chatid, userid);
             //get their status
-            status =Program.Bot.GetChatMemberAsync(chatid, userid).Result.Status;
+            status = Program.Bot.GetChatMemberAsync(chatid, userid).Result.Status;
             while (status == ChatMemberStatus.Member) //loop
             {
                 //wait for database to report status is kicked.
-                status =Program.Bot.GetChatMemberAsync(chatid, userid).Result.Status;
+                status = Program.Bot.GetChatMemberAsync(chatid, userid).Result.Status;
                 Thread.Sleep(100);
             }
             //status is now kicked (as it should be)
 
             while (status != ChatMemberStatus.Left) //unban until status is left
             {
-               Program.Bot.UnbanChatMemberAsync(chatid, userid);
+                Program.Bot.UnbanChatMemberAsync(chatid, userid);
                 Thread.Sleep(100);
-                status =Program.Bot.GetChatMemberAsync(chatid, userid).Result.Status;
+                status = Program.Bot.GetChatMemberAsync(chatid, userid).Result.Status;
             }
-            //yay unbanned
 
+            //yay unbanned
         }
     }
 }

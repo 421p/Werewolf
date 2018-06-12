@@ -2,6 +2,7 @@
 using Owin;
 
 [assembly: OwinStartupAttribute(typeof(Werewolf_Website.Startup))]
+
 namespace Werewolf_Website
 {
     public partial class Startup

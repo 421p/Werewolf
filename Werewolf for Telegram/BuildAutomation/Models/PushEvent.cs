@@ -1,17 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;
 
 namespace BuildAutomation.Models
 {
-
     public class PushEvent
     {
-        [JsonProperty(PropertyName = "ref")]
-        public string _ref { get; set; }
+        [JsonProperty(PropertyName = "ref")] public string _ref { get; set; }
         public string before { get; set; }
         public string after { get; set; }
         public bool created { get; set; }
@@ -101,7 +95,9 @@ namespace BuildAutomation.Models
         public string notifications_url { get; set; }
         public string labels_url { get; set; }
         public string releases_url { get; set; }
+
         public string deployments_url { get; set; }
+
         //public DateTime created_at { get; set; }
         //public DateTime updated_at { get; set; }
         //public DateTime pushed_at { get; set; }
@@ -190,6 +186,4 @@ namespace BuildAutomation.Models
         public string email { get; set; }
         public string username { get; set; }
     }
-
-
 }

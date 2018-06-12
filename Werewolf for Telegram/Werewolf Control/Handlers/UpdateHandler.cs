@@ -1,5 +1,4 @@
-﻿using Database;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlTypes;
 using System.IO;
@@ -7,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Database;
 using Newtonsoft.Json;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types;
@@ -18,6 +18,7 @@ using Telegram.Bot.Types.Payments;
 using Telegram.Bot.Types.ReplyMarkups;
 using Werewolf_Control.Helpers;
 using Werewolf_Control.Models;
+using File = System.IO.File;
 
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 namespace Werewolf_Control.Handler
@@ -28,11 +29,12 @@ namespace Werewolf_Control.Handler
 
         internal static HashSet<int> SpamBanList = new HashSet<int>
         {
-
         };
+
         internal static List<GlobalBan> BanList = new List<GlobalBan>();
 
         internal static bool SendGifIds = false;
+
         public static void UpdateReceived(object sender, UpdateEventArgs e)
         {
             Bot.MessagesReceived++;
@@ -44,14 +46,15 @@ namespace Werewolf_Control.Handler
             try
             {
                 if (!UserMessages.ContainsKey(id))
-                    UserMessages.Add(id, new SpamDetector { Messages = new HashSet<UserMessage>() });
-                
-                var shouldReply = (UserMessages[id].Messages.Where(x => x.Replied).OrderByDescending(x => x.Time).FirstOrDefault()?.Time ?? DateTime.MinValue) <
-                       DateTime.UtcNow.AddSeconds(-4);
+                    UserMessages.Add(id, new SpamDetector {Messages = new HashSet<UserMessage>()});
 
-                UserMessages[id].Messages.Add(new UserMessage(m){Replied = shouldReply});
+                var shouldReply =
+                    (UserMessages[id].Messages.Where(x => x.Replied).OrderByDescending(x => x.Time).FirstOrDefault()
+                         ?.Time ?? DateTime.MinValue) <
+                    DateTime.UtcNow.AddSeconds(-4);
+
+                UserMessages[id].Messages.Add(new UserMessage(m) {Replied = shouldReply});
                 return !shouldReply;
-
             }
             catch
             {
@@ -91,10 +94,10 @@ namespace Werewolf_Control.Handler
                                     expireTime = expireTime.AddDays(3);
                                     break;
                                 default: //perm ban
-                                    expireTime = (DateTime)SqlDateTime.MaxValue;
+                                    expireTime = (DateTime) SqlDateTime.MaxValue;
                                     break;
-
                             }
+
                             db.GlobalBans.Add(new GlobalBan
                             {
                                 BannedBy = "Moderator",
@@ -105,6 +108,7 @@ namespace Werewolf_Control.Handler
                                 Name = name
                             });
                         }
+
                         SpamBanList.Clear();
                         db.SaveChanges();
 
@@ -117,6 +121,7 @@ namespace Werewolf_Control.Handler
                             db.GlobalBans.Remove(db.GlobalBans.Find(list[i].Id));
                             list.RemoveAt(i);
                         }
+
                         db.SaveChanges();
 #endif
 
@@ -165,6 +170,7 @@ namespace Werewolf_Control.Handler
                                     //    Para);
                                     continue;
                                 }
+
                                 if ((temp[key].Warns >= 3 || temp[key].Messages.Count >= 20) & !temp[key].NotifiedAdmin)
                                 {
                                     //Send(
@@ -178,6 +184,7 @@ namespace Werewolf_Control.Handler
                                     {
                                         count = db.Players.FirstOrDefault(x => x.TelegramId == key).TempBanCount ?? 0;
                                     }
+
                                     var unban = "";
                                     switch (count)
                                     {
@@ -195,6 +202,7 @@ namespace Werewolf_Control.Handler
                                                 "Permanent. You have reached the max limit of temp bans for spamming.";
                                             break;
                                     }
+
                                     Send("You have been banned for spamming.  Your ban period is: " + unban,
                                         key);
                                 }
@@ -207,12 +215,14 @@ namespace Werewolf_Control.Handler
                             //Console.WriteLine(e.Message);
                         }
                     }
+
                     UserMessages = temp;
                 }
                 catch (Exception e)
                 {
                     //Console.WriteLine(e.Message);
                 }
+
                 Thread.Sleep(2000);
             }
         }
@@ -220,13 +230,13 @@ namespace Werewolf_Control.Handler
         internal static void HandleUpdate(Update update)
         {
             {
-
                 Bot.MessagesProcessed++;
                 if (update.PreCheckoutQuery != null)
                 {
                     HandlePayment(update.PreCheckoutQuery);
                     return;
                 }
+
                 if (update.Message == null) return;
                 Program.Analytics.TrackAsync("message", update.Message, update.Message.From.Id.ToString());
                 //ignore previous messages
@@ -236,17 +246,17 @@ namespace Werewolf_Control.Handler
                 var id = update.Message.Chat.Id;
 
 #if DEBUG
-                //if (update.Message.Chat.Title != "Werewolf Translators Group" && !String.IsNullOrEmpty(update.Message.Chat.Title) && update.Message.Chat.Title != "Werewolf Mod / Dev chat (SFW CUZ YOUNGENS)" && update.Message.Chat.Title != "Werewolf Translators Group (SFW cuz YOUNGENS)")
-                //{
-                //    try
-                //    {
-                //        Bot.Api.LeaveChat(update.Message.Chat.Id);
-                //    }
-                //    catch
-                //    {
-                //        // ignored
-                //    }
-                //}
+//if (update.Message.Chat.Title != "Werewolf Translators Group" && !String.IsNullOrEmpty(update.Message.Chat.Title) && update.Message.Chat.Title != "Werewolf Mod / Dev chat (SFW CUZ YOUNGENS)" && update.Message.Chat.Title != "Werewolf Translators Group (SFW cuz YOUNGENS)")
+//{
+//    try
+//    {
+//        Bot.Api.LeaveChat(update.Message.Chat.Id);
+//    }
+//    catch
+//    {
+//        // ignored
+//    }
+//}
 #endif
 
                 //let's make sure it is a bot command, as we shouldn't see anything else....
@@ -297,7 +307,8 @@ namespace Werewolf_Control.Handler
 
 
                 //Settings.Main.LogText += update?.Message?.Text + Environment.NewLine;
-                bool block = new[] { Settings.SupportChatId, Settings.PersianSupportChatId, Settings.TranslationChatId }.Contains(id);
+                bool block = new[] {Settings.SupportChatId, Settings.PersianSupportChatId, Settings.TranslationChatId}
+                    .Contains(id);
 
 #if !DEBUG
                 try
@@ -311,7 +322,6 @@ namespace Werewolf_Control.Handler
                         case MessageType.TextMessage:
                             if (update.Message.Text.StartsWith("!") || update.Message.Text.StartsWith("/"))
                             {
-
                                 if (BanList.Any(x => x.TelegramId == (update.Message?.From?.Id ?? 0)) ||
                                     SpamBanList.Contains(update.Message?.From?.Id ?? 0))
                                 {
@@ -326,11 +336,11 @@ namespace Werewolf_Control.Handler
                                     update.Message.From.Id.ToString());
                                 if (args[0].StartsWith("about"))
                                 {
-                                    if (new[] { "Thief", "WiseElder", "Pacifist" }.Contains(args[0].Replace("about", ""))) return;
+                                    if (new[] {"Thief", "WiseElder", "Pacifist"}.Contains(args[0].Replace("about", "")))
+                                        return;
                                     var reply = Commands.GetAbout(update, args);
                                     if (!String.IsNullOrEmpty(reply))
                                     {
-
                                         if (AddCount(update.Message.From.Id, update.Message)) return;
                                         try
                                         {
@@ -339,13 +349,13 @@ namespace Werewolf_Control.Handler
                                             //    Send(
                                             //        GetLocaleString("SentPrivate", GetLanguage(update.Message.From.Id)),
                                             //        update.Message.Chat.Id);
-
                                         }
                                         catch (Exception e)
                                         {
                                             Commands.RequestPM(update.Message.Chat.Id);
                                         }
                                     }
+
                                     return;
                                 }
 
@@ -381,11 +391,13 @@ namespace Werewolf_Control.Handler
                                             Send("No games in translation group!", id);
                                         return;
                                     }
+
                                     if (command.DevOnly & !UpdateHelper.Devs.Contains(update.Message.From.Id))
                                     {
                                         Send(GetLocaleString("NotPara", GetLanguage(id)), id);
                                         return;
                                     }
+
                                     if (command.GlobalAdminOnly)
                                     {
                                         if (!UpdateHelper.IsGlobalAdmin(update.Message.From.Id))
@@ -394,6 +406,7 @@ namespace Werewolf_Control.Handler
                                             return;
                                         }
                                     }
+
                                     if (command.GroupAdminOnly & !UpdateHelper.IsGroupAdmin(update) &
                                         !UpdateHelper.Devs.Contains(update.Message.From.Id) &
                                         !UpdateHelper.IsGlobalAdmin(update.Message.From.Id))
@@ -402,15 +415,16 @@ namespace Werewolf_Control.Handler
                                             id);
                                         return;
                                     }
+
                                     if (command.InGroupOnly & update.Message.Chat.Type == ChatType.Private)
                                     {
                                         Send(GetLocaleString("GroupCommandOnly", GetLanguage(id)), id);
                                         return;
                                     }
+
                                     Bot.CommandsReceived++;
                                     command.Method.Invoke(update, args);
                                 }
-
 
                                 #endregion
                             }
@@ -452,6 +466,7 @@ namespace Werewolf_Control.Handler
                             {
                                 Commands.AddGif(update.Message);
                             }
+
                             break;
                         case MessageType.StickerMessage:
                             break;
@@ -472,6 +487,7 @@ namespace Werewolf_Control.Handler
                                     DB.SaveChanges();
                                     return;
                                 }
+
                                 if (m.LeftChatMember != null)
                                 {
                                     if (m.LeftChatMember.Id == Bot.Me.Id)
@@ -483,12 +499,14 @@ namespace Werewolf_Control.Handler
                                         {
                                             return;
                                         }
+
                                         foreach (var g in grps)
                                         {
                                             g.BotInGroup = false;
                                             g.UserName = update.Message.Chat.Username;
                                             g.Name = update.Message.Chat.Title;
                                         }
+
                                         DB.SaveChanges();
                                     }
                                     else
@@ -497,6 +515,7 @@ namespace Werewolf_Control.Handler
                                         Bot.GetGroupNodeAndGame(id)?.SmitePlayer(m.LeftChatMember.Id);
                                     }
                                 }
+
                                 if (m.NewChatMember?.Id == Bot.Me.Id)
                                 {
                                     Program.Analytics.TrackAsync("botadded", m, m.From?.Id.ToString() ?? "0");
@@ -509,6 +528,7 @@ namespace Werewolf_Control.Handler
                                         DB.SaveChanges();
                                         grp = DB.Groups.FirstOrDefault(x => x.GroupId == id);
                                     }
+
                                     grp.BotInGroup = true;
                                     grp.UserName = update.Message.Chat.Username;
                                     grp.Name = update.Message.Chat.Title;
@@ -539,6 +559,7 @@ namespace Werewolf_Control.Handler
                                         Send($"{m.NewChatMember.FirstName} has played {gamecount} games", m.Chat.Id);
                                         return;
                                     }
+
                                     //user has not reach veteran
                                     Send(
                                         $"{m.NewChatMember.FirstName} removed, as they have not unlocked veteran ({gamecount} games played, need 500)",
@@ -557,6 +578,7 @@ namespace Werewolf_Control.Handler
                                             m.Chat.Id);
                                         return;
                                     }
+
                                     //user has not reach veteran
                                     Send(
                                         $"{m.NewChatMember.FirstName.FormatHTML()} removed, as they have not unlocked veteran ({gamecount} games played, need 500)",
@@ -579,10 +601,12 @@ namespace Werewolf_Control.Handler
                                         }
                                         else
                                             result += $"This ban is permanent.\n";
+
                                         Send(result, m.Chat.Id);
                                     }
                                 }
                             }
+
                             break;
                         case MessageType.VenueMessage:
                             break;
@@ -635,9 +659,12 @@ namespace Werewolf_Control.Handler
                 if (p == null)
                 {
                     //wtf??
-                    Bot.Send($"Successfully received ${amt} from you! YAY!\n\nHowever, we do not see any record of you in our database, so we can't record it.  Please message @ParaCode with this information, and a screenshot", message.From.Id);
+                    Bot.Send(
+                        $"Successfully received ${amt} from you! YAY!\n\nHowever, we do not see any record of you in our database, so we can't record it.  Please message @ParaCode with this information, and a screenshot",
+                        message.From.Id);
                     return;
                 }
+
                 if (p.DonationLevel == null)
                     p.DonationLevel = 0;
                 p.DonationLevel += amt;
@@ -652,7 +679,9 @@ namespace Werewolf_Control.Handler
                 if (p.Founder ?? false)
                     badge += "💎";
 
-                Bot.Send($"Successfully received ${amt} from you! YAY!\nTotal Donated: ${level}\nCurrent Badge (ingame): {badge}", message.From.Id);
+                Bot.Send(
+                    $"Successfully received ${amt} from you! YAY!\nTotal Donated: ${level}\nCurrent Badge (ingame): {badge}",
+                    message.From.Id);
                 //check to see how many people have purchased gif packs
 
                 if (level > 10)
@@ -677,12 +706,14 @@ namespace Werewolf_Control.Handler
                                 "Congratulations! You have unlocked Custom Gif Packs :)\nUse /customgif to build your pack, /submitgif to submit for approval",
                                 message.From.Id);
                         }
+
                         data.HasPurchased = true;
 
                         json = JsonConvert.SerializeObject(data);
                         p.CustomGifSet = json;
                     }
                 }
+
                 db.SaveChanges();
             }
         }
@@ -765,15 +796,19 @@ namespace Werewolf_Control.Handler
 
         private static GameInfo GetGroupNodeAndGame(long id)
         {
-            var node = Bot.Nodes.ToList().FirstOrDefault(n => n.Games.Any(g => g.GroupId == id))?.Games.FirstOrDefault(x => x.GroupId == id);
+            var node = Bot.Nodes.ToList().FirstOrDefault(n => n.Games.Any(g => g.GroupId == id))?.Games
+                .FirstOrDefault(x => x.GroupId == id);
             if (node == null)
-                node = Bot.Nodes.ToList().FirstOrDefault(n => n.Games.Any(g => g.GroupId == id))?.Games.FirstOrDefault(x => x.GroupId == id);
+                node = Bot.Nodes.ToList().FirstOrDefault(n => n.Games.Any(g => g.GroupId == id))?.Games
+                    .FirstOrDefault(x => x.GroupId == id);
             if (node == null)
-                node = Bot.Nodes.ToList().FirstOrDefault(n => n.Games.Any(g => g.GroupId == id))?.Games.FirstOrDefault(x => x.GroupId == id);
+                node = Bot.Nodes.ToList().FirstOrDefault(n => n.Games.Any(g => g.GroupId == id))?.Games
+                    .FirstOrDefault(x => x.GroupId == id);
             return node;
         }
 
-        private static string[] nonCommandsList = new[] { "vote", "getlang", "validate", "setlang", "groups", "status", "done", "stopwaiting" };
+        private static string[] nonCommandsList = new[]
+            {"vote", "getlang", "validate", "setlang", "groups", "status", "done", "stopwaiting"};
 
         public static void CallbackReceived(object sender, CallbackQueryEventArgs e)
         {
@@ -797,8 +832,9 @@ namespace Werewolf_Control.Handler
                         Bot.ReplyToCallback(query, "Invalid Callback");
                         return;
                     }
+
                     string[] args = query.Data.Split('|');
-                    Program.Analytics.TrackAsync($"cb:{args[0]}", new { args = args }, query.From.Id.ToString());
+                    Program.Analytics.TrackAsync($"cb:{args[0]}", new {args = args}, query.From.Id.ToString());
 
                     if (args[0] == "donatetg")
                     {
@@ -825,7 +861,8 @@ namespace Werewolf_Control.Handler
                         node?.SendReply(query);
                         return;
                     }
-                    if (new[] { "reviewgifs", "approvesfw", "approvensfw" }.Contains(args[0]))
+
+                    if (new[] {"reviewgifs", "approvesfw", "approvensfw"}.Contains(args[0]))
                     {
                         if (UpdateHelper.IsGlobalAdmin(query.From.Id))
                         {
@@ -844,6 +881,7 @@ namespace Werewolf_Control.Handler
                                         Send("User does not have a custom gif pack", query.Message.Chat.Id);
                                         return;
                                     }
+
                                     if (query.Message.Chat.Type != ChatType.Private)
                                         Send("I will send you the gifs in private", query.Message.Chat.Id);
 
@@ -882,6 +920,7 @@ namespace Werewolf_Control.Handler
                                             msg += "Disapproved By " + dby.Name + " for: " + pack.DenyReason;
                                             break;
                                     }
+
                                     Bot.Send(msg, id);
                                     break;
                                 case "approvesfw":
@@ -892,6 +931,7 @@ namespace Werewolf_Control.Handler
                                         Send("Id not found.", query.Message.Chat.Id);
                                         return;
                                     }
+
                                     json = tplayer.CustomGifSet;
                                     if (String.IsNullOrEmpty(json))
                                     {
@@ -921,6 +961,7 @@ namespace Werewolf_Control.Handler
                                         Send("Id not found.", query.Message.Chat.Id);
                                         return;
                                     }
+
                                     json = tplayer.CustomGifSet;
                                     if (String.IsNullOrEmpty(json))
                                     {
@@ -944,6 +985,7 @@ namespace Werewolf_Control.Handler
                                     break;
                             }
                         }
+
                         return;
                     }
 
@@ -967,7 +1009,7 @@ namespace Werewolf_Control.Handler
 
 
                     //check for permission
-                    if (new[] { "update", "build", "ohai", "restore", "movelang" }.Contains(command))
+                    if (new[] {"update", "build", "ohai", "restore", "movelang"}.Contains(command))
                     {
                         //dev only commands
                         if (!UpdateHelper.Devs.Contains(query.From.Id))
@@ -975,6 +1017,7 @@ namespace Werewolf_Control.Handler
                             Bot.ReplyToCallback(query, "You aren't Para! Go Away!!", false, true);
                             return;
                         }
+
                         Bot.ReplyToCallback(query, "Processing...", false);
                         //args[1] is yes or no
                         if (args[1] == "no")
@@ -983,7 +1026,7 @@ namespace Werewolf_Control.Handler
                             return;
                         }
                     }
-                    else if (new[] { "status", "validate", "upload" }.Contains(command))
+                    else if (new[] {"status", "validate", "upload"}.Contains(command))
                     {
                         //global admin only commands
                         if (!UpdateHelper.Devs.Contains(query.From.Id) && !UpdateHelper.IsGlobalAdmin(query.From.Id))
@@ -998,13 +1041,15 @@ namespace Werewolf_Control.Handler
                         if (p == null)
                             return;
                     }
-                    else if (!new[] { "groups", "getlang", "done" }.Contains(command))
+                    else if (!new[] {"groups", "getlang", "done"}.Contains(command))
                     {
                         //the commands in the array don't require a group. every other command requires a group
                         if (grp == null)
                             return;
                         //among the remaining commands, only stopwaiting can be used by anyone. the other commands are config commands.
-                        if (command != "stopwaiting" && !UpdateHelper.Devs.Contains(query.From.Id) && !UpdateHelper.IsGlobalAdmin(query.From.Id) && !UpdateHelper.IsGroupAdmin(query.From.Id, groupid))
+                        if (command != "stopwaiting" && !UpdateHelper.Devs.Contains(query.From.Id) &&
+                            !UpdateHelper.IsGlobalAdmin(query.From.Id) &&
+                            !UpdateHelper.IsGroupAdmin(query.From.Id, groupid))
                         {
                             Bot.ReplyToCallback(query, GetLocaleString("GroupAdminOnly", language), false, true);
                             return;
@@ -1012,14 +1057,14 @@ namespace Werewolf_Control.Handler
                     }
 
 
-
-
                     //config helpers
                     if (choice == "cancel")
                     {
-                        Bot.ReplyToCallback(query, GetLocaleString("WhatToDo", language), replyMarkup: GetConfigMenu(groupid));
+                        Bot.ReplyToCallback(query, GetLocaleString("WhatToDo", language),
+                            replyMarkup: GetConfigMenu(groupid));
                         return;
                     }
+
                     grp?.UpdateFlags();
                     var Yes = GetLocaleString("Yes", language);
                     var No = GetLocaleString("No", language);
@@ -1028,6 +1073,7 @@ namespace Werewolf_Control.Handler
                     switch (command)
                     {
                         #region Dev Commands
+
                         case "update":
                             Updater.DoUpdate(query);
                             return;
@@ -1044,11 +1090,11 @@ namespace Werewolf_Control.Handler
 
                                 //get all the players Para has played with
                                 var ohaiplayers = (from g in DB.Games
-                                                   join gp in DB.GamePlayers on g.Id equals gp.GameId
-                                                   join gp2 in DB.GamePlayers on g.Id equals gp2.GameId
-                                                   join pl in DB.Players on gp2.PlayerId equals pl.Id
-                                                   where gp.PlayerId == para.Id
-                                                   select pl).Distinct();
+                                    join gp in DB.GamePlayers on g.Id equals gp.GameId
+                                    join gp2 in DB.GamePlayers on g.Id equals gp2.GameId
+                                    join pl in DB.Players on gp2.PlayerId equals pl.Id
+                                    where gp.PlayerId == para.Id
+                                    select pl).Distinct();
 
                                 //figure out which players don't have the achievement
 
@@ -1061,19 +1107,23 @@ namespace Werewolf_Control.Handler
                                     //add the achievement
                                     if (player.Achievements == null)
                                         player.Achievements = 0;
-                                    var ach = (Achievements)player.Achievements;
+                                    var ach = (Achievements) player.Achievements;
                                     if (ach.HasFlag(Achievements.OHAIDER)) continue;
                                     count++;
                                     var a = Achievements.OHAIDER;
-                                    player.Achievements = (long)(ach | a);
+                                    player.Achievements = (long) (ach | a);
                                     //log these ids, just in case....
-                                    using (var sw = new StreamWriter(Path.Combine(Bot.RootDirectory, "../Logs/ohaider.log"), true))
+                                    using (var sw =
+                                        new StreamWriter(Path.Combine(Bot.RootDirectory, "../Logs/ohaider.log"), true))
                                     {
                                         sw.WriteLine(player.Id);
                                     }
-                                    Send($"Achievement Unlocked!\n{a.GetName().ToBold()}\n{a.GetDescription()}", player.TelegramId);
+
+                                    Send($"Achievement Unlocked!\n{a.GetName().ToBold()}\n{a.GetDescription()}",
+                                        player.TelegramId);
                                     Thread.Sleep(200);
                                 }
+
                                 DB.SaveChanges();
                                 ohaimsg += $"\nAchievement added to {count} players\nFinished";
                                 Bot.Edit(query, ohaimsg);
@@ -1088,6 +1138,7 @@ namespace Werewolf_Control.Handler
                                     e = e.InnerException;
                                 Send(e.Message, query.From.Id);
                             }
+
                             return;
                         case "restore":
                             var oldid = int.Parse(args[1]);
@@ -1104,28 +1155,33 @@ namespace Werewolf_Control.Handler
 
                             var groupsmoved = (from g in DB.Groups where g.Language == oldfilename select g).ToList();
                             var players = (from pl in DB.Players where pl.Language == oldfilename select pl).ToList();
-                            var grouprankings = (from gr in DB.GroupRanking where gr.Language == oldfilename select gr).ToList();
+                            var grouprankings = (from gr in DB.GroupRanking where gr.Language == oldfilename select gr)
+                                .ToList();
 
                             foreach (var g in groupsmoved)
                             {
                                 g.Language = newfilename;
                                 grpcount++;
                             }
+
                             foreach (var pl in players)
                             {
                                 pl.Language = newfilename;
                                 plcount++;
                             }
+
                             foreach (var gr in grouprankings)
                             {
                                 gr.Language = newfilename;
                                 grprcount++;
                             }
+
                             DB.SaveChanges();
-                            var msg = $"Groups changed: {grpcount}\nPlayers changed: {plcount}\nTotal rows changed: {grpcount + plcount}";
+                            var msg =
+                                $"Groups changed: {grpcount}\nPlayers changed: {plcount}\nTotal rows changed: {grpcount + plcount}";
                             try
                             {
-                                System.IO.File.Delete(Path.Combine(Bot.LanguageDirectory, oldfilename + ".xml"));
+                                File.Delete(Path.Combine(Bot.LanguageDirectory, oldfilename + ".xml"));
                                 msg += $"\n\nSuccessfully deleted {oldfilename}.xml";
                             }
                             catch (Exception e)
@@ -1133,15 +1189,23 @@ namespace Werewolf_Control.Handler
                                 msg += $"\n\n*Error: *";
                                 msg += e.Message;
                             }
+
                             Bot.Edit(query, query.Message.Text + "\n\n" + msg);
                             return;
+
                         #endregion
+
                         #region Global Admin Commands
+
                         case "status":
                             if (args[3] == "null")
                             {
                                 //get status
-                                menu = new InlineKeyboardMarkup(new[] { "Normal", "Overloaded", "Recovering", "API Bug", "Offline", "Maintenance" }.Select(x => new[] { new InlineKeyboardCallbackButton(x, $"status|{groupid}|{choice}|{x}") }).ToArray());
+                                menu = new InlineKeyboardMarkup(
+                                    new[] {"Normal", "Overloaded", "Recovering", "API Bug", "Offline", "Maintenance"}
+                                        .Select(x => new[]
+                                            {new InlineKeyboardCallbackButton(x, $"status|{groupid}|{choice}|{x}")})
+                                        .ToArray());
                                 Bot.ReplyToCallback(query, "Set status to?", replyMarkup: menu);
                             }
                             else
@@ -1153,8 +1217,10 @@ namespace Werewolf_Control.Handler
                                     bot.BotStatus = args[3];
                                     DB.SaveChanges();
                                 }
+
                                 Bot.ReplyToCallback(query, "Status updated");
                             }
+
                             break;
                         case "preferred":
                             var grpid = grp.Id;
@@ -1166,7 +1232,8 @@ namespace Werewolf_Control.Handler
                                     //toggle preferred
                                     grp.Preferred = !(grp.Preferred ?? true);
                                 //say if they're preferred
-                                Bot.ReplyToCallback(query, "Global: " + (grp.Preferred == false ? "disabled" : "enabled"), false);
+                                Bot.ReplyToCallback(query,
+                                    "Global: " + (grp.Preferred == false ? "disabled" : "enabled"), false);
                                 if (args[3] == "info")
                                     return;
                             }
@@ -1178,25 +1245,34 @@ namespace Werewolf_Control.Handler
                                     //toggle show
                                     ranking.Show = !(ranking.Show ?? true);
                                 //say if they're shown
-                                Bot.ReplyToCallback(query, lang + ": " + (ranking.Show == false ? "disabled" : "enabled"), false);
+                                Bot.ReplyToCallback(query,
+                                    lang + ": " + (ranking.Show == false ? "disabled" : "enabled"), false);
                                 if (args[3] == "info")
                                     return;
                             }
+
                             DB.SaveChanges();
                             //make the menu
-                            var rows = rankings.Select(x => new[] {
-                                new InlineKeyboardCallbackButton(x.Language, $"preferred|{grp.GroupId}|{x.Language}|info"),
-                                new InlineKeyboardCallbackButton(x.Show == false ? "☑️" : "✅", $"preferred|{grp.GroupId}|{x.Language}|toggle")
+                            var rows = rankings.Select(x => new[]
+                            {
+                                new InlineKeyboardCallbackButton(x.Language,
+                                    $"preferred|{grp.GroupId}|{x.Language}|info"),
+                                new InlineKeyboardCallbackButton(x.Show == false ? "☑️" : "✅",
+                                    $"preferred|{grp.GroupId}|{x.Language}|toggle")
                             }).ToList();
                             //add a button at the beginning and at the end
-                            rows.Insert(0, new[] {
+                            rows.Insert(0, new[]
+                            {
                                 new InlineKeyboardCallbackButton("Global", $"preferred|{grp.GroupId}|null|info"),
-                                new InlineKeyboardCallbackButton(grp.Preferred == false ? "☑️" : "✅", $"preferred|{grp.GroupId}|null|toggle")
+                                new InlineKeyboardCallbackButton(grp.Preferred == false ? "☑️" : "✅",
+                                    $"preferred|{grp.GroupId}|null|toggle")
                             });
-                            rows.Add(new[] { new InlineKeyboardCallbackButton("Done", "done") });
+                            rows.Add(new[] {new InlineKeyboardCallbackButton("Done", "done")});
                             //send everything
                             Bot.ReplyToCallback(query,
-                                $"{grp.GroupId} | " + (grp.GroupLink == null ? grp.Name : $" <a href=\"{grp.GroupLink}\">{grp.Name}</a>") +
+                                $"{grp.GroupId} | " + (grp.GroupLink == null
+                                    ? grp.Name
+                                    : $" <a href=\"{grp.GroupLink}\">{grp.Name}</a>") +
                                 "\n\nSelect the languages under which the group is allowed to appear in grouplist.\nNote that the first option, if disabled, overrides all the others.",
                                 replyMarkup: new InlineKeyboardMarkup(rows.ToArray()),
                                 parsemode: ParseMode.Html
@@ -1222,13 +1298,14 @@ namespace Werewolf_Control.Handler
                             {
                                 buttons.Clear();
                                 Bot.ReplyToCallback(query, GetLocaleString("WhatVariant", language, choice),
-                                       replyMarkup: menu);
+                                    replyMarkup: menu);
                                 return;
                             }
 
                             //var menu = new ReplyKeyboardHide { HideKeyboard = true, Selective = true };
                             //Bot.SendTextMessageAsync(id, "", replyToMessageId: update.Message.MessageId, replyMarkup: menu);
-                            LanguageHelper.ValidateLanguageFile(query.Message.Chat.Id, vlang.FilePath, query.Message.MessageId);
+                            LanguageHelper.ValidateLanguageFile(query.Message.Chat.Id, vlang.FilePath,
+                                query.Message.MessageId);
                             return;
                         case "upload":
                             Console.WriteLine(choice);
@@ -1237,10 +1314,15 @@ namespace Werewolf_Control.Handler
                                 Bot.ReplyToCallback(query, "No action taken.");
                                 return;
                             }
-                            Helpers.LanguageHelper.UseNewLanguageFile(choice, query.Message.Chat.Id, query.Message.MessageId);
+
+                            LanguageHelper.UseNewLanguageFile(choice, query.Message.Chat.Id,
+                                query.Message.MessageId);
                             return;
+
                         #endregion
+
                         #region Other Commands
+
                         case "groups":
                             var variant = args[3];
 
@@ -1254,8 +1336,13 @@ namespace Werewolf_Control.Handler
                                 else
                                 {
                                     //create a menu out of this
-                                    buttons = new List<InlineKeyboardButton>() { new InlineKeyboardCallbackButton(GetLocaleString("All", language), $"groups|{query.From.Id}|{choice}|all") };
-                                    buttons.AddRange(variants.OrderBy(x => x).Select(x => new InlineKeyboardCallbackButton(x, $"groups|{query.From.Id}|{choice}|{x}")));
+                                    buttons = new List<InlineKeyboardButton>()
+                                    {
+                                        new InlineKeyboardCallbackButton(GetLocaleString("All", language),
+                                            $"groups|{query.From.Id}|{choice}|all")
+                                    };
+                                    buttons.AddRange(variants.OrderBy(x => x).Select(x =>
+                                        new InlineKeyboardCallbackButton(x, $"groups|{query.From.Id}|{choice}|{x}")));
                                     var playersGames = DB.Players.FirstOrDefault(x => x.TelegramId == query.From.Id);
                                     var gamecount = playersGames?.GamePlayers.Count ?? 0;
                                     var message = "";
@@ -1267,27 +1354,33 @@ namespace Werewolf_Control.Handler
                                     }
                                     else
                                         message = GetLocaleString("WhatVariant", language, choice);
+
                                     var variantMenu = new List<InlineKeyboardButton[]>();
                                     for (var i = 0; i < buttons.Count; i++)
                                     {
                                         if (buttons.Count - 1 == i)
                                         {
-                                            variantMenu.Add(new[] { buttons[i] });
+                                            variantMenu.Add(new[] {buttons[i]});
                                         }
                                         else
-                                            variantMenu.Add(new[] { buttons[i], buttons[i + 1] });
+                                            variantMenu.Add(new[] {buttons[i], buttons[i + 1]});
+
                                         i++;
                                     }
 
-                                    Bot.ReplyToCallback(query, message, replyMarkup: new InlineKeyboardMarkup(variantMenu.ToArray()), parsemode:ParseMode.Html);
+                                    Bot.ReplyToCallback(query, message,
+                                        replyMarkup: new InlineKeyboardMarkup(variantMenu.ToArray()),
+                                        parsemode: ParseMode.Html);
                                     break;
                                 }
                             }
-                           
 
-                            var groups = PublicGroups.ForLanguage(choice, variant).ToList().OrderByDescending(x => x.LastRefresh).ThenByDescending(x => x.Ranking).Take(10).ToList();
+
+                            var groups = PublicGroups.ForLanguage(choice, variant).ToList()
+                                .OrderByDescending(x => x.LastRefresh).ThenByDescending(x => x.Ranking).Take(10)
+                                .ToList();
                             var variantmsg = args[3] == "all" ? "" : (" " + variant);
-                           
+
                             Bot.ReplyToCallback(query, GetLocaleString("HereIsList", language, choice + variantmsg));
                             if (groups.Count() > 5)
                             {
@@ -1335,35 +1428,43 @@ namespace Werewolf_Control.Handler
                             {
                                 buttons.Clear();
                                 Bot.ReplyToCallback(query, GetLocaleString("WhatVariant", language, choice),
-                                       replyMarkup: menu);
+                                    replyMarkup: menu);
                                 return;
                             }
+
                             Bot.ReplyToCallback(query, "One moment...");
                             LanguageHelper.SendFile(query.Message.Chat.Id, glang.Name);
                             break;
                         case "stopwaiting":
                             using (var db = new WWContext())
-                                db.Database.ExecuteSqlCommand($"DELETE FROM NotifyGame WHERE GroupId = {groupid} AND UserId = {query.From.Id}");
+                                db.Database.ExecuteSqlCommand(
+                                    $"DELETE FROM NotifyGame WHERE GroupId = {groupid} AND UserId = {query.From.Id}");
                             Bot.ReplyToCallback(query, GetLocaleString("DeletedFromWaitList", grp.Language, grp.Name));
                             break;
+
                         #endregion
+
                         #region Config Commands
+
                         case "lang":
                             //load up each file and get the names
-                            var langs = Directory.GetFiles(Bot.LanguageDirectory, "*.xml").Select(x => new LangFile(x)).ToList();
+                            var langs = Directory.GetFiles(Bot.LanguageDirectory, "*.xml").Select(x => new LangFile(x))
+                                .ToList();
 
                             buttons.Clear();
-                            buttons.AddRange(langs.Select(x => x.Base).Distinct().OrderBy(x => x).Select(x => new InlineKeyboardCallbackButton(x, $"setlang|{groupid}|{x}|null|base")));
+                            buttons.AddRange(langs.Select(x => x.Base).Distinct().OrderBy(x => x).Select(x =>
+                                new InlineKeyboardCallbackButton(x, $"setlang|{groupid}|{x}|null|base")));
 
                             var baseMenu = new List<InlineKeyboardButton[]>();
                             for (var i = 0; i < buttons.Count; i++)
                             {
                                 if (buttons.Count - 1 == i)
                                 {
-                                    baseMenu.Add(new[] { buttons[i] });
+                                    baseMenu.Add(new[] {buttons[i]});
                                 }
                                 else
-                                    baseMenu.Add(new[] { buttons[i], buttons[i + 1] });
+                                    baseMenu.Add(new[] {buttons[i], buttons[i + 1]});
+
                                 i++;
                             }
 
@@ -1371,7 +1472,8 @@ namespace Werewolf_Control.Handler
 
 
                             var curLang = langs.First(x => x.FileName == (grp?.Language ?? p.Language));
-                            Bot.ReplyToCallback(query, GetLocaleString("WhatLang", language, curLang.Base), replyMarkup: menu);
+                            Bot.ReplyToCallback(query, GetLocaleString("WhatLang", language, curLang.Base),
+                                replyMarkup: menu);
                             break;
                         case "setlang":
                             menu = new InlineKeyboardMarkup();
@@ -1379,7 +1481,8 @@ namespace Werewolf_Control.Handler
                             if (slang == null)
                             {
                                 buttons.Clear();
-                                var curLangfilePath = Directory.GetFiles(Bot.LanguageDirectory).First(x => Path.GetFileNameWithoutExtension(x) == (grp?.Language ?? p.Language));
+                                var curLangfilePath = Directory.GetFiles(Bot.LanguageDirectory).First(x =>
+                                    Path.GetFileNameWithoutExtension(x) == (grp?.Language ?? p.Language));
                                 var curVariant = new LangFile(curLangfilePath).Variant;
                                 Bot.ReplyToCallback(query, GetLocaleString("WhatVariant", language, curVariant),
                                     replyMarkup: menu);
@@ -1402,15 +1505,25 @@ namespace Werewolf_Control.Handler
 
                                     ig?.LoadLanguage(slang.FileName);
                                     menu = GetConfigMenu(groupid);
-                                    Bot.Api.AnswerCallbackQueryAsync(query.Id, GetLocaleString("LangSet", language, slang.Base + (String.IsNullOrWhiteSpace(slang.Variant) ? "" : ": " + slang.Variant)));
-                                    Bot.ReplyToCallback(query, GetLocaleString("WhatToDo", language), replyMarkup: menu);
+                                    Bot.Api.AnswerCallbackQueryAsync(query.Id,
+                                        GetLocaleString("LangSet", language,
+                                            slang.Base + (String.IsNullOrWhiteSpace(slang.Variant)
+                                                ? ""
+                                                : ": " + slang.Variant)));
+                                    Bot.ReplyToCallback(query, GetLocaleString("WhatToDo", language),
+                                        replyMarkup: menu);
                                 }
                                 else if (p != null)
                                 {
                                     p.Language = slang.FileName;
-                                    Bot.ReplyToCallback(query, GetLocaleString("LangSet", language, slang.Base + (String.IsNullOrWhiteSpace(slang.Variant) ? "" : ": " + slang.Variant)));
+                                    Bot.ReplyToCallback(query,
+                                        GetLocaleString("LangSet", language,
+                                            slang.Base + (String.IsNullOrWhiteSpace(slang.Variant)
+                                                ? ""
+                                                : ": " + slang.Variant)));
                                 }
                             }
+
                             DB.SaveChanges();
                             break;
                         //case "online":
@@ -1458,7 +1571,7 @@ namespace Werewolf_Control.Handler
                             buttons.Add(new InlineKeyboardCallbackButton("30", $"setmaxplayer|{groupid}|30"));
                             buttons.Add(new InlineKeyboardCallbackButton("35", $"setmaxplayer|{groupid}|35"));
                             buttons.Add(new InlineKeyboardCallbackButton(Cancel, $"setmaxplayer|{groupid}|cancel"));
-                            menu = new InlineKeyboardMarkup(buttons.Select(x => new[] { x }).ToArray());
+                            menu = new InlineKeyboardMarkup(buttons.Select(x => new[] {x}).ToArray());
                             Bot.ReplyToCallback(query,
                                 GetLocaleString("MaxPlayersQ", language, grp.MaxPlayers ?? Settings.MaxPlayers),
                                 replyMarkup: menu);
@@ -1466,7 +1579,8 @@ namespace Werewolf_Control.Handler
                         case "setmaxplayer":
 
                             grp.MaxPlayers = int.Parse(choice);
-                            Bot.Api.AnswerCallbackQueryAsync(query.Id, GetLocaleString("MaxPlayersA", language, choice));
+                            Bot.Api.AnswerCallbackQueryAsync(query.Id,
+                                GetLocaleString("MaxPlayersA", language, choice));
                             Bot.ReplyToCallback(query,
                                 GetLocaleString("WhatToDo", language), replyMarkup: GetConfigMenu(groupid));
                             DB.SaveChanges();
@@ -1490,11 +1604,14 @@ namespace Werewolf_Control.Handler
                         //    DB.SaveChanges();
                         //    break;
                         case "mode":
-                            buttons.Add(new InlineKeyboardCallbackButton(GetLocaleString("NormalOnly", language), $"setmode|{groupid}|Normal"));
-                            buttons.Add(new InlineKeyboardCallbackButton(GetLocaleString("ChaosOnly", language), $"setmode|{groupid}|Chaos"));
-                            buttons.Add(new InlineKeyboardCallbackButton(GetLocaleString("PlayerChoice", language), $"setmode|{groupid}|Player"));
+                            buttons.Add(new InlineKeyboardCallbackButton(GetLocaleString("NormalOnly", language),
+                                $"setmode|{groupid}|Normal"));
+                            buttons.Add(new InlineKeyboardCallbackButton(GetLocaleString("ChaosOnly", language),
+                                $"setmode|{groupid}|Chaos"));
+                            buttons.Add(new InlineKeyboardCallbackButton(GetLocaleString("PlayerChoice", language),
+                                $"setmode|{groupid}|Player"));
                             buttons.Add(new InlineKeyboardCallbackButton(Cancel, $"setmode|{groupid}|cancel"));
-                            menu = new InlineKeyboardMarkup(buttons.Select(x => new[] { x }).ToArray());
+                            menu = new InlineKeyboardMarkup(buttons.Select(x => new[] {x}).ToArray());
                             Bot.ReplyToCallback(query,
                                 GetLocaleString("GameModeQ", language, grp.Mode), replyMarkup: menu);
                             break;
@@ -1507,18 +1624,22 @@ namespace Werewolf_Control.Handler
                             DB.SaveChanges();
                             break;
                         case "endroles":
-                            buttons.Add(new InlineKeyboardCallbackButton(GetLocaleString("ShowNone", language), $"setendroles|{groupid}|None"));
-                            buttons.Add(new InlineKeyboardCallbackButton(GetLocaleString("ShowLiving", language), $"setendroles|{groupid}|Living"));
-                            buttons.Add(new InlineKeyboardCallbackButton(GetLocaleString("ShowAll", language), $"setendroles|{groupid}|All"));
+                            buttons.Add(new InlineKeyboardCallbackButton(GetLocaleString("ShowNone", language),
+                                $"setendroles|{groupid}|None"));
+                            buttons.Add(new InlineKeyboardCallbackButton(GetLocaleString("ShowLiving", language),
+                                $"setendroles|{groupid}|Living"));
+                            buttons.Add(new InlineKeyboardCallbackButton(GetLocaleString("ShowAll", language),
+                                $"setendroles|{groupid}|All"));
                             buttons.Add(new InlineKeyboardCallbackButton(Cancel, $"setendroles|{groupid}|cancel"));
-                            menu = new InlineKeyboardMarkup(buttons.Select(x => new[] { x }).ToArray());
+                            menu = new InlineKeyboardMarkup(buttons.Select(x => new[] {x}).ToArray());
                             Bot.ReplyToCallback(query,
                                 GetLocaleString("ShowRolesEndQ", language, grp.ShowRolesEnd),
                                 replyMarkup: menu);
                             break;
                         case "setendroles":
                             grp.ShowRolesEnd = choice;
-                            Bot.Api.AnswerCallbackQueryAsync(query.Id, GetLocaleString("ShowRolesEndA", language, choice));
+                            Bot.Api.AnswerCallbackQueryAsync(query.Id,
+                                GetLocaleString("ShowRolesEndA", language, choice));
                             Bot.ReplyToCallback(query,
                                 GetLocaleString("WhatToDo", language), replyMarkup: GetConfigMenu(groupid));
                             DB.SaveChanges();
@@ -1529,14 +1650,16 @@ namespace Werewolf_Control.Handler
                             buttons.Add(new InlineKeyboardCallbackButton("150", $"setday|{groupid}|90"));
                             buttons.Add(new InlineKeyboardCallbackButton("180", $"setday|{groupid}|120"));
                             buttons.Add(new InlineKeyboardCallbackButton(Cancel, $"setday|{groupid}|cancel"));
-                            menu = new InlineKeyboardMarkup(buttons.Select(x => new[] { x }).ToArray());
+                            menu = new InlineKeyboardMarkup(buttons.Select(x => new[] {x}).ToArray());
                             Bot.ReplyToCallback(query,
-                                GetLocaleString("SetDayTimeQ", language, Settings.TimeDay + 60, (grp.DayTime ?? Settings.TimeDay) + 60),
+                                GetLocaleString("SetDayTimeQ", language, Settings.TimeDay + 60,
+                                    (grp.DayTime ?? Settings.TimeDay) + 60),
                                 replyMarkup: menu);
                             break;
                         case "setday":
                             grp.DayTime = int.Parse(choice);
-                            Bot.Api.AnswerCallbackQueryAsync(query.Id, GetLocaleString("SetDayTimeA", language, int.Parse(choice) + 60));
+                            Bot.Api.AnswerCallbackQueryAsync(query.Id,
+                                GetLocaleString("SetDayTimeA", language, int.Parse(choice) + 60));
                             Bot.ReplyToCallback(query,
                                 GetLocaleString("WhatToDo", language), replyMarkup: GetConfigMenu(groupid));
                             DB.SaveChanges();
@@ -1547,15 +1670,17 @@ namespace Werewolf_Control.Handler
                             buttons.Add(new InlineKeyboardCallbackButton("90", $"setnight|{groupid}|90"));
                             buttons.Add(new InlineKeyboardCallbackButton("120", $"setnight|{groupid}|120"));
                             buttons.Add(new InlineKeyboardCallbackButton(Cancel, $"setnight|{groupid}|cancel"));
-                            menu = new InlineKeyboardMarkup(buttons.Select(x => new[] { x }).ToArray());
+                            menu = new InlineKeyboardMarkup(buttons.Select(x => new[] {x}).ToArray());
                             Bot.ReplyToCallback(query,
-                                GetLocaleString("SetNightTimeQ", language, Settings.TimeNight, grp.NightTime ?? Settings.TimeNight),
+                                GetLocaleString("SetNightTimeQ", language, Settings.TimeNight,
+                                    grp.NightTime ?? Settings.TimeNight),
                                 replyMarkup: menu);
                             break;
                         case "setnight":
 
                             grp.NightTime = int.Parse(choice);
-                            Bot.Api.AnswerCallbackQueryAsync(query.Id, GetLocaleString("SetNightTimeA", language, choice));
+                            Bot.Api.AnswerCallbackQueryAsync(query.Id,
+                                GetLocaleString("SetNightTimeA", language, choice));
                             Bot.ReplyToCallback(query,
                                 GetLocaleString("WhatToDo", language), replyMarkup: GetConfigMenu(groupid));
                             DB.SaveChanges();
@@ -1566,14 +1691,16 @@ namespace Werewolf_Control.Handler
                             buttons.Add(new InlineKeyboardCallbackButton("90", $"setlynch|{groupid}|90"));
                             buttons.Add(new InlineKeyboardCallbackButton("120", $"setlynch|{groupid}|120"));
                             buttons.Add(new InlineKeyboardCallbackButton(Cancel, $"setlynch|{groupid}|cancel"));
-                            menu = new InlineKeyboardMarkup(buttons.Select(x => new[] { x }).ToArray());
+                            menu = new InlineKeyboardMarkup(buttons.Select(x => new[] {x}).ToArray());
                             Bot.ReplyToCallback(query,
-                                GetLocaleString("SetLynchTimeQ", language, Settings.TimeLynch, grp.LynchTime ?? Settings.TimeLynch),
+                                GetLocaleString("SetLynchTimeQ", language, Settings.TimeLynch,
+                                    grp.LynchTime ?? Settings.TimeLynch),
                                 replyMarkup: menu);
                             break;
                         case "setlynch":
                             grp.LynchTime = int.Parse(choice);
-                            Bot.Api.AnswerCallbackQueryAsync(query.Id, GetLocaleString("SetLynchTimeA", language, choice));
+                            Bot.Api.AnswerCallbackQueryAsync(query.Id,
+                                GetLocaleString("SetLynchTimeA", language, choice));
                             Bot.ReplyToCallback(query,
                                 GetLocaleString("WhatToDo", language), replyMarkup: GetConfigMenu(groupid));
                             DB.SaveChanges();
@@ -1661,9 +1788,10 @@ namespace Werewolf_Control.Handler
                             buttons.Add(new InlineKeyboardCallbackButton("240", $"setmaxextend|{groupid}|240"));
                             buttons.Add(new InlineKeyboardCallbackButton("300", $"setmaxextend|{groupid}|300"));
                             buttons.Add(new InlineKeyboardCallbackButton(Cancel, $"setmaxextend|{groupid}|cancel"));
-                            menu = new InlineKeyboardMarkup(buttons.Select(x => new[] { x }).ToArray());
+                            menu = new InlineKeyboardMarkup(buttons.Select(x => new[] {x}).ToArray());
                             Bot.ReplyToCallback(query,
-                                GetLocaleString("MaxExtendQ", language, Settings.MaxExtend, grp.MaxExtend ?? Settings.MaxExtend), replyMarkup: menu);
+                                GetLocaleString("MaxExtendQ", language, Settings.MaxExtend,
+                                    grp.MaxExtend ?? Settings.MaxExtend), replyMarkup: menu);
                             break;
                         case "setmaxextend":
                             grp.MaxExtend = int.Parse(choice);
@@ -1683,7 +1811,8 @@ namespace Werewolf_Control.Handler
                             var chosen =
                                 settings.FirstOrDefault(
                                     x => x.GetInfo().ShortName == command || "set" + x.GetInfo().ShortName == command);
-                            if (chosen == GroupConfig.None) break; //always false? on a FirstOrDefault?....  I'll check later. //reny's answer: yep, enum's default is zero, ie GroupConfig.None
+                            if (chosen == GroupConfig.None)
+                                break; //always false? on a FirstOrDefault?....  I'll check later. //reny's answer: yep, enum's default is zero, ie GroupConfig.None
                             //TODO we need to call the database method to update the group flags based on current settings (also under TODO)
 
                             string pos = "", neg = "";
@@ -1708,40 +1837,46 @@ namespace Werewolf_Control.Handler
                                 var current = choice == "true";
                                 //get the flags.
                                 var flagLong = grp.Flags ?? 0;
-                                var flags = (GroupConfig)flagLong; // i think that's right....
+                                var flags = (GroupConfig) flagLong; // i think that's right....
 
                                 if (current)
                                     flags = flags | chosen;
                                 else
                                     flags = flags & ~chosen;
 
-                                grp.Flags = (long)flags;
+                                grp.Flags = (long) flags;
                                 command = command.Substring(3);
-                                Bot.Api.AnswerCallbackQueryAsync(query.Id, GetLocaleString($"{chosen.ToString()}A", language, current ? GetLocaleString(pos, language) : GetLocaleString(neg, language)));
-                                Bot.ReplyToCallback(query, GetLocaleString("WhatToDo", language), replyMarkup: GetConfigMenu(groupid));
+                                Bot.Api.AnswerCallbackQueryAsync(query.Id,
+                                    GetLocaleString($"{chosen.ToString()}A", language,
+                                        current ? GetLocaleString(pos, language) : GetLocaleString(neg, language)));
+                                Bot.ReplyToCallback(query, GetLocaleString("WhatToDo", language),
+                                    replyMarkup: GetConfigMenu(groupid));
                                 DB.SaveChanges();
                             }
                             else
                             {
-
-                                buttons.Add(new InlineKeyboardCallbackButton(GetLocaleString(pos, language), $"set{command}|{groupid}|true"));
-                                buttons.Add(new InlineKeyboardCallbackButton(GetLocaleString(neg, language), $"set{command}|{groupid}|false"));
+                                buttons.Add(new InlineKeyboardCallbackButton(GetLocaleString(pos, language),
+                                    $"set{command}|{groupid}|true"));
+                                buttons.Add(new InlineKeyboardCallbackButton(GetLocaleString(neg, language),
+                                    $"set{command}|{groupid}|false"));
                                 buttons.Add(new InlineKeyboardCallbackButton(Cancel, $"set{command}|{groupid}|cancel"));
 
-                                menu = new InlineKeyboardMarkup(buttons.Select(x => new[] { x }).ToArray());
+                                menu = new InlineKeyboardMarkup(buttons.Select(x => new[] {x}).ToArray());
                                 var current = chosen.GetDefaultValue();
                                 if (grp.Flags != null)
                                 {
-                                    current = ((GroupConfig)grp.Flags).HasFlag(chosen);
+                                    current = ((GroupConfig) grp.Flags).HasFlag(chosen);
                                 }
+
                                 Bot.ReplyToCallback(query,
                                     GetLocaleString(chosen + "Q", language, current
-                                            ? GetLocaleString(pos, language)
-                                            : GetLocaleString(neg, language)), replyMarkup: menu);
+                                        ? GetLocaleString(pos, language)
+                                        : GetLocaleString(neg, language)), replyMarkup: menu);
                             }
 
                             break;
-                            #endregion
+
+                        #endregion
                     }
                 }
                 catch (Exception ex)
@@ -1754,16 +1889,20 @@ namespace Werewolf_Control.Handler
 
         private static string[] GetParameters(string input)
         {
-            return input.Contains(" ") ? new[] { input.Substring(1, input.IndexOf(" ")).Trim(), input.Substring(input.IndexOf(" ") + 1) } : new[] { input.Substring(1).Trim(), null };
+            return input.Contains(" ")
+                ? new[] {input.Substring(1, input.IndexOf(" ")).Trim(), input.Substring(input.IndexOf(" ") + 1)}
+                : new[] {input.Substring(1).Trim(), null};
         }
 
-        internal static Task<Message> Send(string message, long id, bool clearKeyboard = false, InlineKeyboardMarkup customMenu = null, ParseMode parseMode = ParseMode.Html)
+        internal static Task<Message> Send(string message, long id, bool clearKeyboard = false,
+            InlineKeyboardMarkup customMenu = null, ParseMode parseMode = ParseMode.Html)
         {
             return Bot.Send(message, id, clearKeyboard, customMenu, parseMode);
         }
 
 
-        internal static LangFile SelectLanguage(string command, string[] args, ref InlineKeyboardMarkup menu, bool addAllbutton = true)
+        internal static LangFile SelectLanguage(string command, string[] args, ref InlineKeyboardMarkup menu,
+            bool addAllbutton = true)
         {
             var langs = Directory.GetFiles(Bot.LanguageDirectory, "*.xml").Select(x => new LangFile(x)).ToList();
             var isBase = args[4] == "base";
@@ -1773,21 +1912,25 @@ namespace Werewolf_Control.Handler
                 if (variants.Count() > 1)
                 {
                     var buttons = new List<InlineKeyboardButton>();
-                    buttons.AddRange(variants.Select(x => new InlineKeyboardCallbackButton(x.Variant, $"{command}|{args[1]}|{x.Base}|{x.Variant}|v")));
+                    buttons.AddRange(variants.Select(x =>
+                        new InlineKeyboardCallbackButton(x.Variant, $"{command}|{args[1]}|{x.Base}|{x.Variant}|v")));
                     if (addAllbutton)
-                        buttons.Insert(0, new InlineKeyboardCallbackButton("All", $"{command}|{args[1]}|{args[2]}|All|v"));
+                        buttons.Insert(0,
+                            new InlineKeyboardCallbackButton("All", $"{command}|{args[1]}|{args[2]}|All|v"));
 
                     var twoMenu = new List<InlineKeyboardButton[]>();
                     for (var i = 0; i < buttons.Count; i++)
                     {
                         if (buttons.Count - 1 == i)
                         {
-                            twoMenu.Add(new[] { buttons[i] });
+                            twoMenu.Add(new[] {buttons[i]});
                         }
                         else
-                            twoMenu.Add(new[] { buttons[i], buttons[i + 1] });
+                            twoMenu.Add(new[] {buttons[i], buttons[i + 1]});
+
                         i++;
                     }
+
                     menu = new InlineKeyboardMarkup(twoMenu.ToArray());
 
                     return null;
@@ -1816,6 +1959,7 @@ namespace Werewolf_Control.Handler
                 //fallback to English
                 strings = Bot.English.Descendants("string").FirstOrDefault(x => x.Attribute("key").Value == key);
             }
+
             try
             {
                 var values = strings.Descendants("value");
@@ -1827,7 +1971,6 @@ namespace Werewolf_Control.Handler
             {
                 return "";
             }
-
         }
 
         //internal static Group MakeDefaultGroup(long groupid, string name, string createdBy)
@@ -1878,7 +2021,8 @@ namespace Werewolf_Control.Handler
             {
                 if (!flag.IsEditable()) continue;
                 //get the flag, determine the shortname and make a button out of it.
-                buttons.Add(new InlineKeyboardCallbackButton(GetLocaleString(flag.ToString(), GetLanguage(id)), $"{flag.GetInfo().ShortName}|{id}"));
+                buttons.Add(new InlineKeyboardCallbackButton(GetLocaleString(flag.ToString(), GetLanguage(id)),
+                    $"{flag.GetInfo().ShortName}|{id}"));
             }
 
             buttons.Add(new InlineKeyboardCallbackButton("Done", $"done"));
@@ -1887,17 +2031,17 @@ namespace Werewolf_Control.Handler
             {
                 if (buttons.Count - 1 == i)
                 {
-                    twoMenu.Add(new[] { buttons[i] });
+                    twoMenu.Add(new[] {buttons[i]});
                 }
                 else
-                    twoMenu.Add(new[] { buttons[i], buttons[i + 1] });
+                    twoMenu.Add(new[] {buttons[i], buttons[i + 1]});
+
                 i++;
             }
 
             var menu = new InlineKeyboardMarkup(twoMenu.ToArray());
             return menu;
         }
-
 
 
         public static void InlineQueryReceived(object sender, InlineQueryEventArgs e)
@@ -1908,7 +2052,6 @@ namespace Werewolf_Control.Handler
 
         internal static void HandleInlineQuery(InlineQuery q)
         {
-
             var commands = new InlineCommand[]
             {
                 new StatsInlineCommand(q.From),
@@ -1924,8 +2067,10 @@ namespace Werewolf_Control.Handler
             {
                 //let's figure out what they wanted
                 var com = q.Query;
-                choices = commands.Where(command => command.Command.StartsWith(com) || Commands.ComputeLevenshtein(com, command.Command) < 3).ToList();
+                choices = commands.Where(command =>
+                    command.Command.StartsWith(com) || Commands.ComputeLevenshtein(com, command.Command) < 3).ToList();
             }
+
             Program.Analytics.TrackAsync("inline", q, q.From.Id.ToString());
             Bot.Api.AnswerInlineQueryAsync(q.Id, choices.Select(c => new InlineQueryResultArticle()
             {
@@ -1942,4 +2087,3 @@ namespace Werewolf_Control.Handler
         }
     }
 }
-

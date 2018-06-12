@@ -30,11 +30,13 @@ namespace Werewolf_Website.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+
             GlobalBan globalBan = await db.GlobalBans.FindAsync(id);
             if (globalBan == null)
             {
                 return HttpNotFound();
             }
+
             return View(globalBan);
         }
 
@@ -49,7 +51,8 @@ namespace Werewolf_Website.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create([Bind(Include = "Id,TelegramId,Reason,Expires,BannedBy,BanDate,Name")] GlobalBan globalBan)
+        public async Task<ActionResult> Create([Bind(Include = "Id,TelegramId,Reason,Expires,BannedBy,BanDate,Name")]
+            GlobalBan globalBan)
         {
             if (ModelState.IsValid)
             {
@@ -68,11 +71,13 @@ namespace Werewolf_Website.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+
             GlobalBan globalBan = await db.GlobalBans.FindAsync(id);
             if (globalBan == null)
             {
                 return HttpNotFound();
             }
+
             return View(globalBan);
         }
 
@@ -81,7 +86,8 @@ namespace Werewolf_Website.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit([Bind(Include = "Id,TelegramId,Reason,Expires,BannedBy,BanDate,Name")] GlobalBan globalBan)
+        public async Task<ActionResult> Edit([Bind(Include = "Id,TelegramId,Reason,Expires,BannedBy,BanDate,Name")]
+            GlobalBan globalBan)
         {
             if (ModelState.IsValid)
             {
@@ -89,6 +95,7 @@ namespace Werewolf_Website.Controllers
                 await db.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
+
             return View(globalBan);
         }
 
@@ -99,11 +106,13 @@ namespace Werewolf_Website.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+
             GlobalBan globalBan = await db.GlobalBans.FindAsync(id);
             if (globalBan == null)
             {
                 return HttpNotFound();
             }
+
             return View(globalBan);
         }
 
@@ -124,6 +133,7 @@ namespace Werewolf_Website.Controllers
             {
                 db.Dispose();
             }
+
             base.Dispose(disposing);
         }
     }

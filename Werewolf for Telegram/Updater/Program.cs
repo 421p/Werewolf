@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Updater
 {
@@ -22,6 +19,7 @@ namespace Updater
                 return Path.GetDirectoryName(path);
             }
         }
+
         static void Main(string[] args)
         {
             //ignore this commit
@@ -36,7 +34,7 @@ namespace Updater
 
                 Console.WriteLine("Waiting on bot to exit....");
                 //first, wait for the bot to close out
-                var botName = 
+                var botName =
 #if RELEASE2
                     "Werewolf Control 2";
 #elif RELEASE
@@ -48,6 +46,7 @@ namespace Updater
                 {
                     Thread.Sleep(100);
                 }
+
                 Console.WriteLine("Patching...");
                 Thread.Sleep(500);
                 //ok, it's off, patch it
@@ -57,6 +56,7 @@ namespace Updater
                     File.Copy(file, file.Replace("\\update", ""), true);
                     File.Delete(file);
                 }
+
                 Console.WriteLine("Starting bot....");
                 //now start it back up
                 //if (!Process.GetProcessesByName("Werewolf Control").Any())
@@ -68,7 +68,7 @@ namespace Updater
 #else
                     "Werewolf Control Beta.exe"
 #endif
-                    );
+                );
                 Process.Start(path, id);
                 Console.WriteLine("Update complete");
                 Thread.Sleep(5000);

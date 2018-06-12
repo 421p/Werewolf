@@ -23,11 +23,13 @@ namespace Telegram.Bot.Exceptions
         {
             ErrorCode = errorCode;
         }
+
         public ApiRequestException(string message, Exception innerException) : base(message, innerException)
         {
         }
 
-        public ApiRequestException(string message, int errorCode, Exception innerException) : base(message, innerException)
+        public ApiRequestException(string message, int errorCode, Exception innerException) : base(message,
+            innerException)
         {
             ErrorCode = errorCode;
         }

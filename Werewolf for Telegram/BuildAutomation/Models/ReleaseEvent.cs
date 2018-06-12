@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 namespace BuildAutomation.Models.Release
 {
-
     public class ReleaseEvent
     {
         public string subscriptionId { get; set; }
@@ -440,5 +436,4 @@ namespace BuildAutomation.Models.Release
         public string id { get; set; }
         public string baseUrl { get; set; }
     }
-
 }

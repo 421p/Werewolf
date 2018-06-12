@@ -13,6 +13,7 @@ namespace Werewolf_Website.Models
         public string GroupName { get; set; }
         public int NumPlayers { get; set; }
         public int PlayersAlive { get; set; }
+
         [JsonConverter(typeof(StringEnumConverter))]
         public GameState State { get; set; }
     }

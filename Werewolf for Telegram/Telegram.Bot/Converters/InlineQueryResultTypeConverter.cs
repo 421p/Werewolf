@@ -8,12 +8,13 @@ namespace Telegram.Bot.Converters
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            var resultType = (InlineQueryResultType)value;
+            var resultType = (InlineQueryResultType) value;
 
             writer.WriteValue(resultType.ToTypeString());
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
+            JsonSerializer serializer)
         {
             InlineQueryResultType resultType;
 
@@ -26,7 +27,7 @@ namespace Telegram.Bot.Converters
 
         public override bool CanConvert(Type objectType)
         {
-            return objectType == typeof (InlineQueryResultType);
+            return objectType == typeof(InlineQueryResultType);
         }
     }
 }

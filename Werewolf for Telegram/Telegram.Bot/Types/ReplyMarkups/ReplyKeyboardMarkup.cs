@@ -28,7 +28,9 @@ namespace Telegram.Bot.Types.ReplyMarkups
             DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public bool OneTimeKeyboard { get; set; }
 
-        public ReplyKeyboardMarkup() { }
+        public ReplyKeyboardMarkup()
+        {
+        }
 
         public ReplyKeyboardMarkup(KeyboardButton[] keyboardRow, bool resizeKeyboard = false,
             bool oneTimeKeyboard = false)

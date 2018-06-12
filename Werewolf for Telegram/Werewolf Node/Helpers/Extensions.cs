@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
-using Database;
 using Werewolf_Node.Models;
 
 namespace Werewolf_Node.Helpers
@@ -64,6 +63,7 @@ namespace Werewolf_Node.Helpers
                 if (player.Founder && player.Id != 142032675 && player.Id != 129046388)
                     end += "💎";
             }
+
             if (player.Id == 142032675 || player.Id == 129046388)
                 end += "📟";
             name += end;
@@ -82,27 +82,35 @@ namespace Werewolf_Node.Helpers
             return players?.Where(x => !x.IsDead);
         }
 
-        public static IEnumerable<IPlayer> GetPlayersForTeam(this IEnumerable<IPlayer> players, ITeam team, bool aliveOnly = true, IPlayer exceptPlayer = null)
+        public static IEnumerable<IPlayer> GetPlayersForTeam(this IEnumerable<IPlayer> players, ITeam team,
+            bool aliveOnly = true, IPlayer exceptPlayer = null)
         {
             return players?.Where(x => x.Team == team && (!aliveOnly || !x.IsDead) && x.Id != exceptPlayer?.Id);
         }
 
-        public static IPlayer GetPlayerForRole(this IEnumerable<IPlayer> players, IRole role, bool aliveOnly = true, IPlayer exceptPlayer = null)
+        public static IPlayer GetPlayerForRole(this IEnumerable<IPlayer> players, IRole role, bool aliveOnly = true,
+            IPlayer exceptPlayer = null)
         {
-            return players?.FirstOrDefault(x => x.PlayerRole == role && (!aliveOnly || !x.IsDead) && x.Id != exceptPlayer?.Id);
+            return players?.FirstOrDefault(x =>
+                x.PlayerRole == role && (!aliveOnly || !x.IsDead) && x.Id != exceptPlayer?.Id);
         }
 
         public static IEnumerable<IPlayer> GetPlayersForRoles(this IEnumerable<IPlayer> players, IRole[] roles,
             bool aliveOnly = true, IPlayer exceptPlayer = null)
         {
-            return players?.Where(x => roles.Contains(x.PlayerRole) && (!aliveOnly || !x.IsDead) && x.Id != exceptPlayer?.Id);
+            return players?.Where(x =>
+                roles.Contains(x.PlayerRole) && (!aliveOnly || !x.IsDead) && x.Id != exceptPlayer?.Id);
         }
 
 
         public static int GetStrength(this IRole role, List<IRole> allRoles)
         {
-            IRole[] WolfRoles = { IRole.WolfCub, IRole.WolfCub, IRole.AlphaWolf, IRole.WolfMan };
-            IRole[] nonConvertibleRoles = { IRole.Seer, IRole.GuardianAngel, IRole.Detective, IRole.Cursed, IRole.Harlot, IRole.Hunter, IRole.Doppelgänger, IRole.Wolf, IRole.AlphaWolf, IRole.WolfCub, IRole.SerialKiller };
+            IRole[] WolfRoles = {IRole.WolfCub, IRole.WolfCub, IRole.AlphaWolf, IRole.WolfMan};
+            IRole[] nonConvertibleRoles =
+            {
+                IRole.Seer, IRole.GuardianAngel, IRole.Detective, IRole.Cursed, IRole.Harlot, IRole.Hunter,
+                IRole.Doppelgänger, IRole.Wolf, IRole.AlphaWolf, IRole.WolfCub, IRole.SerialKiller
+            };
             switch (role)
             {
                 case IRole.Villager:
@@ -140,7 +148,9 @@ namespace Werewolf_Node.Helpers
                 case IRole.CultistHunter:
                     return allRoles.Count(x => x == IRole.Cultist) == 0 ? 1 : 7;
                 case IRole.Mason:
-                    return allRoles.Count(x => x == IRole.Mason) <= 1 ? 1 : allRoles.Count(x => x == IRole.Mason) + 3; //strength in numbers
+                    return allRoles.Count(x => x == IRole.Mason) <= 1
+                        ? 1
+                        : allRoles.Count(x => x == IRole.Mason) + 3; //strength in numbers
                 case IRole.Doppelgänger:
                     return 2;
                 case IRole.Cupid:
@@ -180,7 +190,6 @@ namespace Werewolf_Node.Helpers
                 default:
                     throw new ArgumentOutOfRangeException(nameof(role), role, null);
             }
-
         }
     }
 }

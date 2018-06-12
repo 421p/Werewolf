@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 using TcpFramework.Server;
 
@@ -15,12 +16,12 @@ namespace TcpFramework
         public SimpleTcpServer()
         {
             Delimiter = 0x13;
-            StringEncoder = System.Text.Encoding.UTF8;
+            StringEncoder = Encoding.UTF8;
         }
 
-        private readonly List<Server.ServerListener> _listeners = new List<Server.ServerListener>();
+        private readonly List<ServerListener> _listeners = new List<ServerListener>();
         public byte Delimiter { get; set; }
-        public System.Text.Encoding StringEncoder { get; set; }
+        public Encoding StringEncoder { get; set; }
         public bool AutoTrimStrings { get; set; }
 
         public IEnumerable<ConnectedClient> ConnectedClients => _listeners.SelectMany(x => x.ConnectedClients);
@@ -83,7 +84,11 @@ namespace TcpFramework
 
         public void Broadcast(string data)
         {
-            if (data == null) { return; }
+            if (data == null)
+            {
+                return;
+            }
+
             Broadcast(StringEncoder.GetBytes(data));
         }
 
@@ -94,16 +99,24 @@ namespace TcpFramework
 
         public void Broadcast(string data, TcpClient client)
         {
-            if (data == null) { return; }
+            if (data == null)
+            {
+                return;
+            }
+
             Broadcast(StringEncoder.GetBytes(data), client);
         }
 
         public void BroadcastLine(string data)
         {
-            if (string.IsNullOrEmpty(data)) { return; }
+            if (string.IsNullOrEmpty(data))
+            {
+                return;
+            }
+
             if (data.LastOrDefault() != Delimiter)
             {
-                Broadcast(data + StringEncoder.GetString(new[] { Delimiter }));
+                Broadcast(data + StringEncoder.GetString(new[] {Delimiter}));
             }
             else
             {
@@ -113,10 +126,14 @@ namespace TcpFramework
 
         public void BroadcastLine(string data, TcpClient client)
         {
-            if (string.IsNullOrEmpty(data)) { return; }
+            if (string.IsNullOrEmpty(data))
+            {
+                return;
+            }
+
             if (data.LastOrDefault() != Delimiter)
             {
-                Broadcast(data + StringEncoder.GetString(new[] { Delimiter }), client);
+                Broadcast(data + StringEncoder.GetString(new[] {Delimiter}), client);
             }
             else
             {
@@ -207,11 +224,14 @@ namespace TcpFramework
             return this;
         }
 
-        public bool IsStarted { get { return _listeners.Any(l => l.Listener.Active); } }
+        public bool IsStarted
+        {
+            get { return _listeners.Any(l => l.Listener.Active); }
+        }
 
         public SimpleTcpServer Start(IPAddress ipAddress, int port)
         {
-            Server.ServerListener listener = new Server.ServerListener(this, ipAddress, port);
+            ServerListener listener = new ServerListener(this, ipAddress, port);
             _listeners.Add(listener);
 
             return this;
@@ -225,18 +245,16 @@ namespace TcpFramework
             {
                 Thread.Sleep(100);
             }
+
             _listeners.Clear();
         }
 
         public int ConnectedClientsCount
         {
-            get
-            {
-                return _listeners.Sum(l => l.ConnectedClientsCount);
-            }
+            get { return _listeners.Sum(l => l.ConnectedClientsCount); }
         }
 
-        internal void NotifyDelimiterMessageRx(Server.ServerListener listener, TcpClient client, byte[] msg)
+        internal void NotifyDelimiterMessageRx(ServerListener listener, TcpClient client, byte[] msg)
         {
             if (DelimiterDataReceived != null)
             {
@@ -245,7 +263,7 @@ namespace TcpFramework
             }
         }
 
-        internal void NotifyEndTransmissionRx(Server.ServerListener listener, TcpClient client, byte[] msg)
+        internal void NotifyEndTransmissionRx(ServerListener listener, TcpClient client, byte[] msg)
         {
             if (DataReceived != null)
             {
@@ -254,12 +272,12 @@ namespace TcpFramework
             }
         }
 
-        internal void NotifyClientConnected(Server.ServerListener listener, ConnectedClient newClient)
+        internal void NotifyClientConnected(ServerListener listener, ConnectedClient newClient)
         {
             ClientConnected?.Invoke(this, newClient);
         }
 
-        internal void NotifyClientDisconnected(Server.ServerListener listener, ConnectedClient disconnectedClient)
+        internal void NotifyClientDisconnected(ServerListener listener, ConnectedClient disconnectedClient)
         {
             ClientDisconnected?.Invoke(this, disconnectedClient);
         }
@@ -283,17 +301,19 @@ namespace TcpFramework
 
         #region Debug logging
 
-        [System.Diagnostics.Conditional("DEBUG")]
+        [Conditional("DEBUG")]
         void DebugInfo(string format, params object[] args)
         {
             if (_debugInfoTime == null)
             {
-                _debugInfoTime = new System.Diagnostics.Stopwatch();
+                _debugInfoTime = new Stopwatch();
                 _debugInfoTime.Start();
             }
-            System.Diagnostics.Debug.WriteLine(_debugInfoTime.ElapsedMilliseconds + ": " + format, args);
+
+            Debug.WriteLine(_debugInfoTime.ElapsedMilliseconds + ": " + format, args);
         }
-        System.Diagnostics.Stopwatch _debugInfoTime;
+
+        Stopwatch _debugInfoTime;
 
         #endregion Debug logging
     }

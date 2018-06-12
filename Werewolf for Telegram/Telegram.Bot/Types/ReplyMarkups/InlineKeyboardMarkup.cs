@@ -21,7 +21,9 @@ namespace Telegram.Bot.Types.ReplyMarkups
         /// <summary>
         /// Initializes a new instance of the <see cref="InlineKeyboardMarkup"/> class.
         /// </summary>
-        public InlineKeyboardMarkup() { }
+        public InlineKeyboardMarkup()
+        {
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InlineKeyboardMarkup"/> class.

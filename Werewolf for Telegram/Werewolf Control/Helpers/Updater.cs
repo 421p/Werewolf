@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Database;
@@ -11,6 +10,7 @@ using Microsoft.TeamFoundation.Build.WebApi;
 using Microsoft.VisualStudio.Services.Common;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using File = System.IO.File;
 
 namespace Werewolf_Control.Helpers
 {
@@ -42,7 +42,7 @@ namespace Werewolf_Control.Helpers
         public static void DoBuild(CallbackQuery query)
         {
             var msg = query.Message.Text + $"\n\nBeginning build...\n";
-            
+
             Bot.ReplyToCallback(query, msg);
             //determine what we are building
             var updateType = query.Data.Split('|')[1];
@@ -76,7 +76,6 @@ namespace Werewolf_Control.Helpers
             var updateType = query.Data.Split('|')[1];
             try
             {
-
                 Bot.ReplyToCallback(query, msg);
                 //directories
                 var uDir = "c:\\build\\";
@@ -104,16 +103,18 @@ namespace Werewolf_Control.Helpers
                     {
                         foreach (
                             var file in
-                                Directory.GetFiles(controlDir + b.BuildName)
-                                    .Where(
-                                        x =>
-                                            baseFiles.Contains(Path.GetFileName(x)) ||
-                                            Path.GetFileName(x).Contains(b.ControlExeName))
-                            )
+                            Directory.GetFiles(controlDir + b.BuildName)
+                                .Where(
+                                    x =>
+                                        baseFiles.Contains(Path.GetFileName(x)) ||
+                                        Path.GetFileName(x).Contains(b.ControlExeName))
+                        )
                         {
                             var fName = Path.GetFileName(file);
-                            System.IO.File.Copy(file, botBaseDir + b.BotDirSuffix + "\\Control\\Update\\" + fName, true);
+                            File.Copy(file, botBaseDir + b.BotDirSuffix + "\\Control\\Update\\" + fName,
+                                true);
                         }
+
                         msg += $"\nCopied {b.BuildName} Control files";
                         Bot.ReplyToCallback(query, msg);
                     }
@@ -135,12 +136,12 @@ namespace Werewolf_Control.Helpers
                                 copied = true;
                                 try
                                 {
-                                    System.IO.File.Copy(file, Path.Combine(d, fName), true);
+                                    File.Copy(file, Path.Combine(d, fName), true);
                                 }
                                 catch (Exception e)
                                 {
                                     if (e.Message.Contains("because it is being used by another process"))
-                                    //nodes in this folder are still active D:
+                                        //nodes in this folder are still active D:
                                     {
                                         copied = false;
                                         break;
@@ -150,7 +151,6 @@ namespace Werewolf_Control.Helpers
                                         throw;
                                     }
                                 }
-
                             }
 
                             if (copied)
@@ -164,8 +164,6 @@ namespace Werewolf_Control.Helpers
                         if (!copied)
                             throw new Exception("Unable to copy Node files to a directory.");
                     }
-
-
                 }
 
 
@@ -187,7 +185,8 @@ namespace Werewolf_Control.Helpers
             try
             {
                 var url = "https://parabola949.VisualStudio.com/DefaultCollection/";
-                var build = new BuildHttpClient(new Uri(url), new VssCredentials(new VssBasicCredential("", RegHelper.GetRegValue("VSTSToken"))));
+                var build = new BuildHttpClient(new Uri(url),
+                    new VssCredentials(new VssBasicCredential("", RegHelper.GetRegValue("VSTSToken"))));
 
                 // First we get project's GUID and buildDefinition's ID.
                 // Get the list of build definitions.
@@ -212,7 +211,7 @@ namespace Werewolf_Control.Helpers
                     });
                     return $"Queued build with id: {res.Id}";
                 }
-                catch(VssServiceException e)
+                catch (VssServiceException e)
                 {
                     return $"{e.Message}";
                 }
@@ -253,9 +252,9 @@ namespace Werewolf_Control.Helpers
                             currentChoice.Version = fvi;
                         }
                     }
+
                     if (currentChoice.Version > currentVersion)
                     {
-                        
                         currentVersion = currentChoice.Version;
                         //alert dev group
                         Bot.Send($"New node with version {currentVersion} found.  Stopping old nodes.", -1001077134233);
@@ -270,7 +269,6 @@ namespace Werewolf_Control.Helpers
                     //now check for Control update
                     if (Directory.GetFiles(updateDirectory).Count() > 1)
                     {
-
                         //update available
                         //sleep 5 seconds to allow any nodes to connect and whatnot.
                         await Task.Delay(5000);
@@ -289,7 +287,7 @@ namespace Werewolf_Control.Helpers
 #elif BETA
                         3;
 #elif RELEASE
-                        1;
+                                1;
 #elif RELEASE2
                         2;
 #endif
@@ -300,6 +298,7 @@ namespace Werewolf_Control.Helpers
                             await db.SaveChangesAsync();
 #endif
                         }
+
                         Environment.Exit(1);
                     }
 
@@ -307,17 +306,17 @@ namespace Werewolf_Control.Helpers
                     //check once every 5 seconds
                     await Task.Delay(5000);
                 }
-                //now we have the most recent version, launch one
 
+                //now we have the most recent version, launch one
             }
 #if !DEBUG
             catch (Exception e)
             {
-                Bot.Send($"Error in update monitor: {e.Message}\n{e.StackTrace}", -1001077134233, parseMode: ParseMode.Default);
+                Bot.Send($"Error in update monitor: {e.Message}\n{e.StackTrace}", -1001077134233,
+                    parseMode: ParseMode.Default);
             }
 #endif
         }
-
     }
 
     class BuildConfiguration

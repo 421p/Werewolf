@@ -1,9 +1,4 @@
-﻿using System;
-using System.Linq;
-using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
-
-namespace Telegram.Bot.Helpers
+﻿namespace Telegram.Bot.Helpers
 {
     public static class Extensions
     {

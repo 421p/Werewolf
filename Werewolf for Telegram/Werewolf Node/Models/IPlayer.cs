@@ -12,6 +12,7 @@ namespace Werewolf_Node.Models
         /// Reference to the telegram user
         /// </summary>
         public User TeleUser { get; set; }
+
         /// <summary>
         /// The players role
         /// </summary>
@@ -66,21 +67,27 @@ namespace Werewolf_Node.Models
         public bool HasPM { get; set; } = false;
 
         public bool Fled { get; set; } = false;
+
         [JsonConverter(typeof(StringEnumConverter))]
         public ITeam Team { get; set; } = ITeam.Village;
+
         public bool HasNightAction { get; set; } = false;
         public bool HasDayAction { get; set; } = false;
         public int DayCult { get; set; } = 0;
         public int RoleModel { get; set; } = 0;
+
         [JsonConverter(typeof(StringEnumConverter))]
         public IRole KilledByRole { get; set; }
+
         public bool DiedByVisitingKiller { get; set; } = false;
         public bool DiedByVisitingVictim { get; set; } = false;
         public bool WasSavedLastNight { get; set; } = false;
         public int MessageId { get; set; }
         public string Name { get; set; }
+
         [JsonConverter(typeof(StringEnumConverter))]
         public IRole OriginalRole { get; set; }
+
         public bool InLove { get; set; } = false;
         public int LoverId { get; set; } = 0;
         public int DBPlayerId { get; set; } = 0;
@@ -91,6 +98,7 @@ namespace Werewolf_Node.Models
         public bool Won { get; set; } = false;
 
         public int Id;
+
         [JsonConverter(typeof(StringEnumConverter))]
         public QuestionAsked CurrentQuestion { get; set; }
 
@@ -126,29 +134,85 @@ namespace Werewolf_Node.Models
         public CustomGifData GifPack { get; set; } = null;
 
         #endregion
-
     }
 
 
     public enum IRole
     {
-        Villager, Drunk, Harlot, Seer, Traitor, GuardianAngel, Detective, Wolf, Cursed, Gunner, Tanner, Fool, WildChild, Beholder, ApprenticeSeer, Cultist, CultistHunter, Mason, Doppelgänger, Cupid, Hunter, SerialKiller,
+        Villager,
+        Drunk,
+        Harlot,
+        Seer,
+        Traitor,
+        GuardianAngel,
+        Detective,
+        Wolf,
+        Cursed,
+        Gunner,
+        Tanner,
+        Fool,
+        WildChild,
+        Beholder,
+        ApprenticeSeer,
+        Cultist,
+        CultistHunter,
+        Mason,
+        Doppelgänger,
+        Cupid,
+        Hunter,
+        SerialKiller,
+
         //new roles
-        Sorcerer, AlphaWolf, WolfCub, Blacksmith, ClumsyGuy, Mayor, Prince,
+        Sorcerer,
+        AlphaWolf,
+        WolfCub,
+        Blacksmith,
+        ClumsyGuy,
+        Mayor,
+        Prince,
+
         //more new roles, from april fools.....
-        Lycan, Pacifist, WiseElder, Oracle, Sandman, WolfMan, Thief
+        Lycan,
+        Pacifist,
+        WiseElder,
+        Oracle,
+        Sandman,
+        WolfMan,
+        Thief
     }
 
     public enum ITeam
     {
-        Village, Cult, Wolf, Tanner,
-        Neutral, SerialKiller, Lovers,
+        Village,
+        Cult,
+        Wolf,
+        Tanner,
+        Neutral,
+        SerialKiller,
+        Lovers,
         SKHunter,
         NoOne
     }
 
     public enum KillMthd
     {
-        None, Lynch, Eat, Shoot, VisitWolf, VisitVictim, GuardWolf, Detected, Flee, Hunt, HunterShot, LoverDied, SerialKilled, HunterCult, GuardKiller, VisitKiller, Idle, Suicide
+        None,
+        Lynch,
+        Eat,
+        Shoot,
+        VisitWolf,
+        VisitVictim,
+        GuardWolf,
+        Detected,
+        Flee,
+        Hunt,
+        HunterShot,
+        LoverDied,
+        SerialKilled,
+        HunterCult,
+        GuardKiller,
+        VisitKiller,
+        Idle,
+        Suicide
     }
 }

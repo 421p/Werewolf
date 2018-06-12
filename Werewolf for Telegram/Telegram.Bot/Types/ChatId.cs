@@ -57,9 +57,9 @@ namespace Telegram.Bot.Types
             }
         }
 
-        public override bool Equals(object obj) => ((string)this).Equals(obj);
+        public override bool Equals(object obj) => ((string) this).Equals(obj);
 
-        public override int GetHashCode() => ((string)this).GetHashCode();
+        public override int GetHashCode() => ((string) this).GetHashCode();
 
         /// <summary>
         /// Create a <c>string</c> out of a <see cref="ChatId"/>
@@ -95,6 +95,7 @@ namespace Telegram.Bot.Types
         /// Convert a Chat Object to a <see cref="ChatId"/>
         /// </summary>
         /// <param name="chat"></param>
-        public static implicit operator ChatId(Chat chat) => chat.Id != default(long) ? chat.Id : (ChatId)("@" + chat.Username);
+        public static implicit operator ChatId(Chat chat) =>
+            chat.Id != default(long) ? chat.Id : (ChatId) ("@" + chat.Username);
     }
 }

@@ -32,13 +32,10 @@ namespace Telegram.Bot.Types.InlineQueryResults
         [JsonProperty("audio_duration", Required = Required.Always)]
         public int Duration { get; set; }
 
-        [JsonIgnore]
-        public new string ThumbUrl { get; set; }
+        [JsonIgnore] public new string ThumbUrl { get; set; }
 
-        [JsonIgnore]
-        public new string ThumbWidth { get; set; }
+        [JsonIgnore] public new string ThumbWidth { get; set; }
 
-        [JsonIgnore]
-        public new string ThumbHeight { get; set; }
+        [JsonIgnore] public new string ThumbHeight { get; set; }
     }
 }
