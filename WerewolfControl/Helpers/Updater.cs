@@ -226,7 +226,7 @@ namespace Werewolf_Control.Helpers
         }
 
 
-        internal static async void MonitorUpdates()
+        internal static async Task MonitorUpdates()
         {
 #if !DEBUG
             try

@@ -17,5 +17,9 @@ services:
       - './logs:/app/goose/Logs'
     depends_on:
       - sql
+  build:
+    image: mono
+    volumes:
+      - .:/app
 volumes:
   sqldata:

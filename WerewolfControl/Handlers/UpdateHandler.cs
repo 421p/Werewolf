@@ -212,7 +212,7 @@ namespace Werewolf_Control.Handler
                         }
                         catch (Exception e)
                         {
-                            //Console.WriteLine(e.Message);
+                            Console.WriteLine(e.Message);
                         }
                     }
 
@@ -220,7 +220,7 @@ namespace Werewolf_Control.Handler
                 }
                 catch (Exception e)
                 {
-                    //Console.WriteLine(e.Message);
+                    Console.WriteLine(e.Message);
                 }
 
                 Thread.Sleep(2000);
@@ -350,7 +350,7 @@ namespace Werewolf_Control.Handler
                                             //        GetLocaleString("SentPrivate", GetLanguage(update.Message.From.Id)),
                                             //        update.Message.Chat.Id);
                                         }
-                                        catch (Exception e)
+                                        catch (Exception)
                                         {
                                             Commands.RequestPM(update.Message.Chat.Id);
                                         }
@@ -1967,7 +1967,7 @@ namespace Werewolf_Control.Handler
                 var selected = values.ElementAt(choice);
                 return String.Format(selected.Value.FormatHTML(), args).Replace("\\n", Environment.NewLine);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return "";
             }

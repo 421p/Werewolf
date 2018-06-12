@@ -75,7 +75,7 @@ namespace Werewolf_Control.Models
                 return JsonConvert.DeserializeObject<GameInfo>(this
                     .WriteLineAndGetReply(JsonConvert.SerializeObject(ggi)).MessageString);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }
