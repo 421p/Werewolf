@@ -1,4 +1,4 @@
-﻿namespace Telegram.Bot.Types.Enums
+namespace Telegram.Bot.Types.Enums
 {
     public enum Status
     {

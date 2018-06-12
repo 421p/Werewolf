@@ -1,0 +1,21 @@
+sqlservr
+  Version 14.0.3026.27
+  Build ID fc8ac3bd631b39f36adf534dd8e12fd5ce49defce65b0562c53042b14dbd8162
+  Build Type release
+  Git Version 122d1be
+  Built at Wed May 23 00:13:27 GMT 2018
+
+PAL
+  Build ID 9b686498aef3f1f1fa7122544a803732f994c2a305015d1968ac3e0dc33b67e1
+  Build Type release
+  Git Version e7f3fd2
+  Built at Wed May 23 00:12:32 GMT 2018
+
+Packages
+  system.sfp                    6.2.9200.2,e7f3fd228+hls-win2-20180523000705,
+  system.common.sfp             10.0.15063.540
+  system.certificates.sfp       6.2.9200.2,e7f3fd228+hls-win2-20180523000705,
+  system.netfx.sfp              4.6.1590.0
+  secforwarderxplat.sfp         14.0.3026.27
+  sqlservr.sfp                  14.0.3026.27
+  sqlagent.sfp                  14.0.3026.27

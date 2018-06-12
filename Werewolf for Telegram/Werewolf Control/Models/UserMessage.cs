@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Telegram.Bot.Types;
 
 namespace Werewolf_Control.Models

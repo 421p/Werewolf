@@ -1,4 +1,4 @@
-﻿function FirstInit() {
+function FirstInit() {
     jQuery.browserDetect(), _goFullScreen(), _aside(), Init(!1)
 }
 

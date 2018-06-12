@@ -1,0 +1,23 @@
+version: '2'
+
+services:
+  sql:
+    image: microsoft/mssql-server-linux
+    environment:
+      ACCEPT_EULA: 'y'
+      SA_PASSWORD: 'zaqwsxA111111'
+    ports:
+      - '1433:1433'
+    volumes:
+      - 'sqldata:/var/opt/mssql'
+  bot:
+    build: .
+    working_dir: '/app/goose/Control'
+    volumes:
+      - './Werewolf Control/bin/Release:/app/goose/Control'
+      - './Languages:/app/Languages'
+      - './Werewolf Node/bin/Release:/app/goose/Node 1'
+      - './logs:/app/goose/Logs'
+    command: 'mono Werewolf\ Control.exe'
+volumes:
+  sqldata:

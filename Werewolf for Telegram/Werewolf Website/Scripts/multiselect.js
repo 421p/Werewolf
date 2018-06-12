@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Bootstrap Multiselect (https://github.com/davidstutz/bootstrap-multiselect)
  * 
  * Apache License, Version 2.0:

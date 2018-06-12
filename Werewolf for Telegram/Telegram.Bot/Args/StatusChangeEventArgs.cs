@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Telegram.Bot.Types.Enums;
 
 namespace Telegram.Bot.Args

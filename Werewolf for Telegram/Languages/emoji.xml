@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <strings>
   <language name="Emoji Normal" base="Special" variant="Emoji Normal" owner="ayylimao" code="en" isDefault="false"/>
   <string key="NotInGame">
@@ -1239,7 +1239,7 @@
   </string>
   <string key="DeletedFromWaitList">
     <value>🚫💬👇❕ {0}.</value>
-  </string>
+  </string>
   <string key="HaveJoined">
     <!-- {0} = list of people who have joined -->
     <value>{0} 🚶🎮⬅3⃣0⃣⏱.</value>

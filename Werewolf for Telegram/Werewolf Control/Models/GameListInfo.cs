@@ -1,4 +1,4 @@
-﻿namespace Werewolf_Control.Models
+namespace Werewolf_Control.Models
 {
     public class GameListInfo
     {

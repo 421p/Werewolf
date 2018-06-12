@@ -1,4 +1,4 @@
-﻿namespace Werewolf_Node.Models
+namespace Werewolf_Node.Models
 {
     public class QuestionAsked
     {

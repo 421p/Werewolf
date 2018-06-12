@@ -1,4 +1,4 @@
-﻿USE [werewolf]
+USE [werewolf]
 GO
 /****** Object:  Table [dbo].[Group]    Script Date: 5/27/2018 10:01:48 AM ******/
 SET ANSI_NULLS ON

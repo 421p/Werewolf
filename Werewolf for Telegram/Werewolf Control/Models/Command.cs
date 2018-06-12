@@ -1,4 +1,4 @@
-﻿using Werewolf_Control.Helpers;
+using Werewolf_Control.Helpers;
 
 namespace Werewolf_Control.Models
 {

@@ -1,4 +1,4 @@
-﻿using Werewolf_Node.Models;
+using Werewolf_Node.Models;
 
 namespace Werewolf_Node.Roles
 {

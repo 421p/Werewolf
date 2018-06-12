@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.Payments;
 

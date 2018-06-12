@@ -1,4 +1,4 @@
-﻿using System.Threading;
+using System.Threading;
 using Telegram.Bot.Types.Enums;
 
 namespace Werewolf_Node.Helpers
