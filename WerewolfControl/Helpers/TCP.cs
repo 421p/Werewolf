@@ -162,9 +162,6 @@ namespace Werewolf_Control.Helpers
                 using (var sw = new StreamWriter(Path.Combine(Bot.RootDirectory, "../Logs/tcperror.log"), true))
                     sw.WriteLine(e.Message + "\n" + e.StackTrace + "\n");
             }
-            finally
-            {
-            }
         }
 
         private static void StatusServerOnClientDisconnected(object sender, ConnectedClient connectedClient)

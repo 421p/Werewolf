@@ -29,7 +29,7 @@ namespace Werewolf_Control
             Bot.Api.EditMessageTextAsync(update.Message.Chat.Id, result.MessageId, message);
         }
 #if (BETA || DEBUG)
-        [Command(Trigger = "achv")]
+        [Attributes.Command(Trigger = "achv")]
         public static void GetAchievements(Update u, string[] args)
         {
             Send("Please use /stats", u.Message.Chat.Id);

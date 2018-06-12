@@ -68,7 +68,7 @@ namespace Werewolf_Control.Helpers
                 RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64)
                     .OpenSubKey("SOFTWARE\\Werewolf");
 #if DEBUG
-            TelegramAPIKey = key.GetValue("ProductionAPI").ToString();
+            TelegramApiKey = key.GetValue("ProductionAPI").ToString();
 #elif RELEASE
             TelegramApiKey = key.GetValue("ProductionAPI").ToString();
 #elif RELEASE2

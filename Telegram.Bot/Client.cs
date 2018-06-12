@@ -218,16 +218,10 @@ namespace Telegram.Bot
                     else SetStatus(Status.Normal);
 
 
-                    try
+                    using (var s = new StreamWriter(LogPath, true))
                     {
-                        using (var s = new StreamWriter(LogPath, true))
-                        {
-                            s.WriteLine($"{DateTime.Now} - {sw.Elapsed:g} - {updates.Length}");
-                            s.Flush();
-                        }
-                    }
-                    finally
-                    {
+                        s.WriteLine($"{DateTime.Now} - {sw.Elapsed:g} - {updates.Length}");
+                        s.Flush();
                     }
 
                     foreach (var update in updates)
@@ -257,17 +251,10 @@ namespace Telegram.Bot
                 {
                     sw.Stop();
                     SetStatus(Status.Error);
-                    try
+                    using (var s = new StreamWriter(LogPath, true))
                     {
-                        using (var s = new StreamWriter(LogPath, true))
-                        {
-                            s.WriteLine($"{DateTime.Now} - {sw.Elapsed:g} - {e.Message}");
-                            s.Flush();
-                        }
-                    }
-                    finally
-                    {
-                        // do nothing
+                        s.WriteLine($"{DateTime.Now} - {sw.Elapsed:g} - {e.Message}");
+                        s.Flush();
                     }
                 }
                 catch (Exception e)
@@ -277,19 +264,12 @@ namespace Telegram.Bot
                     //well.  bad things happened.  ignore it this time I guess? At least until I can figure out what the error actually is
                     while (e.InnerException != null)
                         e = e.InnerException;
-                    try
+                    var path = Path.GetDirectoryName(LogPath);
+                    Directory.CreateDirectory(path);
+                    using (var s = new StreamWriter(LogPath, true))
                     {
-                        var path = Path.GetDirectoryName(LogPath);
-                        Directory.CreateDirectory(path);
-                        using (var s = new StreamWriter(LogPath, true))
-                        {
-                            s.WriteLine($"{DateTime.Now} - {sw.Elapsed.ToString("g")} - {e.Message}");
-                            s.Flush();
-                        }
-                    }
-                    finally
-                    {
-                        // do nothing
+                        s.WriteLine($"{DateTime.Now} - {sw.Elapsed.ToString("g")} - {e.Message}");
+                        s.Flush();
                     }
                 }
             }
