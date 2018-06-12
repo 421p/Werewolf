@@ -1,12 +1,0 @@
-This program has encountered a fatal error and cannot continue running.
-The following diagnostic information is available:
-
-       Reason: 0x00000002
-       Status: 0xc0070050
-   Stacktrace: 000000006a4ea9b8 000000006a43f73d 000000006a4fee80 
-               000000006a43ce94 000000006a5133b2 00007f774a5ef5b0 
-                     Process: 9 - sqlservr
-       Thread: 44 (application thread 0x107c)
-  Instance Id: ee01cd7c-0cbd-4d3d-8ae2-e4d1bbb6e556
-     Crash Id: 82a58114-6c8c-42df-829c-e6b91cf17b45
-  Build stamp: fc8ac3bd631b39f36adf534dd8e12fd5ce49defce65b0562c53042b14dbd8162
