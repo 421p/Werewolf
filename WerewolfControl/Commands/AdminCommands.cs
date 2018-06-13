@@ -31,7 +31,9 @@ namespace Werewolf_Control
             //check for reply
             if (u.Message.ReplyToMessage != null)
                 //smite sender
+            {
                 Bot.GetGroupNodeAndGame(u.Message.Chat.Id)?.SmitePlayer(u.Message.ReplyToMessage.From.Id);
+            }
 
             //get the names to smite
             foreach (var e in u.Message.Entities)
@@ -45,7 +47,9 @@ namespace Werewolf_Control
                         {
                             var id = db.Players.FirstOrDefault(x => x.UserName == username)?.TelegramId ?? 0;
                             if (id != 0)
+                            {
                                 Bot.GetGroupNodeAndGame(u.Message.Chat.Id)?.SmitePlayer(id);
+                            }
                         }
 
                         break;
@@ -55,8 +59,10 @@ namespace Werewolf_Control
                 }
             }
 
-            if (int.TryParse(args[1], out int did))
+            if (int.TryParse(args[1], out var did))
+            {
                 Bot.GetGroupNodeAndGame(u.Message.Chat.Id)?.SmitePlayer(did);
+            }
         }
 
         [Attributes.Command(Trigger = "config", GroupAdminOnly = true, InGroupOnly = true)]
@@ -108,9 +114,11 @@ namespace Werewolf_Control
 
                 var fileid = update.Message.ReplyToMessage.Document?.FileId;
                 if (fileid != null)
+                {
                     LanguageHelper.UploadFile(fileid, id,
                         update.Message.ReplyToMessage.Document.FileName,
                         update.Message.MessageId);
+                }
             }
             catch (Exception e)
             {
@@ -130,25 +138,27 @@ namespace Werewolf_Control
                 {
                     status =
                         $"<b>Banned for: {ban.Reason}</b>\nBy: {ban.BannedBy} on {ban.BanDate?.ToString("ddMMMyyyy H:mm:ss zzz").ToUpper()}\n";
-                    var expire = (ban.Expires - DateTime.UtcNow);
+                    var expire = ban.Expires - DateTime.UtcNow;
                     if (expire > TimeSpan.FromDays(365))
                     {
                         status += "<b>Perm Ban</b>";
                     }
                     else
                     {
-                        status += String.Format("Ban expiration: <b>{0:%d} days, {0:%h} hours, {0:%m} minutes</b>",
+                        status += string.Format("Ban expiration: <b>{0:%d} days, {0:%h} hours, {0:%m} minutes</b>",
                             expire);
                     }
                 }
                 else
+                {
                     status = "Not banned (in Werewolf)";
+                }
 
                 var firstSeen = p.GamePlayers?.OrderBy(x => x.GameId).FirstOrDefault()?.Game?.TimeStarted;
 
                 Bot.Api.SendTextMessageAsync(u.Message.Chat.Id,
-                    $"Player: {p.Name.FormatHTML()}\nCurrent Status: {status}\nPlayer first seen: {(firstSeen?.ToString("ddMMMyyyy H:mm:ss zzz").ToUpper() ?? "Hasn't played ever!")}",
-                    disableWebPagePreview: true, replyToMessageId: u.Message.MessageId, parseMode: ParseMode.Html);
+                    $"Player: {p.Name.FormatHTML()}\nCurrent Status: {status}\nPlayer first seen: {firstSeen?.ToString("ddMMMyyyy H:mm:ss zzz").ToUpper() ?? "Hasn't played ever!"}",
+                    true, replyToMessageId: u.Message.MessageId, parseMode: ParseMode.Html);
             }
         }
 
@@ -174,7 +184,7 @@ namespace Werewolf_Control
             var langs = Directory.GetFiles(Bot.LanguageDirectory, "*.xml").Select(x => new LangFile(x)).ToList();
 
 
-            List<InlineKeyboardCallbackButton> buttons = langs.Select(x => x.Base).Distinct().OrderBy(x => x)
+            var buttons = langs.Select(x => x.Base).Distinct().OrderBy(x => x)
                 .Select(x => new InlineKeyboardCallbackButton(x, $"validate|{update.Message.From.Id}|{x}|null|base"))
                 .ToList();
             //buttons.Insert(0, new InlineKeyboardButton("All", $"validate|{update.Message.From.Id}|All|null|base"));
@@ -187,7 +197,9 @@ namespace Werewolf_Control
                     baseMenu.Add(new[] {buttons[i]});
                 }
                 else
+                {
                     baseMenu.Add(new[] {buttons[i], buttons[i + 1]});
+                }
 
                 i++;
             }
@@ -218,10 +230,10 @@ namespace Werewolf_Control
         public static void GetIdles(Update update, string[] args)
         {
             //check user ids and such
-            List<int> ids = new List<int>();
+            var ids = new List<int>();
             foreach (var arg in args.Skip(1).FirstOrDefault()?.Split(' ') ?? new[] {""})
             {
-                if (int.TryParse(arg, out int id))
+                if (int.TryParse(arg, out var id))
                 {
                     ids.Add(id);
                 }
@@ -235,7 +247,9 @@ namespace Werewolf_Control
 
             //check for reply
             if (update.Message.ReplyToMessage != null)
+            {
                 ids.Add(update.Message.ReplyToMessage.From.Id);
+            }
 
             var reply = "";
             //now get the idle kills
@@ -284,7 +298,7 @@ namespace Werewolf_Control
             //args[1] should be the link
 
             //first, check if the group has a username
-            if (!String.IsNullOrEmpty(update.Message.Chat.Username))
+            if (!string.IsNullOrEmpty(update.Message.Chat.Username))
             {
                 Send($"Your group link has already been set to https://telegram.me/{update.Message.Chat.Username}",
                     update.Message.Chat.Id);
@@ -292,7 +306,7 @@ namespace Werewolf_Control
             }
 
             //now check the args
-            if (args.Length < 2 || String.IsNullOrEmpty(args[1]))
+            if (args.Length < 2 || string.IsNullOrEmpty(args[1]))
             {
                 Send($"You must use /setlink with the link to the group (invite link)", update.Message.Chat.Id);
                 return;
@@ -319,7 +333,7 @@ namespace Werewolf_Control
         [Attributes.Command(Trigger = "addach", DevOnly = true)]
         public static void AddAchievement(Update u, string[] args)
         {
-#if !BETA
+            #if !BETA
             //get the user to add the achievement to
             //first, try by reply
             var id = 0;
@@ -329,12 +343,16 @@ namespace Werewolf_Control
             {
                 var m = u.Message.ReplyToMessage;
                 while (m.ReplyToMessage != null)
+                {
                     m = m.ReplyToMessage;
+                }
                 //check for forwarded message
 
                 id = m.From.Id;
                 if (m.ForwardFrom != null)
+                {
                     id = m.ForwardFrom.Id;
+                }
             }
             else
             {
@@ -366,9 +384,13 @@ namespace Werewolf_Control
             {
                 //check for arguments then
                 if (int.TryParse(param[0], out id))
+                {
                     achIndex = 1;
+                }
                 else if (int.TryParse(param[1], out id))
+                {
                     achIndex = 0;
+                }
             }
 
 
@@ -384,9 +406,16 @@ namespace Werewolf_Control
                         if (p != null)
                         {
                             if (p.Achievements == null)
+                            {
                                 p.Achievements = 0;
+                            }
+
                             var ach = (Achievements) p.Achievements;
-                            if (ach.HasFlag(a)) return; //no point making another db call if they already have it
+                            if (ach.HasFlag(a))
+                            {
+                                return; //no point making another db call if they already have it
+                            }
+
                             ach = ach | a;
                             p.Achievements = (long) ach;
                             db.SaveChanges();
@@ -396,13 +425,13 @@ namespace Werewolf_Control
                     }
                 }
             }
-#endif
+            #endif
         }
 
         [Attributes.Command(Trigger = "remach", DevOnly = true)]
         public static void RemAchievement(Update u, string[] args)
         {
-#if !BETA
+            #if !BETA
             //get the user to add the achievement to
             //first, try by reply
             var id = 0;
@@ -412,12 +441,16 @@ namespace Werewolf_Control
             {
                 var m = u.Message.ReplyToMessage;
                 while (m.ReplyToMessage != null)
+                {
                     m = m.ReplyToMessage;
+                }
                 //check for forwarded message
 
                 id = m.From.Id;
                 if (m.ForwardFrom != null)
+                {
                     id = m.ForwardFrom.Id;
+                }
             }
             else
             {
@@ -449,9 +482,13 @@ namespace Werewolf_Control
             {
                 //check for arguments then
                 if (int.TryParse(param[0], out id))
+                {
                     achIndex = 1;
+                }
                 else if (int.TryParse(param[1], out id))
+                {
                     achIndex = 0;
+                }
             }
 
 
@@ -468,9 +505,16 @@ namespace Werewolf_Control
                         if (p != null)
                         {
                             if (p.Achievements == null)
+                            {
                                 p.Achievements = 0;
+                            }
+
                             var ach = (Achievements) p.Achievements;
-                            if (!ach.HasFlag(a)) return; //no point making another db call if they already have it
+                            if (!ach.HasFlag(a))
+                            {
+                                return; //no point making another db call if they already have it
+                            }
+
                             ach &= ~a;
                             p.Achievements = (long) ach;
                             db.SaveChanges();
@@ -480,13 +524,13 @@ namespace Werewolf_Control
                     }
                 }
             }
-#endif
+            #endif
         }
 
         [Attributes.Command(Trigger = "restore", GlobalAdminOnly = true)]
         public static void RestoreAccount(Update u, string[] args)
         {
-#if !BETA
+            #if !BETA
             var score = 100;
             var result = "";
             int oldid, newid;
@@ -543,8 +587,8 @@ namespace Werewolf_Control
                 //compare groups
                 var total = newGrp.Count();
                 var likeness = newGrp.Count(x => oldGrp.Any(g => g.Id == x.Id));
-                var groupLike = ((likeness * 100) / total);
-                score -= 20 - ((groupLike * 20) / 100);
+                var groupLike = likeness * 100 / total;
+                score -= 20 - groupLike * 20 / 100;
                 result += $"Percent of new groups that were in old account: {groupLike}%\n";
 
                 //TODO check names (username) likeness
@@ -552,7 +596,10 @@ namespace Werewolf_Control
                 var dndist = ComputeLevenshtein(oldP.Name, newP.Name);
 
 
-                if (undist == 0) dndist = 0;
+                if (undist == 0)
+                {
+                    dndist = 0;
+                }
                 else
                 {
                     score -= (undist + dndist) / 2;
@@ -575,13 +622,13 @@ namespace Werewolf_Control
                         new InlineKeyboardCallbackButton("No", "restore|no")
                     }));
             }
-#endif
+            #endif
         }
 
         [Attributes.Command(Trigger = "reviewgifs", GlobalAdminOnly = true, Blockable = true)]
         public static void ReviewGifs(Update u, string[] args)
         {
-#if !BETA
+            #if !BETA
             using (var db = new WWContext())
             {
                 if (args[1] == null)
@@ -592,15 +639,24 @@ namespace Werewolf_Control
                     foreach (var p in packs)
                     {
                         var pack = JsonConvert.DeserializeObject<CustomGifData>(p.CustomGifSet);
-                        if (pack.Approved != null || !pack.Submitted) continue;
+                        if (pack.Approved != null || !pack.Submitted)
+                        {
+                            continue;
+                        }
+
                         count++;
                         list += p.TelegramId + Environment.NewLine;
                         if (count == 10)
+                        {
                             break;
+                        }
                     }
 
                     if (count == 0)
+                    {
                         list += "None!";
+                    }
+
                     Send(list, u.Message.Chat.Id);
                 }
                 else
@@ -614,14 +670,16 @@ namespace Werewolf_Control
                     }
 
                     var json = p.CustomGifSet;
-                    if (String.IsNullOrEmpty(json))
+                    if (string.IsNullOrEmpty(json))
                     {
                         Send("User does not have a custom gif pack", u.Message.Chat.Id);
                         return;
                     }
 
                     if (u.Message.Chat.Type != ChatType.Private)
+                    {
                         Send("I will send you the gifs in private", u.Message.Chat.Id);
+                    }
 
                     var pack = JsonConvert.DeserializeObject<CustomGifData>(json);
                     var id = u.Message.From.Id;
@@ -662,7 +720,7 @@ namespace Werewolf_Control
                     Bot.Send(msg, id);
                 }
             }
-#endif
+            #endif
         }
 
         [Attributes.Command(Trigger = "fi", GlobalAdminOnly = true)]
@@ -676,13 +734,13 @@ namespace Werewolf_Control
             var r = Bot.Send(msg, u.Message.Chat.Id, parseMode: ParseMode.Markdown).Result;
             ts = DateTime.UtcNow - send;
             msg += $"\n*Time to reply*: {ts:mm\\:ss\\.ff}";
-            Bot.Api.EditMessageTextAsync(u.Message.Chat.Id, r.MessageId, msg, parseMode: ParseMode.Markdown);
+            Bot.Api.EditMessageTextAsync(u.Message.Chat.Id, r.MessageId, msg, ParseMode.Markdown);
         }
 
         [Attributes.Command(Trigger = "approvegifs", GlobalAdminOnly = true, Blockable = true)]
         public static void ApproveGifs(Update u, string[] args)
         {
-#if !BETA
+            #if !BETA
             using (var db = new WWContext())
             {
                 if (args[1] == null)
@@ -708,7 +766,7 @@ namespace Werewolf_Control
                     }
 
                     var json = p.CustomGifSet;
-                    if (String.IsNullOrEmpty(json))
+                    if (string.IsNullOrEmpty(json))
                     {
                         Send("User does not have a custom gif pack", u.Message.Chat.Id);
                         return;
@@ -728,13 +786,13 @@ namespace Werewolf_Control
                     Bot.Send(msg, u.Message.Chat.Id);
                 }
             }
-#endif
+            #endif
         }
 
         [Attributes.Command(Trigger = "disapprovegifs", GlobalAdminOnly = true, Blockable = true)]
         public static void DisapproveGifs(Update u, string[] args)
         {
-#if !BETA
+            #if !BETA
             using (var db = new WWContext())
             {
                 if (args[1] == null)
@@ -760,7 +818,7 @@ namespace Werewolf_Control
                     }
 
                     var json = p.CustomGifSet;
-                    if (String.IsNullOrEmpty(json))
+                    if (string.IsNullOrEmpty(json))
                     {
                         Send("User does not have a custom gif pack", u.Message.Chat.Id);
                         return;
@@ -781,7 +839,7 @@ namespace Werewolf_Control
                     Bot.Send(msg, u.Message.Chat.Id);
                 }
             }
-#endif
+            #endif
         }
     }
 }

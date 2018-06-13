@@ -53,11 +53,11 @@ namespace Werewolf_Control.Helpers
         internal delegate void ChatCommandMethod(Update u, string[] args);
 
         internal static readonly List<Command> Commands = new List<Command>();
-#if DEBUG
+        #if DEBUG
         internal static string LanguageDirectory => Path.GetFullPath(Path.Combine(RootDirectory, @"../../Languages"));
 #else
         internal static string LanguageDirectory => Path.GetFullPath(Path.Combine(RootDirectory, @"../../Languages"));
-#endif
+        #endif
         internal static string TempLanguageDirectory =>
             Path.GetFullPath(Path.Combine(RootDirectory, @"../../TempLanguageFiles"));
 
@@ -67,11 +67,11 @@ namespace Werewolf_Control.Helpers
             var key =
                 RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64)
                     .OpenSubKey("SOFTWARE\\Werewolf");
-#if DEBUG
+            #if DEBUG
             TelegramApiKey = key.GetValue("ProductionAPI").ToString();
 #elif RELEASE
             TelegramApiKey = key.GetValue("ProductionAPI").ToString();
-#elif RELEASE2
+            #elif RELEASE2
             TelegramAPIKey = key.GetValue("ProductionAPI2").ToString();
 #elif BETA
             TelegramAPIKey = key.GetValue("BetaAPI").ToString();
@@ -86,7 +86,11 @@ namespace Werewolf_Control.Helpers
                 var c = new Command();
                 foreach (var a in m.GetCustomAttributes(true))
                 {
-                    if (!(a is Attributes.Command ca)) continue;
+                    if (!(a is Attributes.Command ca))
+                    {
+                        continue;
+                    }
+
                     c.Blockable = ca.Blockable;
                     c.DevOnly = ca.DevOnly;
                     c.GlobalAdminOnly = ca.GlobalAdminOnly;
@@ -108,8 +112,11 @@ namespace Werewolf_Control.Helpers
             Me = Api.GetMeAsync().Result;
             //Api.OnMessage += ApiOnOnMessage;
             Console.Title += " " + Me.Username;
-            if (!String.IsNullOrEmpty(updateid))
+            if (!string.IsNullOrEmpty(updateid))
+            {
                 Api.SendTextMessageAsync(updateid, "Control updated\n" + Program.GetVersion());
+            }
+
             StartTime = DateTime.UtcNow;
 
             //now we can start receiving
@@ -130,7 +137,8 @@ namespace Werewolf_Control.Helpers
         //}
 
         internal static void ReplyToCallback(CallbackQuery query, string text = null, bool edit = true,
-            bool showAlert = false, InlineKeyboardMarkup replyMarkup = null, ParseMode parsemode = ParseMode.Default)
+                                             bool showAlert = false, InlineKeyboardMarkup replyMarkup = null,
+                                             ParseMode parsemode = ParseMode.Default)
         {
             //first answer the callback
             Api.AnswerCallbackQueryAsync(query.Id, edit ? null : text, showAlert);
@@ -142,13 +150,11 @@ namespace Werewolf_Control.Helpers
         }
 
         internal static Task<Message> Edit(CallbackQuery query, string text, InlineKeyboardMarkup replyMarkup = null,
-            ParseMode parsemode = ParseMode.Default)
-        {
-            return Edit(query.Message.Chat.Id, query.Message.MessageId, text, replyMarkup, parsemode);
-        }
+                                           ParseMode parsemode = ParseMode.Default) => Edit(query.Message.Chat.Id,
+            query.Message.MessageId, text, replyMarkup, parsemode);
 
         internal static Task<Message> Edit(long id, int msgId, string text, InlineKeyboardMarkup replyMarkup = null,
-            ParseMode parsemode = ParseMode.Default)
+                                           ParseMode parsemode = ParseMode.Default)
         {
             MessagesSent++;
             return Api.EditMessageTextAsync(id, msgId, text, parsemode, replyMarkup: replyMarkup);
@@ -159,16 +165,20 @@ namespace Werewolf_Control.Helpers
             using (var db = new WWContext())
             {
                 var id =
-#if RELEASE
+                    #if RELEASE
                     1;
-#elif RELEASE2
+                #elif RELEASE2
                     2;
 #elif BETA
                     3;
 #else
                     4;
 #endif
-                if (id == 4) return;
+                if (id == 4)
+                {
+                    return;
+                }
+
                 var b = db.BotStatus.Find(id);
                 b.BotStatus = statusChangeEventArgs.Status.ToString();
                 CurrentStatus = b.BotStatus;
@@ -200,38 +210,41 @@ namespace Werewolf_Control.Helpers
         }
 
         //TODO this needs to be an event
-        public static void NodeConnected(Node n)
-        {
-        }
+        public static void NodeConnected(Node n) { }
 
         //TODO this needs to be an event as well
         public static void Disconnect(this Node n, bool notify = true)
         {
             if (notify && n.Games.Count > 2)
+            {
                 foreach (var g in n.Games)
                 {
                     Send(UpdateHandler.GetLocaleString("NodeShutsDown", g.Language), g.GroupId);
                 }
+            }
 
             Nodes.Remove(n);
         }
 
         /// <summary>
-        /// Gets the node with the least number of current games
+        ///     Gets the node with the least number of current games
         /// </summary>
         /// <returns>Best node, or null if no nodes</returns>
         public static Node GetBestAvailableNode()
         {
             //make sure we remove bad nodes first
             foreach (var n in Nodes.Where(x => x.TcpClient.Connected == false).ToList())
+            {
                 Nodes.Remove(n);
+            }
+
             return Nodes.Where(x => x.ShuttingDown == false && x.CurrentGames < Settings.MaxGamesPerNode)
                 .OrderBy(x => x.CurrentGames).FirstOrDefault(); //if this is null, there are no nodes
         }
 
 
         internal static Task<Message> Send(string message, long id, bool clearKeyboard = false,
-            InlineKeyboardMarkup customMenu = null, ParseMode parseMode = ParseMode.Html)
+                                           InlineKeyboardMarkup customMenu = null, ParseMode parseMode = ParseMode.Html)
         {
             MessagesSent++;
             //message = message.Replace("`",@"\`");
@@ -254,8 +267,10 @@ namespace Werewolf_Control.Helpers
         internal static GameInfo GetGroupNodeAndGame(long id)
         {
             var node = (Nodes.ToList().FirstOrDefault(n => n.Games.Any(g => g.GroupId == id))?.Games
-                            .FirstOrDefault(x => x.GroupId == id) ?? Nodes.ToList().FirstOrDefault(n => n.Games.Any(g => g.GroupId == id))?.Games
-                            .FirstOrDefault(x => x.GroupId == id)) ?? Nodes.ToList().FirstOrDefault(n => n.Games.Any(g => g.GroupId == id))?.Games
+                            .FirstOrDefault(x => x.GroupId == id) ?? Nodes.ToList()
+                            .FirstOrDefault(n => n.Games.Any(g => g.GroupId == id))?.Games
+                            .FirstOrDefault(x => x.GroupId == id)) ?? Nodes.ToList()
+                           .FirstOrDefault(n => n.Games.Any(g => g.GroupId == id))?.Games
                            .FirstOrDefault(x => x.GroupId == id);
             return node;
         }

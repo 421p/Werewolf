@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using Database;
 using Newtonsoft.Json;
@@ -9,7 +8,6 @@ using Telegram.Bot.Types.Payments;
 using Telegram.Bot.Types.ReplyMarkups;
 using Werewolf_Control.Helpers;
 using Werewolf_Control.Models;
-using RegHelper = Werewolf_Control.Helpers.RegHelper;
 
 namespace Werewolf_Control
 {
@@ -25,7 +23,9 @@ namespace Werewolf_Control
             //    "\n\nDonations help us pay to keep the expensive servers running and the game online. Every donation you make helps to keep us going for another month. For more information please contact @werewolfsupport", ParseMode.Html, true);
             var menu = new Menu();
             if (u.Message.Chat.Type == ChatType.Private)
+            {
                 menu.Buttons.Add(new InlineKeyboardCallbackButton("Telegram", "donatetg"));
+            }
             else
             {
                 menu.Buttons.Add(new InlineKeyboardUrlButton("Telegram",
@@ -62,7 +62,7 @@ namespace Werewolf_Control
         [Attributes.Command(Trigger = "customgif")]
         public static void SetCustomGifs(Update u, string[] args)
         {
-#if BETA
+            #if BETA
             Bot.Send("Please use this command with @werewolfbot", u.Message.From.Id);
             return;
 #endif
@@ -78,7 +78,7 @@ namespace Werewolf_Control
                 }
 
                 CustomGifData data;
-                if (String.IsNullOrEmpty(json))
+                if (string.IsNullOrEmpty(json))
                 {
                     data = new CustomGifData();
                     data.HasPurchased = true;
@@ -184,7 +184,7 @@ namespace Werewolf_Control
                             break;
                     }
 
-                    i += (added ? " ✅" : " 🚫");
+                    i += added ? " ✅" : " 🚫";
                 }
                 else
                 {
@@ -252,7 +252,7 @@ namespace Werewolf_Control
             Bot.Api.SendTextMessageAsync(q.From.Id,
                 q.Data.Split('|')[1] + "\nOk, send me the GIF you want to use for this situation, as a reply\n" +
                 "#" + choice,
-                replyMarkup: new ForceReply() {Force = true});
+                replyMarkup: new ForceReply {Force = true});
         }
 
         public static void AddGif(Message m)
@@ -262,7 +262,7 @@ namespace Werewolf_Control
                 var p = db.Players.FirstOrDefault(x => x.TelegramId == m.From.Id);
                 var json = p?.CustomGifSet;
 
-                if (String.IsNullOrEmpty(json))
+                if (string.IsNullOrEmpty(json))
                 {
                     Bot.Send("You have not unlocked a custom GIF pack.  Please use /donate", m.From.Id);
                     return;
@@ -285,7 +285,7 @@ namespace Werewolf_Control
                     Bot.Api.SendTextMessageAsync(m.From.Id,
                         "This GIF is too large, the maximum allowed size is 1MB.\n\n" +
                         "Please send me the GIF you want to use for this situation, as a reply\n#" + gifchoice,
-                        replyMarkup: new ForceReply() {Force = true});
+                        replyMarkup: new ForceReply {Force = true});
                     return;
                 }
 
@@ -336,9 +336,7 @@ namespace Werewolf_Control
         }
 
         [Attributes.Command(Trigger = "submitgif")]
-        public static void SubmitGifs(Update u, string[] args)
-        {
-        }
+        public static void SubmitGifs(Update u, string[] args) { }
 
         public static void GetDonationInfo(CallbackQuery q = null, Message m = null)
         {
@@ -354,16 +352,16 @@ namespace Werewolf_Control
             var amt = 0;
             if (int.TryParse(input, out amt))
             {
-#if DEBUG
+                #if DEBUG
                 var api = RegHelper.GetRegValue("DebugStripeTestAPI");
 #elif BETA
                 var api = RegHelper.GetRegValue("BetaStripeProdAPI");
 #elif RELEASE
                 var api = RegHelper.GetRegValue("MainStripeProdAPI");
-#endif
+                #endif
                 Bot.Api.SendInvoiceAsync(m.From.Id, "Werewolf Donation",
                     "Make a donation to Werewolf to help keep us online", "somepayloadtest", api,
-                    "startparam", "USD", new[] {new LabeledPrice() {Amount = amt * 100, Label = "Donation"}});
+                    "startparam", "USD", new[] {new LabeledPrice {Amount = amt * 100, Label = "Donation"}});
             }
             else
             {

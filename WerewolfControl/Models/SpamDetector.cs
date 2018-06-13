@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Werewolf_Control.Models
 {
-    class SpamDetector
+    internal class SpamDetector
     {
         public bool NotifiedAdmin { get; set; } = false;
         public int Warns { get; set; } = 0;

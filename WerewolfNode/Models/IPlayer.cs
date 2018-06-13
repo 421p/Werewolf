@@ -8,61 +8,63 @@ namespace Werewolf_Node.Models
 {
     public class IPlayer
     {
+        public int Id;
+
         /// <summary>
-        /// Reference to the telegram user
+        ///     Reference to the telegram user
         /// </summary>
         public User TeleUser { get; set; }
 
         /// <summary>
-        /// The players role
+        ///     The players role
         /// </summary>
         [JsonConverter(typeof(StringEnumConverter))]
         public IRole PlayerRole { get; set; } = IRole.Villager;
 
         /// <summary>
-        /// Whether or not the player has used their ability this round
+        ///     Whether or not the player has used their ability this round
         /// </summary>
         public bool HasUsedAbility { get; set; } = false;
 
         /// <summary>
-        /// Choice of the player they want to use their ability on
+        ///     Choice of the player they want to use their ability on
         /// </summary>
         public int Choice { get; set; } = 0;
 
         public int Choice2 { get; set; } = 0;
 
         /// <summary>
-        /// Whooops! you died...
+        ///     Whooops! you died...
         /// </summary>
         public bool IsDead { get; set; } = false;
 
         /// <summary>
-        /// If this reaches 2, they are automatically executed
+        ///     If this reaches 2, they are automatically executed
         /// </summary>
         public int NonVote { get; set; } = 0;
 
         /// <summary>
-        /// Indicates this person died overnight
+        ///     Indicates this person died overnight
         /// </summary>
         public bool DiedLastNight { get; set; }
 
         /// <summary>
-        /// How many votes against them they have (lynching)
+        ///     How many votes against them they have (lynching)
         /// </summary>
         public int Votes { get; set; } = 0;
 
         /// <summary>
-        /// For the gunner only
+        ///     For the gunner only
         /// </summary>
         public int Bullet { get; set; } = 2;
 
         /// <summary>
-        /// Werewolf gets drunk after killing the drunk, so sits out one turn
+        ///     Werewolf gets drunk after killing the drunk, so sits out one turn
         /// </summary>
         public bool Drunk { get; set; } = false;
 
         /// <summary>
-        /// Indicates whether user has PM'd the bot.  this is required by telegram.
+        ///     Indicates whether user has PM'd the bot.  this is required by telegram.
         /// </summary>
         public bool HasPM { get; set; } = false;
 
@@ -96,8 +98,6 @@ namespace Werewolf_Node.Models
 
         public string Language { get; set; } = "English";
         public bool Won { get; set; } = false;
-
-        public int Id;
 
         [JsonConverter(typeof(StringEnumConverter))]
         public QuestionAsked CurrentQuestion { get; set; }

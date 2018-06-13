@@ -2,26 +2,26 @@ using System.Collections.Generic;
 
 namespace Werewolf_Node
 {
-    static class Settings
+    internal static class Settings
     {
-#if DEBUG
+        #if DEBUG
         public static string ServerIP = "127.0.0.1";
 #else
         public static string ServerIP = "127.0.0.1";
 
-#endif
-#if DEBUG
+        #endif
+        #if DEBUG
         public static int Port = 9049;
 #elif RELEASE
         public static int Port = 9050;
-#elif RELEASE2
+        #elif RELEASE2
         public static int Port = 9051;
 #elif BETA
         public static int Port = 9052;
 #endif
 
 
-#if RELEASE2
+        #if RELEASE2
         internal static List<string> VillagerDieImages =
  new List<string> { "BQADAwAD2QEAAnQXsQeU2FMN-2D3GgI", "BQADAwADggADdBexB1_X0udQaRs7Ag", "BQADBAADWAMAAt4cZAcXTtE-UCQXxAI" }; //1
         internal static List<string> WolfWin =
@@ -48,14 +48,14 @@ namespace Werewolf_Node
         internal static List<string> WolfWin = new List<string> {"CgADBAAD154AAogbZAfp5Hft43Lk7QI"};
         internal static List<string> WolvesWin = new List<string> {"CgADBAADcZ8AAtAbZAefTVxIGtPZRAI"};
         internal static List<string> VillagersWin = new List<string> {"CgADBAADQp0AAnsdZAdYOLXiOPhbxQI"};
-        internal static List<string> NoWinner = new List<string> { };
+        internal static List<string> NoWinner = new List<string>();
         internal static List<string> StartGame = new List<string> {"CgADBAADIKAAAm8cZAedB1JRO61k9wI"};
         internal static List<string> StartChaosGame = new List<string> {"CgADBAADIKAAAm8cZAedB1JRO61k9wI"};
         internal static List<string> TannerWin = new List<string> {"CgADBAADdLYAAlEaZAdMSg1kY38i7AI"};
         internal static List<string> CultWins = new List<string> {"CgADBAADYdYAAqcZZAexv1WYVAk45gI"};
         internal static List<string> SerialKillerWins = new List<string> {"CgADAgADswMAAg_GSEg5ccSG_o-YXQI"};
         internal static List<string> LoversWin = new List<string> {"CgADBAADA-QAAl0cZAcY8AGMr7Ba_QI"};
-#else
+        #else
         public static List<string> VillagerDieImages =
  new List<string> { "BQADAwADggADdBexBxVNNy-rt--bAg", "BQADBAADWAMAAt4cZAfbY0WobzNPwAI", "BQADBAADKgMAAoMbZAc7Ldme4T3DKQI" };
         public static List<string> WolfWin =
@@ -80,17 +80,17 @@ namespace Werewolf_Node
 #endif
 
         public static int
-#if DEBUG
+            #if DEBUG
             MinPlayers = 1,
 
 #else
             MinPlayers = 4,
-#endif
+            #endif
             MaxPlayers = 35,
             TimeDay = 60,
             TimeNight = 90,
             TimeLynch = 90,
-#if !DEBUG
+            #if !DEBUG
             PlayerCountSeerCursed = 6,
             PlayerCountHarlot = 7,
             PlayerCountBeholderChance = 8,
@@ -130,7 +130,7 @@ namespace Werewolf_Node
             BlacksmithConversionChance = 75,
             OracleConversionChance = 50,
             SandmanConversionChance = 60,
-#else
+            #else
              PlayerCountSeerCursed = 6,
             PlayerCountHarlot = 7,
             PlayerCountBeholderChance = 8,
@@ -175,12 +175,12 @@ namespace Werewolf_Node
             MaxJoinTime = 300;
 
 
-#if DEBUG
+        #if DEBUG
 //public static long MainChatId = -134703013;
         public static long MainChatId = -1001049529775; //Beta group
 #else
         public static long MainChatId = -1001030085238;
-#endif
+        #endif
         public static long VeteranChatId = -1001094614730;
         public static string VeteranChatLink = "werewolfvets";
 

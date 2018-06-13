@@ -20,17 +20,23 @@ namespace Werewolf_Node.Helpers
                     try
                     {
                         var photos = await Program.Bot.GetUserProfilePhotosAsync(userid, limit: 1);
-                        if (photos.Photos.Length == 0) return; //nada
+                        if (photos.Photos.Length == 0)
+                        {
+                            return; //nada
+                        }
+
                         var sizes = photos.Photos[0];
                         var id = "";
                         var largest = 0;
                         foreach (var s in sizes)
                         {
                             if (s.FileSize > largest)
+                            {
                                 id = s.FileId;
+                            }
                         }
 
-                        if (String.IsNullOrEmpty(id))
+                        if (string.IsNullOrEmpty(id))
                         {
                             return;
                         }
@@ -44,8 +50,12 @@ namespace Werewolf_Node.Helpers
                         var fileName = photoPath.Substring(photoPath.LastIndexOf("/") + 1);
                         //check that the file name is different
                         if (p.ImageFile == fileName && System.IO.File.Exists(ImagePath + fileName))
+                        {
                             return; //same, no reason to download again
+                        }
+
                         if (p.ImageFile != fileName)
+                        {
                             try
                             {
                                 //delete old one
@@ -55,6 +65,7 @@ namespace Werewolf_Node.Helpers
                             {
                                 // ignored
                             }
+                        }
 
                         var uri = $"https://api.telegram.org/file/bot{Program.APIToken}/{photoPath}";
 
@@ -70,10 +81,7 @@ namespace Werewolf_Node.Helpers
                         p.ImageFile = fileName;
                         db.SaveChanges();
                     }
-                    catch
-                    {
-                        return;
-                    }
+                    catch { }
                 }
             }
         }

@@ -7,13 +7,13 @@ namespace Werewolf_Control.Helpers
     {
         //By the way, these admin ports will have IP whitelisting.  Don't even bother trying to connect to them :P
         //The regular ports are not even open on the firewall
-#if DEBUG
+        #if DEBUG
         public static int Port = 9049;
         public static int AdminPort = 9059;
 #elif RELEASE
         public static int Port = 9050; //9050-@werewolfbot 
         public static int AdminPort = 9060;
-#elif RELEASE2
+        #elif RELEASE2
         public static int Port = 9051;  //9051-@werewolfIIbot
         public static int AdminPort = 9063; //9061 not responding
 #elif BETA
@@ -34,7 +34,7 @@ namespace Werewolf_Control.Helpers
         public static readonly long TranslationChatId = -1001074012132;
         public static readonly long AdminChatId = -1001094155678;
         public static readonly long ErrorGroup = 268253251; // @athened
-#if RELEASE2
+        #if RELEASE2
         public static List<string> VillagerDieImages =
  new List<string> { "BQADAwAD2QEAAnQXsQeU2FMN-2D3GgI", "BQADAwADggADdBexB1_X0udQaRs7Ag", "BQADBAADWAMAAt4cZAcXTtE-UCQXxAI" }; //1
         public static List<string> WolfWin =
@@ -97,7 +97,7 @@ namespace Werewolf_Control.Helpers
 
         public static List<string> LoversWin =
             new List<string> {"BQADBAAD8hUAAhYYZAeSI-kDTlm6QAI", "BQADBAADYAMAAkMdZAesBzPWN8zN3QI"};
-#else
+        #else
         public static List<string> VillagerDieImages =
  new List<string> { "BQADAwADggADdBexBxVNNy-rt--bAg", "BQADBAADWAMAAt4cZAfbY0WobzNPwAI", "BQADBAADKgMAAoMbZAc7Ldme4T3DKQI" };
         public static List<string> WolfWin =
@@ -121,32 +121,32 @@ namespace Werewolf_Control.Helpers
  new List<string> { "BQADBAADYAMAAkMdZAf0_rs89KCyDAI", "BQADBAAD8hUAAhYYZAcV2T0l7f-lJQI" };
 #endif
 
-        /// <summary>
-        /// How many games are allowed for any given node
-        /// </summary>
-        public static int MaxGamesPerNode = 60;
+           /// <summary>
+           ///     How many games are allowed for any given node
+           /// </summary>
+           public static int MaxGamesPerNode = 60;
 
-        /// <summary>
-        /// How many games on each node before starting a new node (to be added later)
-        /// </summary>
-#if DEBUG
+           /// <summary>
+           ///     How many games on each node before starting a new node (to be added later)
+           /// </summary>
+           #if DEBUG
         public static int NewNodeThreshhold = 10;
 #else
         public static int NewNodeThreshhold = 30;
-#endif
+        #endif
         public static int ShutDownNodesAt = 15;
 
         public static int
-#if DEBUG
+            #if DEBUG
             MinPlayers = 1,
 #else
             MinPlayers = 4,
-#endif
+            #endif
             MaxPlayers = 35,
             TimeDay = 60,
             TimeNight = 90,
             TimeLynch = 90,
-#if DEBUG
+            #if DEBUG
             PlayerCountSeerCursed = 6,
             PlayerCountHarlot = 7,
             PlayerCountBeholderChance = 8,
@@ -205,7 +205,7 @@ namespace Werewolf_Control.Helpers
             BlacksmithConversionChance = 75,
             HarlotDiscoverCultChance = 50,
             ChanceDetectiveCaught = 40,
-#endif
+            #endif
             GameJoinTime = 180,
             MaxExtend = 180;
     }

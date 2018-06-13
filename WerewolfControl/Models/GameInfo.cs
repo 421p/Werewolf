@@ -9,6 +9,13 @@ namespace Werewolf_Control.Models
 {
     public class GameInfo
     {
+        public enum GameTime
+        {
+            Day,
+            Lynch,
+            Night
+        }
+
         public HashSet<int> Users { get; set; } = new HashSet<int>(); //update this to users alive
         public long GroupId { get; set; }
         public Guid Guid { get; set; }
@@ -20,17 +27,14 @@ namespace Werewolf_Control.Models
         public int PlayerCount { get; set; }
         public GameTime Cycle { get; set; }
 
-        public enum GameTime
-        {
-            Day,
-            Lynch,
-            Night
-        }
-
         public void AddPlayer(Update update)
         {
             var n = Bot.Nodes.FirstOrDefault(x => x.ClientId == NodeId);
-            if (n == null) return;
+            if (n == null)
+            {
+                return;
+            }
+
             //var g = n.Games.FirstOrDefault(x => x.GroupId == update.Message.Chat.Id);
             //g?.
             Users.Add(update.Message.From.Id);
@@ -55,7 +59,10 @@ namespace Werewolf_Control.Models
         public void RemovePlayer(Update update)
         {
             var n = Bot.Nodes.FirstOrDefault(x => x.ClientId == NodeId);
-            if (n == null) return;
+            if (n == null)
+            {
+                return;
+            }
 
             Users.Remove(update.Message.From.Id);
             var json = JsonConvert.SerializeObject(new PlayerFleeInfo
@@ -76,7 +83,11 @@ namespace Werewolf_Control.Models
         public void SmitePlayer(int id)
         {
             var n = Bot.Nodes.FirstOrDefault(x => x.ClientId == NodeId);
-            if (n == null) return;
+            if (n == null)
+            {
+                return;
+            }
+
             Users.Remove(id);
             var json = JsonConvert.SerializeObject(new PlayerSmiteInfo {GroupId = GroupId, UserId = id});
             n.Broadcast(json);
@@ -92,15 +103,19 @@ namespace Werewolf_Control.Models
         public void Kill()
         {
             var n = Bot.Nodes.FirstOrDefault(x => x.ClientId == NodeId);
-            var json = JsonConvert.SerializeObject(new GameKillInfo() {GroupId = GroupId});
+            var json = JsonConvert.SerializeObject(new GameKillInfo {GroupId = GroupId});
             n?.Broadcast(json);
         }
 
         public void ExtendTime(long id, bool admin, int seconds)
         {
             var n = Bot.Nodes.FirstOrDefault(x => x.ClientId == NodeId);
-            if (n == null) return;
-            var json = JsonConvert.SerializeObject(new ExtendTimeInfo()
+            if (n == null)
+            {
+                return;
+            }
+
+            var json = JsonConvert.SerializeObject(new ExtendTimeInfo
             {
                 GroupId = GroupId,
                 Admin = admin,

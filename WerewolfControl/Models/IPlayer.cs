@@ -5,42 +5,42 @@ namespace Werewolf_Control.Models
     public class IPlayer
     {
         /// <summary>
-        /// The players role
+        ///     The players role
         /// </summary>
         public IRole PlayerRole { get; set; } = IRole.Villager;
 
         /// <summary>
-        /// Choice of the player they want to use their ability on
+        ///     Choice of the player they want to use their ability on
         /// </summary>
         public int Choice { get; set; } = 0;
 
         /// <summary>
-        /// Whooops! you died...
+        ///     Whooops! you died...
         /// </summary>
         public bool IsDead { get; set; } = false;
 
         /// <summary>
-        /// If this reaches 2, they are automatically executed
+        ///     If this reaches 2, they are automatically executed
         /// </summary>
         public int NonVote { get; set; } = 0;
 
         /// <summary>
-        /// Indicates this person died overnight
+        ///     Indicates this person died overnight
         /// </summary>
         public bool DiedLastNight { get; set; }
 
         /// <summary>
-        /// How many votes against them they have (lynching)
+        ///     How many votes against them they have (lynching)
         /// </summary>
         public int Votes { get; set; } = 0;
 
         /// <summary>
-        /// For the gunner only
+        ///     For the gunner only
         /// </summary>
         public int Bullet { get; set; } = 2;
 
         /// <summary>
-        /// Werewolf gets drunk after killing the drunk, so sits out one turn
+        ///     Werewolf gets drunk after killing the drunk, so sits out one turn
         /// </summary>
         public bool Drunk { get; set; } = false;
 

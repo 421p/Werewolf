@@ -5,11 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using System.Threading.Tasks;
 using Database;
 using Werewolf_Control.Handler;
 using Werewolf_Control.Helpers;
-using RegHelper = Werewolf_Control.Helpers.RegHelper;
 using Timer = System.Timers.Timer;
 
 namespace Werewolf_Control
@@ -21,7 +19,8 @@ namespace Werewolf_Control
 
         internal static float AvgCpuTime;
 
-        ///private static List<float> CpuTimes = new List<float>();
+        /// private static List
+        /// <float> CpuTimes = new List<float>();
         internal static readonly List<long> MessagesReceived = new List<long>();
 
         internal static readonly List<long> MessagesProcessed = new List<long>();
@@ -34,23 +33,25 @@ namespace Werewolf_Control
         public static DateTime MaxTime = DateTime.MinValue;
         public static bool MaintMode = false;
 
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
-#if !DEBUG
+            #if !DEBUG
             AppDomain.CurrentDomain.UnhandledException += (sender, eventArgs) =>
             {
                 //drop the error to log file and exit
                 using (var sw = new StreamWriter(Path.Combine(Bot.RootDirectory, "../Logs/error.log"), true))
                 {
-                    var e = (eventArgs.ExceptionObject as Exception);
+                    var e = eventArgs.ExceptionObject as Exception;
                     sw.WriteLine(DateTime.UtcNow);
                     sw.WriteLine(e.Message);
                     sw.WriteLine(e.StackTrace + "\n");
                     if (eventArgs.IsTerminating)
+                    {
                         Environment.Exit(5);
+                    }
                 }
             };
-#endif
+            #endif
 
             //get the version of the bot and set the window title
             var assembly = Assembly.GetExecutingAssembly();
@@ -110,21 +111,30 @@ namespace Werewolf_Control
                 _previousMessages = Bot.MessagesProcessed;
                 MessagesProcessed.Insert(0, newMessages);
                 if (MessagesProcessed.Count > 60)
+                {
                     MessagesProcessed.RemoveAt(60);
+                }
+
                 MessagePxPerSecond = MessagesProcessed.Max();
 
-                newMessages = (Bot.MessagesSent + _nodeMessagesSent) - _previousMessagesTx;
-                _previousMessagesTx = (Bot.MessagesSent + _nodeMessagesSent);
+                newMessages = Bot.MessagesSent + _nodeMessagesSent - _previousMessagesTx;
+                _previousMessagesTx = Bot.MessagesSent + _nodeMessagesSent;
                 MessagesSent.Insert(0, newMessages);
                 if (MessagesSent.Count > 60)
+                {
                     MessagesSent.RemoveAt(60);
+                }
+
                 MessageTxPerSecond = MessagesSent.Max();
 
                 newMessages = Bot.MessagesReceived - _previousMessagesRx;
                 _previousMessagesRx = Bot.MessagesReceived;
                 MessagesReceived.Insert(0, newMessages);
                 if (MessagesReceived.Count > 60)
+                {
                     MessagesReceived.RemoveAt(60);
+                }
+
                 MessageRxPerSecond = MessagesProcessed.Max();
             }
             catch
@@ -143,9 +153,7 @@ namespace Werewolf_Control
             return "Current Version: " + version + Environment.NewLine + "Build time: " + dt + " (Central)";
         }
 
-        public static void Log(string s, bool error = false)
-        {
-        }
+        public static void Log(string s, bool error = false) { }
 
         private static void MessageMonitor()
         {
@@ -157,14 +165,20 @@ namespace Werewolf_Control
                     _previousMessages = Bot.MessagesProcessed;
                     MessagesProcessed.Insert(0, newMessages);
                     if (MessagesProcessed.Count > 10)
+                    {
                         MessagesProcessed.RemoveAt(10);
+                    }
+
                     MessagePxPerSecond = (float) MessagesProcessed.Average() / 10;
 
-                    newMessages = (Bot.MessagesSent + _nodeMessagesSent) - _previousMessagesTx;
-                    _previousMessagesTx = (Bot.MessagesSent + _nodeMessagesSent);
+                    newMessages = Bot.MessagesSent + _nodeMessagesSent - _previousMessagesTx;
+                    _previousMessagesTx = Bot.MessagesSent + _nodeMessagesSent;
                     MessagesSent.Insert(0, newMessages);
                     if (MessagesSent.Count > 10)
+                    {
                         MessagesSent.RemoveAt(10);
+                    }
+
                     MessageTxPerSecond = (float) MessagesSent.Average() / 10;
                 }
                 catch
@@ -227,9 +241,9 @@ namespace Werewolf_Control
         {
             //wait a bit to allow nodes to register
             Thread.Sleep(2000);
-#if !DEBUG
+            #if !DEBUG
             Updater.MonitorUpdates();
-#endif
+            #endif
             while (Running)
             {
                 try
@@ -294,9 +308,10 @@ namespace Werewolf_Control
                     _writingInfo = false;
 
 
-#if !DEBUG
+                    #if !DEBUG
                     //now, let's manage our nodes.
-                    if (nodes.All(x => x.Games.Count <= Settings.ShutDownNodesAt & !x.ShuttingDown) && nodes.Count > 1)
+                    if (nodes.All(x => (x.Games.Count <= Settings.ShutDownNodesAt) & !x.ShuttingDown) &&
+                        nodes.Count > 1)
                     {
                         //we have too many nodes running, kill one.
                         nodes.First().ShutDown();
@@ -316,7 +331,7 @@ namespace Werewolf_Control
                             Thread.Sleep(5000); //give the node time to register
                         }
                     }
-#endif
+                    #endif
                 }
                 finally
                 {
@@ -333,14 +348,14 @@ namespace Werewolf_Control
             //this is a bit more tricky, we need to figure out which node folder has the latest version...
             var baseDirectory = Path.Combine(Bot.RootDirectory, ".."); //go up one directory
             var currentChoice = new NodeChoice();
-            
+
             foreach (var dir in Directory.GetDirectories(baseDirectory, "*Node*"))
             {
                 //get the node exe in this directory
                 var file = Directory.GetFiles(dir, "Werewolf Node.exe").First();
                 var version = FileVersionInfo.GetVersionInfo(file).FileVersion;
 
-                Version fvi = Version.Parse("1.0.0");
+                var fvi = Version.Parse("1.0.0");
                 if (fvi > currentChoice.Version)
                 {
                     currentChoice.Path = file;

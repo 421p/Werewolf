@@ -56,8 +56,8 @@ namespace Werewolf_Control.Helpers
         private static List<string> _langs;
         private static DateTime _lastGetAll = DateTime.MinValue, _lastGetBase = DateTime.MinValue;
 
-        private static Dictionary<string, List<string>> _variants = new Dictionary<string, List<string>>();
-        private static Dictionary<string, DateTime> _lastGetVariant = new Dictionary<string, DateTime>();
+        private static readonly Dictionary<string, List<string>> _variants = new Dictionary<string, List<string>>();
+        private static readonly Dictionary<string, DateTime> _lastGetVariant = new Dictionary<string, DateTime>();
 
         internal static List<v_GroupRanking> GetAll()
         {
@@ -65,7 +65,10 @@ namespace Werewolf_Control.Helpers
             {
                 //only refresh the list cache once every 20 minutes
                 using (var db = new WWContext())
+                {
                     _list = db.v_GroupRanking.ToList();
+                }
+
                 _lastGetAll = DateTime.UtcNow;
             }
 
@@ -83,7 +86,9 @@ namespace Werewolf_Control.Helpers
                     {
                         //load the language to get the base
                         if (!langs.Contains(lang.Base))
+                        {
                             langs.Add(lang.Base);
+                        }
                     }
                 }
 
@@ -106,7 +111,9 @@ namespace Werewolf_Control.Helpers
                     {
                         //load the language to get the variant
                         if (!langs.Contains(lang.Variant))
+                        {
                             langs.Add(lang.Variant);
+                        }
                     }
                 }
 
@@ -124,7 +131,9 @@ namespace Werewolf_Control.Helpers
                 var langs = LanguageHelper.GetAllLanguages().Where(x => x.Base == baseLang).Select(x => x.FileName);
                 foreach (var g in GetAll().Where(x => langs.Contains(x.Language)).GroupBy(x => x.GroupId)
                     .Select(x => x.OrderByDescending(y => y.Ranking).First()))
+                {
                     yield return g;
+                }
             }
             else
             {
@@ -133,7 +142,9 @@ namespace Werewolf_Control.Helpers
                 foreach (var g in GetAll())
                 {
                     if (lang.FileName == g.Language)
+                    {
                         yield return g;
+                    }
                 }
             }
         }

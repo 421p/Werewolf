@@ -2,7 +2,7 @@ using Werewolf_Control.Helpers;
 
 namespace Werewolf_Control.Models
 {
-    class Command
+    internal class Command
     {
         public string Trigger { get; set; }
         public bool GroupAdminOnly { get; set; }

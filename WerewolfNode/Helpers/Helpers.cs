@@ -10,7 +10,10 @@ namespace Werewolf_Node.Helpers
             var status = Program.Bot.GetChatMemberAsync(chatid, userid).Result.Status;
 
             if (status == ChatMemberStatus.Administrator) //ignore admins
+            {
                 return;
+            }
+
             //kick
             Program.Bot.KickChatMemberAsync(chatid, userid);
             //get their status

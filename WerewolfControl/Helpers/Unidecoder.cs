@@ -4,12 +4,12 @@ using System.Text;
 namespace Werewolf_Control.Helpers
 {
     /// <summary>
-    /// ASCII transliterations of Unicode text
+    ///     ASCII transliterations of Unicode text
     /// </summary>
     public static partial class Unidecoder
     {
         /// <summary>
-        /// Transliterate Unicode string to ASCII string.
+        ///     Transliterate Unicode string to ASCII string.
         /// </summary>
         /// <param name="input">String you want to transliterate into ASCII</param>
         /// <param name="tempStringBuilderCapacity">
@@ -36,7 +36,7 @@ namespace Werewolf_Control.Helpers
 
             // Unidecode result often can be at least two times longer than input string.
             var sb = new StringBuilder(tempStringBuilderCapacity ?? input.Length * 2);
-            foreach (char c in input)
+            foreach (var c in input)
             {
                 // Copypaste is bad, but sb.Append(c.Unidecode()); would be a bit slower.
                 if (c < 0x80)
@@ -45,8 +45,8 @@ namespace Werewolf_Control.Helpers
                 }
                 else
                 {
-                    int high = c >> 8;
-                    int low = c & 0xff;
+                    var high = c >> 8;
+                    var low = c & 0xff;
                     string[] transliterations;
                     if (characters.TryGetValue(high, out transliterations))
                     {
@@ -59,7 +59,7 @@ namespace Werewolf_Control.Helpers
         }
 
         /// <summary>
-        /// Transliterate Unicode character to ASCII string.
+        ///     Transliterate Unicode character to ASCII string.
         /// </summary>
         /// <param name="c">Character you want to transliterate into ASCII</param>
         /// <returns>
@@ -75,8 +75,8 @@ namespace Werewolf_Control.Helpers
             }
             else
             {
-                int high = c >> 8;
-                int low = c & 0xff;
+                var high = c >> 8;
+                var low = c & 0xff;
                 string[] transliterations;
                 if (characters.TryGetValue(high, out transliterations))
                 {

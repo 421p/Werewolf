@@ -4,14 +4,6 @@ function save() {
     /usr/bin/mono /rsaver "$1" "$2"
 }
 
-if [ ! -z ${BOTAN_TOKEN+isset} ]; then 
-    echo 'Found BOTAN_TOKEN...'
-    save 'BotanReleaseAPI' "$BOTAN_TOKEN"
-else 
-    echo "BOTAN_TOKEN is not set. Exiting."
-    exit 1   
-fi
-
 if [ ! -z ${CONNECTION_STRING+isset} ]; then 
     echo 'Found CONNECTION_STRING...'
     save 'BotConnectionString' "$CONNECTION_STRING"    

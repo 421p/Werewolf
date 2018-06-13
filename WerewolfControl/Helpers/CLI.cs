@@ -13,19 +13,17 @@ namespace Werewolf_Control.Helpers
     public static class CLI
     {
         private static TelegramClient client;
-        internal static string AuthCode = null;
+        internal static string AuthCode;
 
         public static Task Initialize(long id)
         {
             Commands.Send("Initializing client", id);
             try
             {
-                client = new TelegramClient(Int32.Parse(RegHelper.GetRegValue("appid")),
+                client = new TelegramClient(int.Parse(RegHelper.GetRegValue("appid")),
                     RegHelper.GetRegValue("apihash"));
             }
-            catch
-            {
-            }
+            catch { }
 
             return client.ConnectAsync();
         }
@@ -35,9 +33,15 @@ namespace Werewolf_Control.Helpers
             if (client == null || !client.IsUserAuthorized())
             {
                 if (client == null)
+                {
                     await Initialize(groupId);
+                }
 
-                if (client.IsUserAuthorized()) return true;
+                if (client.IsUserAuthorized())
+                {
+                    return true;
+                }
+
                 await Commands.Send("User is not logged in.", groupId);
                 var phone = RegHelper.GetRegValue("paraphone");
                 await Commands.Send("Sending code request using Paras phone number", groupId);
@@ -71,15 +75,19 @@ namespace Werewolf_Control.Helpers
 
         public static async Task<ChannelInfo> GetChatInfo(string groupName, long groupId)
         {
-            if (!await AuthUser(groupId)) return null;
+            if (!await AuthUser(groupId))
+            {
+                return null;
+            }
+
             var result = new ChannelInfo();
             var dialogs = (TLDialogsSlice) await client.GetUserDialogsAsync();
             var main = dialogs.chats.lists.Where(c => c.GetType() == typeof(TLChannel))
                 .Cast<TLChannel>()
-                .FirstOrDefault(c => c.title == ("WereWuff - The Game"));
-            var req = new TLRequestGetFullChannel()
+                .FirstOrDefault(c => c.title == "WereWuff - The Game");
+            var req = new TLRequestGetFullChannel
             {
-                channel = new TLInputChannel() {access_hash = main.access_hash.Value, channel_id = main.id}
+                channel = new TLInputChannel {access_hash = main.access_hash.Value, channel_id = main.id}
             };
 
             var res = await client.SendRequestAsync<TLChatFull>(req);
@@ -90,10 +98,10 @@ namespace Werewolf_Control.Helpers
             result.ChatFull = res;
             while (offset < (res.full_chat as TLChannelFull).participants_count)
             {
-                var pReq = new TLRequestGetParticipants()
+                var pReq = new TLRequestGetParticipants
                 {
-                    channel = new TLInputChannel() {access_hash = main.access_hash.Value, channel_id = main.id},
-                    filter = new TLChannelParticipantsRecent() { },
+                    channel = new TLInputChannel {access_hash = main.access_hash.Value, channel_id = main.id},
+                    filter = new TLChannelParticipantsRecent(),
                     limit = 200,
                     offset = offset
                 };

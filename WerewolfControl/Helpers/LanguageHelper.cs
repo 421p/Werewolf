@@ -19,14 +19,6 @@ namespace Werewolf_Control.Helpers
 {
     public class LangFile
     {
-        public string Name { get; set; }
-        public string Base { get; set; }
-        public string Variant { get; set; }
-        public string FileName { get; set; }
-        public string FilePath { get; set; }
-        public XDocument Doc { get; set; }
-        public DateTime LatestUpdate { get; }
-
         public LangFile(string path)
         {
             Doc = XDocument.Load(path);
@@ -37,6 +29,14 @@ namespace Werewolf_Control.Helpers
             FileName = Path.GetFileNameWithoutExtension(path);
             LatestUpdate = File.GetLastWriteTimeUtc(path);
         }
+
+        public string Name { get; set; }
+        public string Base { get; set; }
+        public string Variant { get; set; }
+        public string FileName { get; set; }
+        public string FilePath { get; set; }
+        public XDocument Doc { get; set; }
+        public DateTime LatestUpdate { get; }
     }
 
     public static class LanguageHelper
@@ -66,6 +66,7 @@ namespace Werewolf_Control.Helpers
 
             foreach (var langfile in Directory.GetFiles(Bot.LanguageDirectory).Where(x => !x.EndsWith("English.xml"))
                 .Select(x => new LangFile(x)))
+            {
                 if (langfile.Base == choice || choice == null)
                 {
                     //first check the language node
@@ -77,6 +78,7 @@ namespace Werewolf_Control.Helpers
                     //get the file errors
                     GetFileErrors(langfile, errors, master);
                 }
+            }
 
             //now pack up the errors and send
             var result = "";
@@ -112,10 +114,13 @@ namespace Werewolf_Control.Helpers
                 result +=
                     $"_Missing strings:_ {errors.Count(x => x.Level == ErrorLevel.MissingString && x.File == langfile.FileName)}\n";
                 if (errors.Any(x => x.File == langfile.FileName && x.Level == ErrorLevel.Error))
+                {
                     result = errors.Where(x => x.File == langfile.FileName && x.Level == ErrorLevel.Error)
                         .Aggregate(result,
                             (current, fileError) =>
                                 current + $"_{fileError.Level} - {fileError.Key}_\n{fileError.Message}\n");
+                }
+
                 result += "\n";
             }
 
@@ -127,7 +132,7 @@ namespace Werewolf_Control.Helpers
             result +=
                 $"\nMost recently updated file: {sortedfiles.Last().FileName}.xml ({sortedfiles.Last().LatestUpdate.ToString("MMM dd")})\nLeast recently updated file: {sortedfiles.First().FileName}.xml ({sortedfiles.First().LatestUpdate.ToString("MMM dd")})";
 
-            Bot.Api.EditMessageTextAsync(id, msgId, result, parseMode: ParseMode.Markdown);
+            Bot.Api.EditMessageTextAsync(id, msgId, result, ParseMode.Markdown);
         }
 
         public static void ValidateLanguageFile(long id, string filePath, int msgId)
@@ -201,7 +206,7 @@ namespace Werewolf_Control.Helpers
             Thread.Sleep(500);
             result +=
                 $"*Validation complete*.\nErrors: {errors.Count(x => x.Level == ErrorLevel.Error)}\nMissing strings: {errors.Count(x => x.Level == ErrorLevel.MissingString)}";
-            Bot.Api.EditMessageTextAsync(id, msgId, result, parseMode: ParseMode.Markdown);
+            Bot.Api.EditMessageTextAsync(id, msgId, result, ParseMode.Markdown);
         }
 
         internal static void UploadFile(string fileid, long id, string newFileCorrectName, int msgID)
@@ -232,13 +237,13 @@ namespace Werewolf_Control.Helpers
 
             //check uniqueness
             var error = langs.FirstOrDefault(x =>
-                    (x.FileName.ToLower() == newFile.FileName.ToLower() &&
-                     x.Name != newFile.Name) //check for matching filename and mismatching name
-                    || (x.Name == newFile.Name &&
-                        (x.Base != newFile.Base || x.Variant != newFile.Variant)
-                    ) //check for same name and mismatching base-variant
-                    || (x.Base == newFile.Base && x.Variant == newFile.Variant &&
-                        x.FileName != newFile.FileName) //check for same base-variant and mismatching filename
+                    x.FileName.ToLower() == newFile.FileName.ToLower() &&
+                    x.Name != newFile.Name //check for matching filename and mismatching name
+                    || x.Name == newFile.Name &&
+                    (x.Base != newFile.Base ||
+                     x.Variant != newFile.Variant) //check for same name and mismatching base-variant
+                    || x.Base == newFile.Base && x.Variant == newFile.Variant &&
+                    x.FileName != newFile.FileName //check for same base-variant and mismatching filename
                 //if we want to have the possibility to rename the file, change previous line with FileName -> Name
             );
             if (error != null)
@@ -387,9 +392,14 @@ namespace Werewolf_Control.Helpers
 
                 var output = "";
                 while (!p.StandardOutput.EndOfStream)
+                {
                     output += p.StandardOutput.ReadLine() + Environment.NewLine;
+                }
+
                 while (!p.StandardError.EndOfStream)
+                {
                     output += p.StandardError.ReadLine() + Environment.NewLine;
+                }
 
                 msg += "\nValidating the output...";
                 Bot.Edit(id, msgId, msg);
@@ -416,13 +426,13 @@ namespace Werewolf_Control.Helpers
                     }
 
                     msg +=
-                        $"\n<b>Files committed successfully.</b> {(String.IsNullOrEmpty(commit) ? "" : $"<a href=\"https://github.com/GreyWolfDev/Werewolf/commit/" + commit + $"\">{commit}</a>")}";
+                        $"\n<b>Files committed successfully.</b> {(string.IsNullOrEmpty(commit) ? "" : $"<a href=\"https://github.com/GreyWolfDev/Werewolf/commit/" + commit + $"\">{commit}</a>")}";
                 }
             }
 
             msg += "\n<b>Operation complete.</b>";
 
-            Bot.Api.EditMessageTextAsync(id, msgId, msg, parseMode: ParseMode.Html);
+            Bot.Api.EditMessageTextAsync(id, msgId, msg, ParseMode.Html);
         }
 
         public static void SendAllFiles(long id)
@@ -439,7 +449,9 @@ namespace Werewolf_Control.Helpers
             {
                 var langs = Directory.GetFiles(Bot.LanguageDirectory);
                 foreach (var lang in langs)
+                {
                     zip.CreateEntryFromFile(lang, lang, CompressionLevel.Optimal); //add the langs to the zipfile
+                }
             }
 
             //now send the file
@@ -465,7 +477,9 @@ namespace Werewolf_Control.Helpers
                 var path = Path.Combine(Bot.LanguageDirectory,
                     $"BaseZips\\{zipname}.zip"); //where the zipfile will be stored
                 if (File.Exists(path))
+                {
                     File.Delete(path);
+                }
 
                 //create our zip file
                 using (var zip = ZipFile.Open(path, ZipArchiveMode.Create))
@@ -473,8 +487,10 @@ namespace Werewolf_Control.Helpers
                     var langs = Directory.GetFiles(Bot.LanguageDirectory).Select(x => new LangFile(x))
                         .Where(x => x.Base == choice); //get the base
                     foreach (var lang in langs)
+                    {
                         zip.CreateEntryFromFile(Path.Combine(Bot.LanguageDirectory, $"{lang.FileName}.xml"),
                             $"{lang.FileName}.xml", CompressionLevel.Optimal); //add the langs to the zipfile
+                    }
                 }
 
                 //now send the zip file
@@ -498,19 +514,27 @@ namespace Werewolf_Control.Helpers
 
         private static void CheckLanguageNode(LangFile langfile, List<LanguageError> errors)
         {
-            if (String.IsNullOrWhiteSpace(langfile.Name))
+            if (string.IsNullOrWhiteSpace(langfile.Name))
+            {
                 errors.Add(new LanguageError(langfile.FileName, "*Language Node*", "Language name is missing",
                     ErrorLevel.FatalError));
-            if (String.IsNullOrWhiteSpace(langfile.Base))
+            }
+
+            if (string.IsNullOrWhiteSpace(langfile.Base))
+            {
                 errors.Add(new LanguageError(langfile.FileName, "*Language Node*", "Base is missing",
                     ErrorLevel.FatalError));
-            if (String.IsNullOrWhiteSpace(langfile.Variant))
+            }
+
+            if (string.IsNullOrWhiteSpace(langfile.Variant))
+            {
                 errors.Add(new LanguageError(langfile.FileName, "*Language Node*", "Variant is missing",
                     ErrorLevel.FatalError));
+            }
         }
 
         private static string OutputResult(LangFile newFile, List<LanguageError> newFileErrors, LangFile curFile,
-            List<LanguageError> curFileErrors)
+                                           List<LanguageError> curFileErrors)
         {
             var result = $"NEW FILE\n*{newFile.FileName}.xml - ({newFile.Name ?? ""})*" + Environment.NewLine;
             if (newFileErrors.Any(x => x.Level == ErrorLevel.Ads))
@@ -583,7 +607,10 @@ namespace Werewolf_Control.Helpers
                 result += $"\n_Base:_ {newFile.Base ?? ""}";
                 if (!Directory.GetFiles(Bot.LanguageDirectory, "*.xml").Select(x => new LangFile(x))
                     .Any(x => x.Base == newFile.Base))
+                {
                     result += " *(NEW)*";
+                }
+
                 result += $"\n_Variant:_ {newFile.Variant ?? ""}";
             }
 
@@ -595,8 +622,10 @@ namespace Werewolf_Control.Helpers
             var test = $"setlang|-1001049529775|{file.Base ?? ""}|{file.Variant ?? ""}|v";
             var count = Encoding.UTF8.GetByteCount(test);
             if (count > 64)
+            {
                 fileErrors.Add(new LanguageError(file.FileName, "*Language Node*",
                     "Base and variant are too long. (*38 utf8 byte max*)", ErrorLevel.FatalError));
+            }
         }
 
         private static void GetFileErrors(LangFile file, List<LanguageError> fileErrors, XDocument master)
@@ -606,12 +635,17 @@ namespace Werewolf_Control.Helpers
             //check for CultConvertSerialKiller & CupidChosen duplication
             var dup = file.Doc.Descendants("string").Count(x => x.Attribute("key").Value == "CultConvertSerialKiller");
             if (dup > 1)
+            {
                 fileErrors.Add(new LanguageError(file.FileName, "CultConvertSerialKiller",
                     "CultConvertSerialKiller duplication", ErrorLevel.DuplicatedString));
+            }
+
             dup = file.Doc.Descendants("string").Count(x => x.Attribute("key").Value == "CupidChosen");
             if (dup > 1)
+            {
                 fileErrors.Add(new LanguageError(file.FileName, "CupidChosen", "CupidChosen duplication",
                     ErrorLevel.DuplicatedString));
+            }
 
             foreach (var str in masterStrings)
             {
@@ -627,19 +661,26 @@ namespace Werewolf_Control.Helpers
                 if (values == null)
                 {
                     if (!deprecated)
+                    {
                         fileErrors.Add(new LanguageError(file.FileName, key, $"Values missing"));
+                    }
+
                     continue;
                 }
 
                 //check master string for {#} values
-                int vars = 0;
-                for (int i = 0; i < 5; i++)
+                var vars = 0;
+                for (var i = 0; i < 5; i++)
+                {
                     if (masterString.Contains("{" + i + "}"))
+                    {
                         vars = i + 1;
+                    }
+                }
 
                 foreach (var value in values)
                 {
-                    for (int i = 0; i <= 5 - 1; i++)
+                    for (var i = 0; i <= 5 - 1; i++)
                     {
                         if (!value.Value.Contains("{" + i + "}") && vars - 1 >= i)
                         {
@@ -662,7 +703,9 @@ namespace Werewolf_Control.Helpers
 
                     if (value.Value.ToLower().Contains("/join") && !fileErrors.Any(x =>
                             x.File == file.FileName && x.Key == key && x.Level == ErrorLevel.JoinLink))
+                    {
                         fileErrors.Add(new LanguageError(file.FileName, key, "", ErrorLevel.JoinLink));
+                    }
 
                     if (new Regex(
                         @"((https?:\/\/)?t(elegram)?\.me\/joinchat\/([a-zA-Z0-9_\-]+))|( @(?!werewolfbot)(?!werewolfbetabot)(?!werewolfdev)(?!werewolfsupport)(?!para949)(?!greywolfdev)\w)",
@@ -680,11 +723,6 @@ namespace Werewolf_Control.Helpers
 
     public class LanguageError
     {
-        public string File { get; set; }
-        public string Key { get; set; }
-        public string Message { get; set; }
-        public ErrorLevel Level { get; set; }
-
         public LanguageError(string file, string key, string message, ErrorLevel level = ErrorLevel.MissingString)
         {
             File = file;
@@ -692,6 +730,11 @@ namespace Werewolf_Control.Helpers
             Message = message;
             Level = level;
         }
+
+        public string File { get; set; }
+        public string Key { get; set; }
+        public string Message { get; set; }
+        public ErrorLevel Level { get; set; }
     }
 
     public enum ErrorLevel

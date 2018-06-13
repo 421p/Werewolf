@@ -4547,7 +4547,11 @@ namespace Werewolf_Node
             }
 
             var p = Players?.FirstOrDefault(x => x.Id == banid);
-            if (p == null) return;
+            if (p == null)
+            {
+                return;
+            }
+
             if (p.IsDead)
             {
                 return;
