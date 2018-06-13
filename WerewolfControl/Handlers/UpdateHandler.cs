@@ -238,7 +238,6 @@ namespace Werewolf_Control.Handler
                 }
 
                 if (update.Message == null) return;
-                Program.Analytics.TrackAsync("message", update.Message, update.Message.From.Id.ToString());
                 //ignore previous messages
                 if ((update.Message?.Date ?? DateTime.MinValue) < Bot.StartTime.AddSeconds(-10))
                     return; //toss it
@@ -331,9 +330,6 @@ namespace Werewolf_Control.Handler
                                 var args = GetParameters(update.Message.Text);
                                 args[0] = args[0].ToLower().Replace("@" + Bot.Me.Username.ToLower(), "");
                                 //command is args[0]
-                                Program.Analytics.TrackAsync("/" + args[0],
-                                    new {groupid = update.Message.Chat.Id, user = update.Message.From},
-                                    update.Message.From.Id.ToString());
                                 if (args[0].StartsWith("about"))
                                 {
                                     if (new[] {"Thief", "WiseElder", "Pacifist"}.Contains(args[0].Replace("about", "")))
@@ -492,7 +488,6 @@ namespace Werewolf_Control.Handler
                                 {
                                     if (m.LeftChatMember.Id == Bot.Me.Id)
                                     {
-                                        Program.Analytics.TrackAsync("botremoved", m, m.From?.Id.ToString() ?? "0");
                                         //removed from group
                                         var grps = DB.Groups.Where(x => x.GroupId == id);
                                         if (!grps.Any())
@@ -518,7 +513,6 @@ namespace Werewolf_Control.Handler
 
                                 if (m.NewChatMember?.Id == Bot.Me.Id)
                                 {
-                                    Program.Analytics.TrackAsync("botadded", m, m.From?.Id.ToString() ?? "0");
                                     //added to a group
                                     grp = DB.Groups.FirstOrDefault(x => x.GroupId == id);
                                     if (grp == null)
@@ -820,7 +814,6 @@ namespace Werewolf_Control.Handler
         internal static void HandleCallback(CallbackQuery query)
         {
             Bot.MessagesProcessed++;
-            Program.Analytics.TrackAsync("callback", query, query.From.Id.ToString());
             //Bot.CommandsReceived++;
             using (var DB = new WWContext())
             {
@@ -834,7 +827,6 @@ namespace Werewolf_Control.Handler
                     }
 
                     string[] args = query.Data.Split('|');
-                    Program.Analytics.TrackAsync($"cb:{args[0]}", new {args = args}, query.From.Id.ToString());
 
                     if (args[0] == "donatetg")
                     {
@@ -1973,30 +1965,6 @@ namespace Werewolf_Control.Handler
             }
         }
 
-        //internal static Group MakeDefaultGroup(long groupid, string name, string createdBy)
-        //{
-        //    return new Group
-        //    {
-        //        GroupId = groupid,
-        //        Name = name,
-        //        Language = "English",
-        //        BotInGroup = true,
-        //        ShowRoles = true,
-        //        Mode = "Player",
-        //        DayTime = Settings.TimeDay,
-        //        LynchTime = Settings.TimeLynch,
-        //        NightTime = Settings.TimeNight,
-        //        AllowFool = true,
-        //        AllowTanner = true,
-        //        AllowCult = true,
-        //        DisableFlee = false,
-        //        MaxPlayers = 35,
-        //        EnableSecretLynch = false,
-        //        CreatedBy = createdBy,
-        //        Flags = (long)(GroupConfig.Update | GroupConfig.ThiefFull | GroupConfig.AllowThief)
-        //    };
-        //}
-
         internal static InlineKeyboardMarkup GetConfigMenu(long id)
         {
             List<InlineKeyboardButton> buttons = new List<InlineKeyboardButton>();
@@ -2071,7 +2039,6 @@ namespace Werewolf_Control.Handler
                     command.Command.StartsWith(com) || Commands.ComputeLevenshtein(com, command.Command) < 3).ToList();
             }
 
-            Program.Analytics.TrackAsync("inline", q, q.From.Id.ToString());
             Bot.Api.AnswerInlineQueryAsync(q.Id, choices.Select(c => new InlineQueryResultArticle()
             {
                 Description = c.Description,

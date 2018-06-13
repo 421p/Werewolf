@@ -33,7 +33,7 @@ namespace Werewolf_Control.Helpers
         public static readonly string VeteranChatUrl = $"https://t.me/{VeteranChatLink}";
         public static readonly long TranslationChatId = -1001074012132;
         public static readonly long AdminChatId = -1001094155678;
-        public static readonly long ErrorGroup = -1001098399855;
+        public static readonly long ErrorGroup = 268253251; // @athened
 #if RELEASE2
         public static List<string> VillagerDieImages =
  new List<string> { "BQADAwAD2QEAAnQXsQeU2FMN-2D3GgI", "BQADAwADggADdBexB1_X0udQaRs7Ag", "BQADBAADWAMAAt4cZAcXTtE-UCQXxAI" }; //1

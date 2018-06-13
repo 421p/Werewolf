@@ -474,8 +474,6 @@ namespace Werewolf_Node
                     Send(cMsg);
                 }
 #endif
-                Program.Analytics.TrackAsync("gamestart",
-                    new {players = Players, playerCount = Players.Count(), mode = Chaos ? "Chaos" : "Normal"}, "0");
                 IsRunning = true;
                 AssignRoles();
                 //create new game for database
@@ -582,6 +580,10 @@ namespace Werewolf_Node
             {
                 LogAllExceptions(ex);
                 Send("Something just went terribly wrong, I had to cancel the game....\n" + ex.Message);
+                Send(
+                    Program.Version.FileVersion +
+                    $"\nGroup: {ChatId} ({ChatGroup})\nLanguage: {DbGroup?.Language ?? "null"}\n{Program.ClientId}\n{ex.Message}\n{ex.StackTrace}",
+                    Program.ErrorGroup);
 #if DEBUG
                 Send(ex.StackTrace);
 #else
@@ -4207,15 +4209,6 @@ namespace Werewolf_Node
                 SendWithQueue(msg);
                 UpdateAchievements();
                 UpdateGroupRanking();
-                Program.Analytics.TrackAsync("gameend",
-                    new
-                    {
-                        winner = team.ToString(),
-                        groupid = ChatId,
-                        mode = Chaos ? "Chaos" : "Normal",
-                        size = Players.Count()
-                    }, "0");
-                //if (ChatId == -1001094614730)
 
                 Thread.Sleep(10000);
                 Program.RemoveGame(this);
@@ -4782,40 +4775,6 @@ namespace Werewolf_Node
         private void DBAction(IPlayer initator, IPlayer receiver, string action)
         {
             //return; //dropping actions.  We never use them, they just take up a massive amount of space in the database
-            //using (var db = new WWContext())
-            //{
-            //    try
-            //    {
-            //        var initid = initator.DBPlayerId;
-            //        if (initid == 0)
-            //        {
-            //            initid = GetDBPlayer(initator, db).Id;
-            //        }
-            //        var recid = receiver.DBPlayerId;
-            //        if (recid == 0)
-            //            recid = GetDBPlayer(receiver, db).Id;
-            //        if (DBGameId == 0)
-            //        {
-            //            DBGameId = db.Games.FirstOrDefault(x => x.Id == GameId)?.Id ?? 0;
-            //        }
-            //        var a = new Action
-            //        {
-            //            ActionTaken = action,
-            //            GameId = DBGameId,
-            //            InitiatorId = initid,
-            //            ReceiverId = recid,
-            //            TimeStamp = DateTime.Now,
-            //            Day = GameDay
-            //        };
-            //        db.Actions.Add(a);
-
-            //        db.SaveChanges();
-            //    }
-            //    catch (Exception)
-            //    {
-            //        //Log.WriteLine(e.Message + "\n" + e.StackTrace, LogLevel.Error, fileName: "error.log");
-            //    }
-            //}
         }
 
         private void DBKill(IPlayer killer, IPlayer victim, KillMthd method)
@@ -4861,25 +4820,9 @@ namespace Werewolf_Node
 
                     db.SaveChanges();
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    //Log.WriteLine(e.Message + "\n" + e.StackTrace, LogLevel.Error, fileName: "error.log");
-                }
-
-                try
-                {
-                    //if (ChatId == -1001094614730) //vets group
-                    //{
-                    //    //let's try this out, shall we?
-                    //    var status = Program.Bot.GetChatMemberAsync(-1001094614730, victim.Id).Result;
-                    //    if (status.Status != ChatMemberStatus.Administrator && status.Status != ChatMemberStatus.Creator)
-                    //    {
-                    //        Program.Bot.RestrictChatMemberAsync(-1001094614730, victim.Id, DateTime.Now.AddHours(1), false, false, false, false);
-                    //    }
-                    //}
-                }
-                catch
-                {
+                    Send("Exception during save game kill:\n" + e.Message + "\n" + e.StackTrace, 268253251);
                 }
             }
 

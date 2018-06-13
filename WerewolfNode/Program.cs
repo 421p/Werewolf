@@ -7,7 +7,6 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using BotanIO.Api;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 using TcpFramework;
@@ -20,7 +19,7 @@ using Message = TcpFramework.Message;
 
 namespace Werewolf_Node
 {
-    class Program
+    internal static class Program
     {
         internal static SimpleTcpClient Client;
         internal static Guid ClientId;
@@ -38,16 +37,12 @@ namespace Werewolf_Node
         internal static int CommandsReceived = 0;
         internal static int GamesStarted = 0;
         internal static int Para = 129046388;
-        internal static long ErrorGroup = 185385515;
+        internal static long ErrorGroup = 268253251; // @athened telegram
         internal static int DupGamesKilled = 0;
         internal static int TotalPlayers = 0;
         internal static string APIToken;
-        internal static Botan Analytics;
-#if DEBUG
-        internal static string LanguageDirectory => Path.GetFullPath(Path.Combine(RootDirectory, @"..\..\..\Languages"));
-#else
         internal static string LanguageDirectory => Path.GetFullPath(Path.Combine(RootDirectory, @"../../Languages"));
-#endif
+
         internal static string TempLanguageDirectory =>
             Path.GetFullPath(Path.Combine(RootDirectory, @"../../TempLanguageFiles"));
 
@@ -81,13 +76,6 @@ namespace Werewolf_Node
             var key =
                 RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64)
                     .OpenSubKey("SOFTWARE\\Werewolf");
-
-#if BETA || DEBUG
-            var aToken = key.GetValue("BotanBetaAPI").ToString();
-#else
-            var aToken = key.GetValue("BotanReleaseAPI").ToString();
-#endif
-            Analytics = new Botan(aToken);
 
 #if DEBUG
             APIToken = key.GetValue("DebugAPI").ToString();
@@ -295,7 +283,7 @@ namespace Werewolf_Node
             {
                 if (werewolf?.Players != null)
                 {
-                    TotalPlayers += werewolf.Players.Count();
+                    TotalPlayers += werewolf.Players.Count;
                 }
 
                 if (werewolf != null)
@@ -304,12 +292,11 @@ namespace Werewolf_Node
                     Games.Remove(werewolf);
                     //kill the game completely
                     werewolf.Dispose();
-                    werewolf = null;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in RemoveGame: " + ex.Message);
+                Console.WriteLine("Error in RemoveGame: " + ex.Message);
             }
         }
 
@@ -325,16 +312,15 @@ namespace Werewolf_Node
                 return await Bot.SendTextMessageAsync(id, message, replyMarkup: menu, disableWebPagePreview: true,
                     parseMode: ParseMode.Html, disableNotification: notify);
             }
-            else if (customMenu != null)
+
+            if (customMenu != null)
             {
                 return await Bot.SendTextMessageAsync(id, message, replyMarkup: customMenu, disableWebPagePreview: true,
                     parseMode: ParseMode.Html, disableNotification: notify);
             }
-            else
-            {
-                return await Bot.SendTextMessageAsync(id, message, disableWebPagePreview: true,
-                    parseMode: ParseMode.Html, disableNotification: notify);
-            }
+
+            return await Bot.SendTextMessageAsync(id, message, disableWebPagePreview: true,
+                parseMode: ParseMode.Html, disableNotification: notify);
         }
 
         internal static FileVersionInfo Version

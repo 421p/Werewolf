@@ -6,7 +6,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using BotanIO.Api;
 using Database;
 using Werewolf_Control.Handler;
 using Werewolf_Control.Helpers;
@@ -19,9 +18,6 @@ namespace Werewolf_Control
     {
         internal static bool Running = true;
         private static bool _writingInfo;
-
-        internal static PerformanceCounter CpuCounter =
-            new PerformanceCounter("Processor", "% Processor Time", "_Total");
 
         internal static float AvgCpuTime;
 
@@ -37,7 +33,6 @@ namespace Werewolf_Control
         public static int MaxGames;
         public static DateTime MaxTime = DateTime.MinValue;
         public static bool MaintMode = false;
-        internal static Botan Analytics;
 
         static void Main(string[] args)
         {
@@ -77,14 +72,6 @@ namespace Werewolf_Control
             {
                 updateid = args[0];
             }
-
-            //initialize analytics
-#if BETA || DEBUG
-            var aToken = Helpers.RegHelper.GetRegValue("BotanBetaAPI");
-#else
-            var aToken = RegHelper.GetRegValue("BotanReleaseAPI");
-#endif
-            Analytics = new Botan(aToken);
 
             //Initialize the TCP connections
             TCP.Initialize();
