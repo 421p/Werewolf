@@ -156,7 +156,7 @@ namespace Werewolf_Control
             var langs = Directory.GetFiles(Bot.LanguageDirectory, "*.xml").Select(x => new LangFile(x)).ToList();
 
 
-            List<InlineKeyboardCallbackButton> buttons = langs.Select(x => x.Base).Distinct().OrderBy(x => x)
+            var buttons = langs.Select(x => x.Base).Distinct().OrderBy(x => x)
                 .Select(x => new InlineKeyboardCallbackButton(x, $"setlang|{update.Message.From.Id}|{x}|null|base"))
                 .ToList();
 

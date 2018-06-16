@@ -53,11 +53,7 @@ namespace Werewolf_Control.Helpers
         internal delegate void ChatCommandMethod(Update u, string[] args);
 
         internal static readonly List<Command> Commands = new List<Command>();
-        #if DEBUG
         internal static string LanguageDirectory => Path.GetFullPath(Path.Combine(RootDirectory, @"../../Languages"));
-#else
-        internal static string LanguageDirectory => Path.GetFullPath(Path.Combine(RootDirectory, @"../../Languages"));
-        #endif
         internal static string TempLanguageDirectory =>
             Path.GetFullPath(Path.Combine(RootDirectory, @"../../TempLanguageFiles"));
 
@@ -67,15 +63,9 @@ namespace Werewolf_Control.Helpers
             var key =
                 RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64)
                     .OpenSubKey("SOFTWARE\\Werewolf");
-            #if DEBUG
+
             TelegramApiKey = key.GetValue("ProductionAPI").ToString();
-#elif RELEASE
-            TelegramApiKey = key.GetValue("ProductionAPI").ToString();
-            #elif RELEASE2
-            TelegramAPIKey = key.GetValue("ProductionAPI2").ToString();
-#elif BETA
-            TelegramAPIKey = key.GetValue("BetaAPI").ToString();
-#endif
+
             Api = new Client(TelegramApiKey, LogDirectory);
 
             English = XDocument.Load(Path.Combine(LanguageDirectory, "English.xml"));
@@ -164,20 +154,7 @@ namespace Werewolf_Control.Helpers
         {
             using (var db = new WWContext())
             {
-                var id =
-                    #if RELEASE
-                    1;
-                #elif RELEASE2
-                    2;
-#elif BETA
-                    3;
-#else
-                    4;
-#endif
-                if (id == 4)
-                {
-                    return;
-                }
+                var id = 1;
 
                 var b = db.BotStatus.Find(id);
                 b.BotStatus = statusChangeEventArgs.Status.ToString();

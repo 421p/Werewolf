@@ -269,7 +269,9 @@ namespace Werewolf_Node
             catch
             {
                 if (language != "English")
+                {
                     LoadLanguage("English");
+                }
             }
         }
 
@@ -286,23 +288,23 @@ namespace Werewolf_Node
                 var strings = Locale.File.Descendants("string").FirstOrDefault(x => x.Attribute("key")?.Value == key) ??
                               Program.English.Descendants("string")
                                   .FirstOrDefault(x => x.Attribute("key")?.Value == key);
-                if (strings != null)
-                {
-                    var values = strings.Descendants("value");
-                    var choice = Program.R.Next(values.Count());
-                    var selected = values.ElementAt(choice).Value;
-
-                    //disable bluetexting /join!
-                    if (selected.ToLower().Contains("/join"))
-                        throw new Exception("/join found in the string, using the English file.");
-
-                    return String.Format(selected.FormatHTML(), args).Replace("\\n", Environment.NewLine);
-                }
-                else
+                if (strings == null)
                 {
                     throw new Exception(
                         $"Error getting string {key} with parameters {(args != null && args.Length > 0 ? args.Aggregate((a, b) => a + "," + b.ToString()) : "none")}");
                 }
+
+                var values = strings.Descendants("value");
+                var choice = Program.R.Next(values.Count());
+                var selected = values.ElementAt(choice).Value;
+
+                //disable bluetexting /join!
+                if (selected.ToLower().Contains("/join"))
+                {
+                    throw new Exception("/join found in the string, using the English file.");
+                }
+
+                return string.Format(selected.FormatHTML(), args).Replace("\\n", Environment.NewLine);
             }
             catch (Exception e)
             {
@@ -312,15 +314,16 @@ namespace Werewolf_Node
                     var strings =
                         Program.English.Descendants("string").FirstOrDefault(x => x.Attribute("key")?.Value == key);
                     var values = strings?.Descendants("value");
-                    if (values != null)
+                    
+                    if (values == null)
                     {
-                        var choice = Program.R.Next(values.Count());
-                        var selected = values.ElementAt(choice).Value;
-                        // ReSharper disable once AssignNullToNotNullAttribute
-                        return String.Format(selected.FormatHTML(), args).Replace("\\n", Environment.NewLine);
-                    }
-                    else
                         throw new Exception("Cannot load english string for fallback");
+                    }
+
+                    var choice = Program.R.Next(values.Count());
+                    var selected = values.ElementAt(choice).Value;
+                    // ReSharper disable once AssignNullToNotNullAttribute
+                    return string.Format(selected.FormatHTML(), args).Replace("\\n", Environment.NewLine);
                 }
                 catch
                 {

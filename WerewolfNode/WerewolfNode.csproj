@@ -149,6 +149,10 @@
     <Reference Include="Telegram.Bot, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>../packages/Telegram.Bot.Core.13.2.0/lib/netstandard1.1/Telegram.Bot.dll</HintPath>
     </Reference>
+    <Reference Include="YamlDotNet, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\YamlDotNet.4.3.2\lib\net45\YamlDotNet.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helpers/Extensions.cs" />

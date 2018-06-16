@@ -205,7 +205,7 @@
           <Property Name="Flags" Type="bigint" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'werewolf.dbo.GroupAdmin' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'werewolf.GroupAdmin' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="GroupAdmin">
           <Key>
             <PropertyRef Name="GroupId" />
@@ -254,7 +254,7 @@ warning 6002: The table/view 'werewolf.dbo.GroupAdmin' does not have a primary k
           <Property Name="Name" Type="nvarchar" MaxLength="50" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'werewolf.dbo.NotifyGame' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'werewolf.NotifyGame' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="NotifyGame">
           <Key>
             <PropertyRef Name="UserId" />
@@ -311,7 +311,7 @@ warning 6002: The table/view 'werewolf.dbo.NotifyGame' does not have a primary k
           <Property Name="Date" Type="datetime" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'werewolf.db_owner.v_InactivePlayersMain' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'werewolf.v_InactivePlayersMain' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="v_InactivePlayersMain">
           <Key>
             <PropertyRef Name="Id" />
@@ -324,7 +324,7 @@ warning 6002: The table/view 'werewolf.db_owner.v_InactivePlayersMain' does not 
           <Property Name="last" Type="datetime" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'werewolf.db_owner.v_NonDefaultGroups' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'werewolf.v_NonDefaultGroups' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="v_NonDefaultGroups">
           <Key>
             <PropertyRef Name="Name" />
@@ -350,7 +350,7 @@ warning 6002: The table/view 'werewolf.db_owner.v_NonDefaultGroups' does not hav
           <Property Name="GroupId" Type="bigint" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'werewolf.db_owner.v_PreferredGroups' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'werewolf.v_PreferredGroups' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="v_PreferredGroups">
           <Key>
             <PropertyRef Name="Id" />
@@ -366,7 +366,7 @@ warning 6002: The table/view 'werewolf.db_owner.v_PreferredGroups' does not have
           <Property Name="GroupLink" Type="nvarchar(max)" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'werewolf.db_owner.v_PublicGroups' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'werewolf.v_PublicGroups' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="v_PublicGroups">
           <Key>
             <PropertyRef Name="Id" />
@@ -379,7 +379,7 @@ warning 6002: The table/view 'werewolf.db_owner.v_PublicGroups' does not have a 
           <Property Name="GroupLink" Type="nvarchar(max)" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'werewolf.db_owner.v_WaitList' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'werewolf.v_WaitList' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="v_WaitList">
           <Key>
             <PropertyRef Name="Name" />
@@ -389,7 +389,7 @@ warning 6002: The table/view 'werewolf.db_owner.v_WaitList' does not have a prim
           <Property Name="Expr1" Type="nvarchar(max)" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'werewolf.dbo.v_GroupRanking' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'werewolf.v_GroupRanking' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="v_GroupRanking">
           <Key>
             <PropertyRef Name="GroupId" />
@@ -408,7 +408,7 @@ warning 6002: The table/view 'werewolf.dbo.v_GroupRanking' does not have a prima
           <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'werewolf.dbo.v_IdleKill24HoursMain' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'werewolf.v_IdleKill24HoursMain' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="v_IdleKill24HoursMain">
           <Key>
             <PropertyRef Name="Name" />
@@ -583,42 +583,42 @@ warning 6002: The table/view 'werewolf.dbo.v_IdleKill24HoursMain' does not have 
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Function Name="getDailyCounts" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
-        <Function Name="GetIdleKills24Hours" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+        <Function Name="getDailyCounts" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="werewolf" />
+        <Function Name="GetIdleKills24Hours" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="werewolf">
           <Parameter Name="userid" Type="int" Mode="In" />
         </Function>
-        <Function Name="getPlayTime" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+        <Function Name="getPlayTime" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="werewolf">
           <Parameter Name="playerCount" Type="int" Mode="In" />
         </Function>
-        <Function Name="getRoles" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+        <Function Name="getRoles" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="werewolf">
           <Parameter Name="groupName" Type="nvarchar(max)" Mode="In" />
         </Function>
-        <Function Name="GlobalDay1Death" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
-        <Function Name="GlobalDay1Lynch" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
-        <Function Name="GlobalNight1Death" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
-        <Function Name="GlobalSurvivor" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
-        <Function Name="GroupDay1Death" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+        <Function Name="GlobalDay1Death" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="werewolf" />
+        <Function Name="GlobalDay1Lynch" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="werewolf" />
+        <Function Name="GlobalNight1Death" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="werewolf" />
+        <Function Name="GlobalSurvivor" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="werewolf" />
+        <Function Name="GroupDay1Death" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="werewolf">
           <Parameter Name="groupid" Type="bigint" Mode="In" />
         </Function>
-        <Function Name="GroupDay1Lynch" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+        <Function Name="GroupDay1Lynch" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="werewolf">
           <Parameter Name="groupid" Type="bigint" Mode="In" />
         </Function>
-        <Function Name="GroupNight1Death" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+        <Function Name="GroupNight1Death" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="werewolf">
           <Parameter Name="groupid" Type="bigint" Mode="In" />
         </Function>
-        <Function Name="GroupSurvivor" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+        <Function Name="GroupSurvivor" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="werewolf">
           <Parameter Name="groupid" Type="bigint" Mode="In" />
         </Function>
-        <Function Name="PlayerMostKilled" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+        <Function Name="PlayerMostKilled" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="werewolf">
           <Parameter Name="pid" Type="int" Mode="In" />
         </Function>
-        <Function Name="PlayerMostKilledBy" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+        <Function Name="PlayerMostKilledBy" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="werewolf">
           <Parameter Name="pid" Type="int" Mode="In" />
         </Function>
-        <Function Name="PlayerRoles" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+        <Function Name="PlayerRoles" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="werewolf">
           <Parameter Name="pid" Type="int" Mode="In" />
         </Function>
-        <Function Name="RestoreAccount" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+        <Function Name="RestoreAccount" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="werewolf">
           <Parameter Name="oldTGId" Type="int" Mode="In" />
           <Parameter Name="newTGId" Type="int" Mode="In" />
         </Function>
@@ -626,111 +626,111 @@ warning 6002: The table/view 'werewolf.dbo.v_IdleKill24HoursMain' does not have 
           <EntitySet Name="BotStatus" EntityType="Self.BotStatus" Schema="db_owner" store:Type="Tables" />
           <EntitySet Name="ContestTerms" EntityType="Self.ContestTerms" Schema="db_owner" store:Type="Tables" />
           <EntitySet Name="GlobalBan" EntityType="Self.GlobalBan" Schema="db_owner" store:Type="Tables" />
-          <EntitySet Name="__MigrationHistory" EntityType="Self.__MigrationHistory" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Admin" EntityType="Self.Admin" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="AspNetRoles" EntityType="Self.AspNetRoles" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="AspNetUserClaims" EntityType="Self.AspNetUserClaims" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="AspNetUserLogins" EntityType="Self.AspNetUserLogins" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="AspNetUserRoles" EntityType="Self.AspNetUserRoles" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="AspNetUsers" EntityType="Self.AspNetUsers" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="DailyCount" EntityType="Self.DailyCount" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Game" EntityType="Self.Game" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="GameKill" EntityType="Self.GameKill" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="GamePlayer" EntityType="Self.GamePlayer" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="GlobalStats" EntityType="Self.GlobalStats" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Group" EntityType="Self.Group" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="GroupRanking" EntityType="Self.GroupRanking" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="GroupStats" EntityType="Self.GroupStats" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="KillMethod" EntityType="Self.KillMethod" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Player" EntityType="Self.Player" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="PlayerStats" EntityType="Self.PlayerStats" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="RefreshDate" EntityType="Self.RefreshDate" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="GroupAdmin" EntityType="Self.GroupAdmin" store:Type="Tables" store:Schema="dbo">
+          <EntitySet Name="__MigrationHistory" EntityType="Self.__MigrationHistory" Schema="werewolf" store:Type="Tables" />
+          <EntitySet Name="Admin" EntityType="Self.Admin" Schema="werewolf" store:Type="Tables" />
+          <EntitySet Name="AspNetRoles" EntityType="Self.AspNetRoles" Schema="werewolf" store:Type="Tables" />
+          <EntitySet Name="AspNetUserClaims" EntityType="Self.AspNetUserClaims" Schema="werewolf" store:Type="Tables" />
+          <EntitySet Name="AspNetUserLogins" EntityType="Self.AspNetUserLogins" Schema="werewolf" store:Type="Tables" />
+          <EntitySet Name="AspNetUserRoles" EntityType="Self.AspNetUserRoles" Schema="werewolf" store:Type="Tables" />
+          <EntitySet Name="AspNetUsers" EntityType="Self.AspNetUsers" Schema="werewolf" store:Type="Tables" />
+          <EntitySet Name="DailyCount" EntityType="Self.DailyCount" Schema="werewolf" store:Type="Tables" />
+          <EntitySet Name="Game" EntityType="Self.Game" Schema="werewolf" store:Type="Tables" />
+          <EntitySet Name="GameKill" EntityType="Self.GameKill" Schema="werewolf" store:Type="Tables" />
+          <EntitySet Name="GamePlayer" EntityType="Self.GamePlayer" Schema="werewolf" store:Type="Tables" />
+          <EntitySet Name="GlobalStats" EntityType="Self.GlobalStats" Schema="werewolf" store:Type="Tables" />
+          <EntitySet Name="Group" EntityType="Self.Group" Schema="werewolf" store:Type="Tables" />
+          <EntitySet Name="GroupRanking" EntityType="Self.GroupRanking" Schema="werewolf" store:Type="Tables" />
+          <EntitySet Name="GroupStats" EntityType="Self.GroupStats" Schema="werewolf" store:Type="Tables" />
+          <EntitySet Name="KillMethod" EntityType="Self.KillMethod" Schema="werewolf" store:Type="Tables" />
+          <EntitySet Name="Player" EntityType="Self.Player" Schema="werewolf" store:Type="Tables" />
+          <EntitySet Name="PlayerStats" EntityType="Self.PlayerStats" Schema="werewolf" store:Type="Tables" />
+          <EntitySet Name="RefreshDate" EntityType="Self.RefreshDate" Schema="werewolf" store:Type="Tables" />
+          <EntitySet Name="GroupAdmin" EntityType="Self.GroupAdmin" store:Type="Tables" store:Schema="werewolf">
             <DefiningQuery>SELECT 
-    [GroupAdmin].[GroupId] AS [GroupId], 
-    [GroupAdmin].[PlayerId] AS [PlayerId]
-    FROM [dbo].[GroupAdmin] AS [GroupAdmin]</DefiningQuery>
+    GroupAdmin.GroupId AS GroupId, 
+    GroupAdmin.PlayerId AS PlayerId
+    FROM GroupAdmin AS GroupAdmin</DefiningQuery>
           </EntitySet>
-          <EntitySet Name="NotifyGame" EntityType="Self.NotifyGame" store:Type="Tables" store:Schema="dbo">
+          <EntitySet Name="NotifyGame" EntityType="Self.NotifyGame" store:Type="Tables" store:Schema="werewolf">
             <DefiningQuery>SELECT 
-    [NotifyGame].[UserId] AS [UserId], 
-    [NotifyGame].[GroupId] AS [GroupId]
-    FROM [dbo].[NotifyGame] AS [NotifyGame]</DefiningQuery>
+    NotifyGame.UserId AS UserId, 
+    NotifyGame.GroupId AS GroupId
+    FROM NotifyGame AS NotifyGame</DefiningQuery>
           </EntitySet>
           <EntitySet Name="v_InactivePlayersMain" EntityType="Self.v_InactivePlayersMain" store:Type="Views" store:Schema="db_owner">
             <DefiningQuery>SELECT 
-    [v_InactivePlayersMain].[Id] AS [Id], 
-    [v_InactivePlayersMain].[Name] AS [Name], 
-    [v_InactivePlayersMain].[TelegramId] AS [TelegramId], 
-    [v_InactivePlayersMain].[last] AS [last]
-    FROM [db_owner].[v_InactivePlayersMain] AS [v_InactivePlayersMain]</DefiningQuery>
+    v_InactivePlayersMain.Id AS Id, 
+    v_InactivePlayersMain.Name AS Name, 
+    v_InactivePlayersMain.TelegramId AS TelegramId, 
+    v_InactivePlayersMain.last AS last
+    FROM v_InactivePlayersMain AS v_InactivePlayersMain</DefiningQuery>
           </EntitySet>
           <EntitySet Name="v_NonDefaultGroups" EntityType="Self.v_NonDefaultGroups" store:Type="Views" store:Schema="db_owner">
             <DefiningQuery>SELECT 
-    [v_NonDefaultGroups].[Name] AS [Name], 
-    [v_NonDefaultGroups].[Language] AS [Language], 
-    [v_NonDefaultGroups].[ShowRoles] AS [ShowRoles], 
-    [v_NonDefaultGroups].[ShowRolesEnd] AS [ShowRolesEnd], 
-    [v_NonDefaultGroups].[Mode] AS [Mode], 
-    [v_NonDefaultGroups].[DayTime] AS [DayTime], 
-    [v_NonDefaultGroups].[NightTime] AS [NightTime], 
-    [v_NonDefaultGroups].[LynchTime] AS [LynchTime], 
-    [v_NonDefaultGroups].[AllowFool] AS [AllowFool], 
-    [v_NonDefaultGroups].[AllowTanner] AS [AllowTanner], 
-    [v_NonDefaultGroups].[AllowCult] AS [AllowCult], 
-    [v_NonDefaultGroups].[UserName] AS [UserName], 
-    [v_NonDefaultGroups].[BotInGroup] AS [BotInGroup], 
-    [v_NonDefaultGroups].[DisableNotification] AS [DisableNotification], 
-    [v_NonDefaultGroups].[MaxPlayers] AS [MaxPlayers], 
-    [v_NonDefaultGroups].[DisableFlee] AS [DisableFlee], 
-    [v_NonDefaultGroups].[Preferred] AS [Preferred], 
-    [v_NonDefaultGroups].[GroupId] AS [GroupId]
-    FROM [db_owner].[v_NonDefaultGroups] AS [v_NonDefaultGroups]</DefiningQuery>
+    v_NonDefaultGroups.Name AS Name, 
+    v_NonDefaultGroups.Language AS Language, 
+    v_NonDefaultGroups.ShowRoles AS ShowRoles, 
+    v_NonDefaultGroups.ShowRolesEnd AS ShowRolesEnd, 
+    v_NonDefaultGroups.Mode AS Mode, 
+    v_NonDefaultGroups.DayTime AS DayTime, 
+    v_NonDefaultGroups.NightTime AS NightTime, 
+    v_NonDefaultGroups.LynchTime AS LynchTime, 
+    v_NonDefaultGroups.AllowFool AS AllowFool, 
+    v_NonDefaultGroups.AllowTanner AS AllowTanner, 
+    v_NonDefaultGroups.AllowCult AS AllowCult, 
+    v_NonDefaultGroups.UserName AS UserName, 
+    v_NonDefaultGroups.BotInGroup AS BotInGroup, 
+    v_NonDefaultGroups.DisableNotification AS DisableNotification, 
+    v_NonDefaultGroups.MaxPlayers AS MaxPlayers, 
+    v_NonDefaultGroups.DisableFlee AS DisableFlee, 
+    v_NonDefaultGroups.Preferred AS Preferred, 
+    v_NonDefaultGroups.GroupId AS GroupId
+    FROM v_NonDefaultGroups AS v_NonDefaultGroups</DefiningQuery>
           </EntitySet>
           <EntitySet Name="v_PreferredGroups" EntityType="Self.v_PreferredGroups" store:Type="Views" store:Schema="db_owner">
             <DefiningQuery>SELECT 
-    [v_PreferredGroups].[Id] AS [Id], 
-    [v_PreferredGroups].[Name] AS [Name], 
-    [v_PreferredGroups].[GroupId] AS [GroupId], 
-    [v_PreferredGroups].[Language] AS [Language], 
-    [v_PreferredGroups].[UserName] AS [UserName], 
-    [v_PreferredGroups].[Description] AS [Description], 
-    [v_PreferredGroups].[GroupLink] AS [GroupLink]
-    FROM [db_owner].[v_PreferredGroups] AS [v_PreferredGroups]</DefiningQuery>
+    v_PreferredGroups.Id AS Id, 
+    v_PreferredGroups.Name AS Name, 
+    v_PreferredGroups.GroupId AS GroupId, 
+    v_PreferredGroups.Language AS Language, 
+    v_PreferredGroups.UserName AS UserName, 
+    v_PreferredGroups.Description AS Description, 
+    v_PreferredGroups.GroupLink AS GroupLink
+    FROM v_PreferredGroups AS v_PreferredGroups</DefiningQuery>
           </EntitySet>
           <EntitySet Name="v_PublicGroups" EntityType="Self.v_PublicGroups" store:Type="Views" store:Schema="db_owner">
             <DefiningQuery>SELECT 
-    [v_PublicGroups].[Id] AS [Id], 
-    [v_PublicGroups].[Name] AS [Name], 
-    [v_PublicGroups].[Language] AS [Language], 
-    [v_PublicGroups].[MemberCount] AS [MemberCount], 
-    [v_PublicGroups].[GroupLink] AS [GroupLink]
-    FROM [db_owner].[v_PublicGroups] AS [v_PublicGroups]</DefiningQuery>
+    v_PublicGroups.Id AS Id, 
+    v_PublicGroups.Name AS Name, 
+    v_PublicGroups.Language AS Language, 
+    v_PublicGroups.MemberCount AS MemberCount, 
+    v_PublicGroups.GroupLink AS GroupLink
+    FROM v_PublicGroups AS v_PublicGroups</DefiningQuery>
           </EntitySet>
           <EntitySet Name="v_WaitList" EntityType="Self.v_WaitList" store:Type="Views" store:Schema="db_owner">
             <DefiningQuery>SELECT 
-    [v_WaitList].[Name] AS [Name], 
-    [v_WaitList].[Expr1] AS [Expr1]
-    FROM [db_owner].[v_WaitList] AS [v_WaitList]</DefiningQuery>
+    v_WaitList.Name AS Name, 
+    v_WaitList.Expr1 AS Expr1
+    FROM v_WaitList AS v_WaitList</DefiningQuery>
           </EntitySet>
-          <EntitySet Name="v_GroupRanking" EntityType="Self.v_GroupRanking" store:Type="Views" store:Schema="dbo">
+          <EntitySet Name="v_GroupRanking" EntityType="Self.v_GroupRanking" store:Type="Views" store:Schema="werewolf">
             <DefiningQuery>SELECT 
-    [v_GroupRanking].[GroupId] AS [GroupId], 
-    [v_GroupRanking].[TelegramId] AS [TelegramId], 
-    [v_GroupRanking].[Language] AS [Language], 
-    [v_GroupRanking].[Description] AS [Description], 
-    [v_GroupRanking].[GroupLink] AS [GroupLink], 
-    [v_GroupRanking].[Ranking] AS [Ranking], 
-    [v_GroupRanking].[LastRefresh] AS [LastRefresh], 
-    [v_GroupRanking].[Name] AS [Name]
-    FROM [dbo].[v_GroupRanking] AS [v_GroupRanking]</DefiningQuery>
+    v_GroupRanking.GroupId AS GroupId, 
+    v_GroupRanking.TelegramId AS TelegramId, 
+    v_GroupRanking.Language AS Language, 
+    v_GroupRanking.Description AS Description, 
+    v_GroupRanking.GroupLink AS GroupLink, 
+    v_GroupRanking.Ranking AS Ranking, 
+    v_GroupRanking.LastRefresh AS LastRefresh, 
+    v_GroupRanking.Name AS Name
+    FROM v_GroupRanking AS v_GroupRanking</DefiningQuery>
           </EntitySet>
-          <EntitySet Name="v_IdleKill24HoursMain" EntityType="Self.v_IdleKill24HoursMain" store:Type="Views" store:Schema="dbo">
+          <EntitySet Name="v_IdleKill24HoursMain" EntityType="Self.v_IdleKill24HoursMain" store:Type="Views" store:Schema="werewolf">
             <DefiningQuery>SELECT 
-    [v_IdleKill24HoursMain].[Idles] AS [Idles], 
-    [v_IdleKill24HoursMain].[Name] AS [Name], 
-    [v_IdleKill24HoursMain].[UserName] AS [UserName]
-    FROM [dbo].[v_IdleKill24HoursMain] AS [v_IdleKill24HoursMain]</DefiningQuery>
+    v_IdleKill24HoursMain.Idles AS Idles, 
+    v_IdleKill24HoursMain.Name AS Name, 
+    v_IdleKill24HoursMain.UserName AS UserName
+    FROM v_IdleKill24HoursMain AS v_IdleKill24HoursMain</DefiningQuery>
           </EntitySet>
           <AssociationSet Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" Association="Self.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId">
             <End Role="AspNetUsers" EntitySet="AspNetUsers" />

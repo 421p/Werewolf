@@ -7,6 +7,8 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 using Microsoft.Win32;
+using MySql.Data.Entity;
+
 namespace Database
 {
     using System;
@@ -15,6 +17,7 @@ namespace Database
     using System.Data.Entity.Core.Objects;
     using System.Linq;
     
+    [DbConfigurationType(typeof(MySqlEFConfiguration))]
     public partial class WWContext : DbContext
     {
         public WWContext()
@@ -111,40 +114,40 @@ namespace Database
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GlobalSurvivor_Result1>("GlobalSurvivor");
         }
     
-        public virtual ObjectResult<GroupDay1Death_Result1> GroupDay1Death(Nullable<long> groupid)
+        public virtual ObjectResult<GroupDay1Death_Result1> GroupDay1Death(Nullable<long> GroupId)
         {
-            var groupidParameter = groupid.HasValue ?
-                new ObjectParameter("groupid", groupid) :
-                new ObjectParameter("groupid", typeof(long));
+            var GroupIdParameter = GroupId.HasValue ?
+                new ObjectParameter("GroupId", GroupId) :
+                new ObjectParameter("GroupId", typeof(long));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GroupDay1Death_Result1>("GroupDay1Death", groupidParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GroupDay1Death_Result1>("GroupDay1Death", GroupIdParameter);
         }
     
-        public virtual ObjectResult<GroupDay1Lynch_Result1> GroupDay1Lynch(Nullable<long> groupid)
+        public virtual ObjectResult<GroupDay1Lynch_Result1> GroupDay1Lynch(Nullable<long> GroupId)
         {
-            var groupidParameter = groupid.HasValue ?
-                new ObjectParameter("groupid", groupid) :
-                new ObjectParameter("groupid", typeof(long));
+            var GroupIdParameter = GroupId.HasValue ?
+                new ObjectParameter("GroupId", GroupId) :
+                new ObjectParameter("GroupId", typeof(long));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GroupDay1Lynch_Result1>("GroupDay1Lynch", groupidParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GroupDay1Lynch_Result1>("GroupDay1Lynch", GroupIdParameter);
         }
     
-        public virtual ObjectResult<GroupNight1Death_Result1> GroupNight1Death(Nullable<long> groupid)
+        public virtual ObjectResult<GroupNight1Death_Result1> GroupNight1Death(Nullable<long> GroupId)
         {
-            var groupidParameter = groupid.HasValue ?
-                new ObjectParameter("groupid", groupid) :
-                new ObjectParameter("groupid", typeof(long));
+            var GroupIdParameter = GroupId.HasValue ?
+                new ObjectParameter("GroupId", GroupId) :
+                new ObjectParameter("GroupId", typeof(long));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GroupNight1Death_Result1>("GroupNight1Death", groupidParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GroupNight1Death_Result1>("GroupNight1Death", GroupIdParameter);
         }
     
-        public virtual ObjectResult<GroupSurvivor_Result1> GroupSurvivor(Nullable<long> groupid)
+        public virtual ObjectResult<GroupSurvivor_Result1> GroupSurvivor(Nullable<long> GroupId)
         {
-            var groupidParameter = groupid.HasValue ?
-                new ObjectParameter("groupid", groupid) :
-                new ObjectParameter("groupid", typeof(long));
+            var GroupIdParameter = GroupId.HasValue ?
+                new ObjectParameter("GroupId", GroupId) :
+                new ObjectParameter("GroupId", typeof(long));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GroupSurvivor_Result1>("GroupSurvivor", groupidParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GroupSurvivor_Result1>("GroupSurvivor", GroupIdParameter);
         }
     
         public virtual ObjectResult<getDailyCounts_Result> getDailyCounts()
@@ -155,8 +158,8 @@ namespace Database
         public virtual ObjectResult<Nullable<int>> GetIdleKills24Hours(Nullable<int> userid)
         {
             var useridParameter = userid.HasValue ?
-                new ObjectParameter("userid", userid) :
-                new ObjectParameter("userid", typeof(int));
+                new ObjectParameter("UserId", userid) :
+                new ObjectParameter("UserId", typeof(int));
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<Nullable<int>>("GetIdleKills24Hours", useridParameter);
         }

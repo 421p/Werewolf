@@ -153,7 +153,7 @@ namespace Werewolf_Control.Helpers
             GetFileErrors(langfile, errors, master);
 
             //send the result
-            var result = $"*{langfile.FileName}.xml* (Last updated: {langfile.LatestUpdate.ToString("MMM dd")})" +
+            var result = $"*{langfile.FileName}.xml* (Last updated: {langfile.LatestUpdate:MMM dd})" +
                          Environment.NewLine;
             if (errors.Any(x => x.Level == ErrorLevel.Ads))
             {

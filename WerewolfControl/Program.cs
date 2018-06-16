@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using Database;
 using Werewolf_Control.Handler;
 using Werewolf_Control.Helpers;
@@ -35,23 +36,19 @@ namespace Werewolf_Control
 
         private static void Main(string[] args)
         {
-            #if !DEBUG
             AppDomain.CurrentDomain.UnhandledException += (sender, eventArgs) =>
             {
-                //drop the error to log file and exit
-                using (var sw = new StreamWriter(Path.Combine(Bot.RootDirectory, "../Logs/error.log"), true))
+                var e = eventArgs.ExceptionObject as Exception;
+
+                Console.WriteLine(DateTime.UtcNow);
+                Console.WriteLine(e.Message);
+                Console.WriteLine(e.StackTrace + "\n");
+
+                if (eventArgs.IsTerminating)
                 {
-                    var e = eventArgs.ExceptionObject as Exception;
-                    sw.WriteLine(DateTime.UtcNow);
-                    sw.WriteLine(e.Message);
-                    sw.WriteLine(e.StackTrace + "\n");
-                    if (eventArgs.IsTerminating)
-                    {
-                        Environment.Exit(5);
-                    }
+                    Environment.Exit(5);
                 }
             };
-            #endif
 
             //get the version of the bot and set the window title
             var assembly = Assembly.GetExecutingAssembly();
@@ -86,13 +83,11 @@ namespace Werewolf_Control
             }
 
             //start up the bot
-            new Thread(() => Bot.Initialize(updateid)).Start();
-            new Thread(NodeMonitor).Start();
+            Task.Run(() => Bot.Initialize(updateid));
+            Task.Run(() => NodeMonitor());
+            Task.Run(() => UpdateHandler.SpamDetection());
+            Task.Run(() => UpdateHandler.BanMonitor());
 
-            //new Thread(CpuMonitor).Start();
-            new Thread(UpdateHandler.SpamDetection).Start();
-            new Thread(UpdateHandler.BanMonitor).Start();
-            //new Thread(MessageMonitor).Start();
             _timer = new Timer();
             _timer.Elapsed += TimerOnTick;
             _timer.Interval = 1000;
@@ -155,41 +150,6 @@ namespace Werewolf_Control
 
         public static void Log(string s, bool error = false) { }
 
-        private static void MessageMonitor()
-        {
-            while (Running)
-            {
-                try
-                {
-                    var newMessages = Bot.MessagesProcessed - _previousMessages;
-                    _previousMessages = Bot.MessagesProcessed;
-                    MessagesProcessed.Insert(0, newMessages);
-                    if (MessagesProcessed.Count > 10)
-                    {
-                        MessagesProcessed.RemoveAt(10);
-                    }
-
-                    MessagePxPerSecond = (float) MessagesProcessed.Average() / 10;
-
-                    newMessages = Bot.MessagesSent + _nodeMessagesSent - _previousMessagesTx;
-                    _previousMessagesTx = Bot.MessagesSent + _nodeMessagesSent;
-                    MessagesSent.Insert(0, newMessages);
-                    if (MessagesSent.Count > 10)
-                    {
-                        MessagesSent.RemoveAt(10);
-                    }
-
-                    MessageTxPerSecond = (float) MessagesSent.Average() / 10;
-                }
-                catch
-                {
-                    // ignored
-                }
-
-                Thread.Sleep(1000);
-            }
-        }
-
         internal static string GetFullInfo()
         {
             var nodes = Bot.Nodes.OrderBy(x => x.Version).ToList();
@@ -219,7 +179,7 @@ namespace Werewolf_Control
                 $"`Msgs Tx  : {messagesTx}`\n" +
                 $"`MPS (IN) : {MessagePxPerSecond}`\n" +
                 $"`MPS (OUT): {MessageTxPerSecond}`\n" +
-                $"`Max Games: {MaxGames} at {MaxTime.ToString("T")}`\n\n";
+                $"`Max Games: {MaxGames} at {MaxTime:T}`\n\n";
 
 
             try
@@ -274,7 +234,7 @@ namespace Werewolf_Control
                         $"Uptime: {uptime}\n" +
                         $"Messages Rx: {messagesRx}\tCommands Rx: {commandsRx}\tMessages Tx: {messagesTx}\n" +
                         $"Messages Per Second (IN): {MessagePxPerSecond}\tMessage Per Second (OUT): {MessageTxPerSecond}\t\n" +
-                        $"Max Games: {MaxGames} at {MaxTime.ToString("T")}\t\n\n";
+                        $"Max Games: {MaxGames} at {MaxTime:T}\t\n\n";
 
 
                     try
@@ -299,7 +259,7 @@ namespace Werewolf_Control
                     Console.CursorTop = 0;
                     //var xpos = Console.CursorLeft;
                     Console.CursorLeft = 0;
-                    //Console.Clear();
+                    Console.Clear();
                     //write the info
                     Console.WriteLine(msg);
                     //put the cursor back;

@@ -93,47 +93,14 @@ namespace Werewolf_Control
                 replyMarkup: menu);
         }
 
-        [Attributes.Command(Trigger = "uploadlang", GlobalAdminOnly = true)]
-        public static void UploadLang(Update update, string[] args)
-        {
-            try
-            {
-                var id = update.Message.Chat.Id;
-                if (update.Message.ReplyToMessage?.Type != MessageType.DocumentMessage)
-                {
-                    Send("Please reply to the file with /uploadlang", id);
-                    return;
-                }
-
-                var filename = update.Message.ReplyToMessage.Document?.FileName;
-                if (string.IsNullOrEmpty(filename) || !filename.ToLower().EndsWith(".xml"))
-                {
-                    Send("The file must be an XML file! (*.xml)", id);
-                    return;
-                }
-
-                var fileid = update.Message.ReplyToMessage.Document?.FileId;
-                if (fileid != null)
-                {
-                    LanguageHelper.UploadFile(fileid, id,
-                        update.Message.ReplyToMessage.Document.FileName,
-                        update.Message.MessageId);
-                }
-            }
-            catch (Exception e)
-            {
-                Bot.Api.SendTextMessageAsync(update.Message.Chat.Id, e.Message, parseMode: ParseMode.Default);
-            }
-        }
-
-        [Attributes.Command(Trigger = "getban", GlobalAdminOnly = true)]
+       [Attributes.Command(Trigger = "getban", GlobalAdminOnly = true)]
         public static void GetUserStatus(Update u, string[] a)
         {
             using (var db = new WWContext())
             {
                 var p = u.GetTarget(db);
                 var ban = db.GlobalBans.FirstOrDefault(x => x.TelegramId == p.TelegramId);
-                var status = "";
+                string status;
                 if (ban != null)
                 {
                     status =
@@ -145,8 +112,7 @@ namespace Werewolf_Control
                     }
                     else
                     {
-                        status += string.Format("Ban expiration: <b>{0:%d} days, {0:%h} hours, {0:%m} minutes</b>",
-                            expire);
+                        status += string.Format("Ban expiration: <b>{0:%d} days, {0:%h} hours, {0:%m} minutes</b>",expire);
                     }
                 }
                 else
