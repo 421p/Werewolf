@@ -102,7 +102,7 @@ namespace Werewolf_Control
                     Send(GetLocaleString("SentPrivate", GetLanguage(update.Message.From.Id)), update.Message.Chat.Id);
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 RequestPM(update.Message.Chat.Id);
                 return;

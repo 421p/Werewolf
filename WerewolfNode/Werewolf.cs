@@ -3301,12 +3301,17 @@ namespace Werewolf_Node
                                     break;
                                 case IRole.Harlot:
                                     if (target.Choice == 0 || target.Choice == -1) // stayed home
+                                    {
                                         ConvertToCult(target, voteCult, Settings.HarlotConversionChance);
+                                    }
                                     else
                                     {
                                         foreach (var c in voteCult)
+                                        {
                                             Send(GetLocaleString("CultVisitEmpty", newbie.GetName(), target.GetName()),
                                                 c.Id);
+                                        }
+
                                         //Send(GetLocaleString("CultAttempt"), target.Id);
                                     }
 
