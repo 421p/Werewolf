@@ -9,13 +9,9 @@
     <Import_RootNamespace>Languages</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="$(MSBuildThisFileDirectory)English.xml" />
-    <Content Include="$(MSBuildThisFileDirectory)EnglishNSFW.xml" />
+    <Content Include="$(MSBuildThisFileDirectory)English.yaml" />
     <Content Include="$(MSBuildThisFileDirectory)Goosian.yaml" />
-    <Content Include="$(MSBuildThisFileDirectory)Russian.xml" />
     <Content Include="$(MSBuildThisFileDirectory)Russian.yaml" />
-    <Content Include="$(MSBuildThisFileDirectory)RussianAccurate.xml" />
-    <Content Include="$(MSBuildThisFileDirectory)RussianNSFW.xml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)commit.bat" />

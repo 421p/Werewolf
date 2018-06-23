@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Database;
+using LanguageFileConverter;
 using Newtonsoft.Json;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types;
@@ -1173,8 +1174,8 @@ namespace Werewolf_Control.Handler
                                 $"Groups changed: {grpcount}\nPlayers changed: {plcount}\nTotal rows changed: {grpcount + plcount}";
                             try
                             {
-                                File.Delete(Path.Combine(Bot.LanguageDirectory, oldfilename + ".xml"));
-                                msg += $"\n\nSuccessfully deleted {oldfilename}.xml";
+                                File.Delete(Path.Combine(Bot.LanguageDirectory, oldfilename + ".yaml"));
+                                msg += $"\n\nSuccessfully deleted {oldfilename}.yaml";
                             }
                             catch (Exception e)
                             {
@@ -1440,7 +1441,7 @@ namespace Werewolf_Control.Handler
 
                         case "lang":
                             //load up each file and get the names
-                            var langs = Directory.GetFiles(Bot.LanguageDirectory, "*.xml").Select(x => new LangFile(x))
+                            var langs = Directory.GetFiles(Bot.LanguageDirectory, "*.yaml").Select(x => new LangFile(x))
                                 .ToList();
 
                             buttons.Clear();
@@ -1896,7 +1897,7 @@ namespace Werewolf_Control.Handler
         internal static LangFile SelectLanguage(string command, string[] args, ref InlineKeyboardMarkup menu,
             bool addAllbutton = true)
         {
-            var langs = Directory.GetFiles(Bot.LanguageDirectory, "*.xml").Select(x => new LangFile(x)).ToList();
+            var langs = Directory.GetFiles(Bot.LanguageDirectory, "*.yaml").Select(x => new LangFile(x)).ToList();
             var isBase = args[4] == "base";
             if (isBase)
             {
@@ -1943,7 +1944,7 @@ namespace Werewolf_Control.Handler
             XDocument doc;
             var file = files.First(x => Path.GetFileNameWithoutExtension(x) == language);
             {
-                doc = XDocument.Load(file);
+                doc = LanguageConverter.Load(file);
             }
             var strings = doc.Descendants("string").FirstOrDefault(x => x.Attribute("key").Value == key);
             if (strings == null)

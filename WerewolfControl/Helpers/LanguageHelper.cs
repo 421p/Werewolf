@@ -9,6 +9,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Xml.Linq;
+using LanguageFileConverter;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineKeyboardButtons;
@@ -21,7 +22,7 @@ namespace Werewolf_Control.Helpers
     {
         public LangFile(string path)
         {
-            Doc = XDocument.Load(path);
+            Doc = LanguageConverter.Load(path);
             Name = Doc.Descendants("language").First().Attribute("name")?.Value;
             Base = Doc.Descendants("language").First().Attribute("base")?.Value;
             Variant = Doc.Descendants("language").First().Attribute("variant")?.Value;
@@ -48,7 +49,7 @@ namespace Werewolf_Control.Helpers
         {
             if (LastGet < DateTime.UtcNow.AddMinutes(60))
             {
-                var files = Directory.GetFiles(Bot.LanguageDirectory, "*.xml");
+                var files = Directory.GetFiles(Bot.LanguageDirectory, "*.yaml");
                 var temp = files.Select(file => new LangFile(file)).ToList();
                 _langFiles = temp;
                 LastGet = DateTime.UtcNow;
@@ -62,9 +63,9 @@ namespace Werewolf_Control.Helpers
             var errors = new List<LanguageError>();
 
             //first, let's load up the English file, which is our master file
-            var master = XDocument.Load(Path.Combine(Bot.LanguageDirectory, "English.xml"));
+            var master = LanguageConverter.Load(Path.Combine(Bot.LanguageDirectory, "English.yaml"));
 
-            foreach (var langfile in Directory.GetFiles(Bot.LanguageDirectory).Where(x => !x.EndsWith("English.xml"))
+            foreach (var langfile in Directory.GetFiles(Bot.LanguageDirectory).Where(x => !x.EndsWith("English.yaml"))
                 .Select(x => new LangFile(x)))
             {
                 if (langfile.Base == choice || choice == null)
@@ -84,8 +85,8 @@ namespace Werewolf_Control.Helpers
             var result = "";
             foreach (var file in errors.Select(x => x.File).Distinct().ToList())
             {
-                var langfile = new LangFile(Path.Combine(Bot.LanguageDirectory, $"{file}.xml"));
-                result += $"*{langfile.FileName}.xml* (Last updated: {langfile.LatestUpdate.ToString("MMM dd")})\n";
+                var langfile = new LangFile(Path.Combine(Bot.LanguageDirectory, $"{file}.yaml"));
+                result += $"*{langfile.FileName}.yaml* (Last updated: {langfile.LatestUpdate.ToString("MMM dd")})\n";
                 if (errors.Any(x => x.Level == ErrorLevel.Ads))
                 {
                     result += "*Ads detected:";
@@ -130,7 +131,7 @@ namespace Werewolf_Control.Helpers
             result =
                 $"*Validation complete*\nErrors: {errors.Count(x => x.Level == ErrorLevel.Error)}\nMissing strings: {errors.Count(x => x.Level == ErrorLevel.MissingString)}";
             result +=
-                $"\nMost recently updated file: {sortedfiles.Last().FileName}.xml ({sortedfiles.Last().LatestUpdate.ToString("MMM dd")})\nLeast recently updated file: {sortedfiles.First().FileName}.xml ({sortedfiles.First().LatestUpdate.ToString("MMM dd")})";
+                $"\nMost recently updated file: {sortedfiles.Last().FileName}.yaml ({sortedfiles.Last().LatestUpdate.ToString("MMM dd")})\nLeast recently updated file: {sortedfiles.First().FileName}.yaml ({sortedfiles.First().LatestUpdate.ToString("MMM dd")})";
 
             Bot.Api.EditMessageTextAsync(id, msgId, result, ParseMode.Markdown);
         }
@@ -141,7 +142,7 @@ namespace Werewolf_Control.Helpers
             var langfile = new LangFile(filePath);
 
             //first, let's load up the English file, which is our master file
-            var master = XDocument.Load(Path.Combine(Bot.LanguageDirectory, "English.xml"));
+            var master = LanguageConverter.Load(Path.Combine(Bot.LanguageDirectory, "English.yaml"));
 
             //first check the language node
             CheckLanguageNode(langfile, errors);
@@ -153,7 +154,7 @@ namespace Werewolf_Control.Helpers
             GetFileErrors(langfile, errors, master);
 
             //send the result
-            var result = $"*{langfile.FileName}.xml* (Last updated: {langfile.LatestUpdate:MMM dd})" +
+            var result = $"*{langfile.FileName}.yaml* (Last updated: {langfile.LatestUpdate:MMM dd})" +
                          Environment.NewLine;
             if (errors.Any(x => x.Level == ErrorLevel.Ads))
             {
@@ -225,8 +226,8 @@ namespace Werewolf_Control.Helpers
             //ok, we have the file.  Now we need to determine the language, scan it and the original file.
             var newFileErrors = new List<LanguageError>();
             //first, let's load up the English file, which is our master file
-            var langs = Directory.GetFiles(Bot.LanguageDirectory, "*.xml").Select(x => new LangFile(x));
-            var master = XDocument.Load(Path.Combine(Bot.LanguageDirectory, "English.xml"));
+            var langs = Directory.GetFiles(Bot.LanguageDirectory, "*.yaml").Select(x => new LangFile(x));
+            var master = LanguageConverter.Load(Path.Combine(Bot.LanguageDirectory, "English.yaml"));
             var newFile = new LangFile(newFilePath);
 
             //make sure it has a complete langnode
@@ -250,7 +251,7 @@ namespace Werewolf_Control.Helpers
             {
                 //problem....
                 newFileErrors.Add(new LanguageError(newFile.FileName, "*Language Node*",
-                    $"ERROR: The following file partially matches the same language node. Please check the file name, and the language name, base and variant. Aborting.\n\n*{error.FileName}.xml*\n_Name:_{error.Name}\n_Base:_{error.Base}\n_Variant:_{error.Variant}",
+                    $"ERROR: The following file partially matches the same language node. Please check the file name, and the language name, base and variant. Aborting.\n\n*{error.FileName}.yaml*\n_Name:_{error.Name}\n_Base:_{error.Base}\n_Variant:_{error.Variant}",
                     ErrorLevel.FatalError));
             }
 
@@ -310,14 +311,14 @@ namespace Werewolf_Control.Helpers
             var msg = "Moving file to production..\n";
             msg += "Checking paths for duplicate language file...\n";
             Bot.Api.EditMessageTextAsync(id, msgId, msg);
-            fileName += ".xml";
+            fileName += ".yaml";
             var tempPath = Bot.TempLanguageDirectory;
             var langPath = Bot.LanguageDirectory;
             var newFilePath = Path.Combine(tempPath, fileName);
             var copyToPath = Path.Combine(langPath, fileName);
 
             //get the new files language
-            var doc = XDocument.Load(newFilePath);
+            var doc = LanguageConverter.Load(newFilePath);
 
             var newFileLang = new
             {
@@ -370,14 +371,14 @@ namespace Werewolf_Control.Helpers
             File.Copy(newFilePath, gitPath, true);
             File.Delete(newFilePath);
             msg += $"File copied to git directory\n";
-            if (newFilePath.EndsWith("English.xml"))
+            if (newFilePath.EndsWith("English.yaml"))
             {
                 var p = new Process
                 {
                     StartInfo =
                     {
                         FileName = @"C:\Werewolf Source\Werewolf\Werewolf for Telegram\Languages\commit.bat",
-                        Arguments = $"\"Syncing langfiles from Telegram (English.xml update)\"",
+                        Arguments = $"\"Syncing langfiles from Telegram (English.yaml update)\"",
                         WorkingDirectory = @"C:\Werewolf Source\Werewolf\Werewolf for Telegram\Languages",
                         UseShellExecute = false,
                         RedirectStandardOutput = true,
@@ -464,7 +465,7 @@ namespace Werewolf_Control.Helpers
             var langOptions = Directory.GetFiles(Bot.LanguageDirectory).Select(x => new LangFile(x));
             var option = langOptions.First(x => x.Name == choice);
             var fs = new FileStream(option.FilePath, FileMode.Open);
-            Bot.Api.SendDocumentAsync(id, new FileToSend(option.FileName + ".xml", fs));
+            Bot.Api.SendDocumentAsync(id, new FileToSend(option.FileName + ".yaml", fs));
         }
 
         internal static void SendBase(string choice, long id)
@@ -488,8 +489,8 @@ namespace Werewolf_Control.Helpers
                         .Where(x => x.Base == choice); //get the base
                     foreach (var lang in langs)
                     {
-                        zip.CreateEntryFromFile(Path.Combine(Bot.LanguageDirectory, $"{lang.FileName}.xml"),
-                            $"{lang.FileName}.xml", CompressionLevel.Optimal); //add the langs to the zipfile
+                        zip.CreateEntryFromFile(Path.Combine(Bot.LanguageDirectory, $"{lang.FileName}.yaml"),
+                            $"{lang.FileName}.yaml", CompressionLevel.Optimal); //add the langs to the zipfile
                     }
                 }
 
@@ -536,7 +537,7 @@ namespace Werewolf_Control.Helpers
         private static string OutputResult(LangFile newFile, List<LanguageError> newFileErrors, LangFile curFile,
                                            List<LanguageError> curFileErrors)
         {
-            var result = $"NEW FILE\n*{newFile.FileName}.xml - ({newFile.Name ?? ""})*" + Environment.NewLine;
+            var result = $"NEW FILE\n*{newFile.FileName}.yaml - ({newFile.Name ?? ""})*" + Environment.NewLine;
             if (newFileErrors.Any(x => x.Level == ErrorLevel.Ads))
             {
                 result += "*ADS DETECTED*\n";
@@ -594,7 +595,7 @@ namespace Werewolf_Control.Helpers
             {
                 result += "\n\n";
                 result +=
-                    $"OLD FILE (Last updated: {curFile.LatestUpdate.ToString("MMM dd")})\n*{curFile.FileName}.xml - ({curFile.Name})*\n";
+                    $"OLD FILE (Last updated: {curFile.LatestUpdate.ToString("MMM dd")})\n*{curFile.FileName}.yaml - ({curFile.Name})*\n";
                 result +=
                     $"Errors: {curFileErrors.Count(x => x.Level == ErrorLevel.Error)}\nMissing strings: {curFileErrors.Count(x => x.Level == ErrorLevel.MissingString)}";
             }
@@ -605,8 +606,7 @@ namespace Werewolf_Control.Helpers
                     "\nPlease double check the filename, and the language name, base and variant, as you won't be able to change them.";
                 result += $"\n_Name:_ {newFile.Name ?? ""}";
                 result += $"\n_Base:_ {newFile.Base ?? ""}";
-                if (!Directory.GetFiles(Bot.LanguageDirectory, "*.xml").Select(x => new LangFile(x))
-                    .Any(x => x.Base == newFile.Base))
+                if (Directory.GetFiles(Bot.LanguageDirectory, "*.yaml").Select(x => new LangFile(x)).All(x => x.Base != newFile.Base))
                 {
                     result += " *(NEW)*";
                 }

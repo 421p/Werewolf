@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Database;
+using LanguageFileConverter;
 using Microsoft.Win32;
 using Telegram.Bot;
 using Telegram.Bot.Args;
@@ -68,7 +69,7 @@ namespace Werewolf_Control.Helpers
 
             Api = new Client(TelegramApiKey, LogDirectory);
 
-            English = XDocument.Load(Path.Combine(LanguageDirectory, "English.xml"));
+            English = LanguageConverter.Load(Path.Combine(LanguageDirectory, "English.yaml"));
 
             //load the commands list
             foreach (var m in typeof(Commands).GetMethods())

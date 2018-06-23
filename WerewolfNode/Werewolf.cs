@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Database;
+using LanguageFileConverter;
 using Newtonsoft.Json;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -251,7 +252,7 @@ namespace Werewolf_Node
                 var files = Directory.GetFiles(Program.LanguageDirectory);
                 var file = files.First(x => Path.GetFileNameWithoutExtension(x) == language);
                 {
-                    var doc = XDocument.Load(file);
+                    var doc = LanguageConverter.Load(file);
                     Locale = new Locale
                     {
                         Language = Path.GetFileNameWithoutExtension(file),

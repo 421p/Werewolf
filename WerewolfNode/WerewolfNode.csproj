@@ -187,6 +187,10 @@
       <Project>{acb86d9a-837c-4bb6-83fa-99fe4dc7d3e4}</Project>
       <Name>TcpFramework</Name>
     </ProjectReference>
+    <ProjectReference Include="..\LanguageFileConverter\LanguageFileConverter.csproj">
+      <Project>{fcd23604-bec8-49e7-b879-ac885865e74d}</Project>
+      <Name>LanguageFileConverter</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)/Microsoft.CSharp.targets" />
   <PropertyGroup>

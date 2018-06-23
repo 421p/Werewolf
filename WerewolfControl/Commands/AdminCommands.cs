@@ -147,7 +147,7 @@ namespace Werewolf_Control
             //    replyToMessageId: update.Message.MessageId, replyMarkup: menu);
 
 
-            var langs = Directory.GetFiles(Bot.LanguageDirectory, "*.xml").Select(x => new LangFile(x)).ToList();
+            var langs = Directory.GetFiles(Bot.LanguageDirectory, "*.yaml").Select(x => new LangFile(x)).ToList();
 
 
             var buttons = langs.Select(x => x.Base).Distinct().OrderBy(x => x)

@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Database;
+using LanguageFileConverter;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineKeyboardButtons;
@@ -194,7 +195,7 @@ namespace Werewolf_Control
                 XDocument doc;
                 var file = files.First(x => Path.GetFileNameWithoutExtension(x) == language);
                 {
-                    doc = XDocument.Load(file);
+                    doc = LanguageConverter.Load(file);
                 }
                 var strings = doc.Descendants("string").FirstOrDefault(x => x.Attribute("key").Value == key) ??
                               Bot.English.Descendants("string").FirstOrDefault(x => x.Attribute("key").Value == key);
@@ -331,7 +332,7 @@ namespace Werewolf_Control
             XDocument doc;
             var file = files.First(x => Path.GetFileNameWithoutExtension(x) == baseName);
             {
-                doc = XDocument.Load(file);
+                doc = LanguageConverter.Load(file);
             }
             var langNode = doc.Descendants("language").First();
             return $"{langNode.Attribute("base").Value}"; // - {langNode.Attribute("variant").Value}
@@ -344,13 +345,13 @@ namespace Werewolf_Control
             XDocument doc;
             var file = files.First(x => Path.GetFileNameWithoutExtension(x) == language);
             {
-                doc = XDocument.Load(file);
+                doc = LanguageConverter.Load(file);
             }
             var strings = doc.Descendants("string")
                 .FirstOrDefault(x => x.Attribute("key").Value.ToLower() == args[0].ToLower());
             if (strings == null)
             {
-                var efile = XDocument.Load(Path.Combine(Bot.LanguageDirectory, "English.xml"));
+                var efile = LanguageConverter.Load(Path.Combine(Bot.LanguageDirectory, "English.yaml"));
                 strings =
                     efile.Descendants("string")
                         .FirstOrDefault(x => x.Attribute("key").Value.ToLower() == args[0].ToLower());

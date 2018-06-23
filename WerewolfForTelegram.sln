@@ -22,6 +22,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Telegram.Bot", "Telegram.Bo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegistrySaver", "RegistrySaver\RegistrySaver.csproj", "{46778EC5-A29A-4CBC-BC65-1681382401A8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LanguageFileConverter", "LanguageFileConverter\LanguageFileConverter.csproj", "{FCD23604-BEC8-49E7-B879-AC885865E74D}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Languages/Languages.projitems*{594fdc40-26dc-4edd-9c16-c79b3ad35e9d}*SharedItemsImports = 13
@@ -82,6 +84,14 @@ Global
 		{46778EC5-A29A-4CBC-BC65-1681382401A8}.Release 2|Any CPU.Build.0 = Debug|Any CPU
 		{46778EC5-A29A-4CBC-BC65-1681382401A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{46778EC5-A29A-4CBC-BC65-1681382401A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCD23604-BEC8-49E7-B879-AC885865E74D}.Beta|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCD23604-BEC8-49E7-B879-AC885865E74D}.Beta|Any CPU.Build.0 = Debug|Any CPU
+		{FCD23604-BEC8-49E7-B879-AC885865E74D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCD23604-BEC8-49E7-B879-AC885865E74D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCD23604-BEC8-49E7-B879-AC885865E74D}.Release 2|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCD23604-BEC8-49E7-B879-AC885865E74D}.Release 2|Any CPU.Build.0 = Debug|Any CPU
+		{FCD23604-BEC8-49E7-B879-AC885865E74D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCD23604-BEC8-49E7-B879-AC885865E74D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

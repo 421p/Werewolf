@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using LanguageFileConverter;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 using TcpFramework;
@@ -66,7 +67,7 @@ namespace Werewolf_Node
                     sw.WriteLine("--------------------------------------------------------");
                 }
             };
-            English = XDocument.Load(Path.Combine(LanguageDirectory, "English.xml"));
+            English = LanguageConverter.Load(Path.Combine(LanguageDirectory, "English.yaml"));
 
 
             //get api token from registry
