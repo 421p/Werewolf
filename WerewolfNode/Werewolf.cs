@@ -133,7 +133,7 @@ namespace Werewolf_Node
                     {
                         // ignored
                     }
-#if !BETA
+                    #if !BETA
                     var player = db.Players.FirstOrDefault(x => x.TelegramId == u.Id);
                     if (player?.CustomGifSet != null)
                     {
@@ -153,7 +153,7 @@ namespace Werewolf_Node
                             }
                         }
                     }
-#endif
+                    #endif
                     DbGroup.UpdateFlags();
                     ShowIDs = DbGroup.HasFlag(GroupConfig.ShowIDs);
                     RandomMode = DbGroup.HasFlag(GroupConfig.RandomMode);
@@ -208,14 +208,14 @@ namespace Werewolf_Node
                         $"https://t.me/{Program.Me.Username}?start=" + deeplink)
                 });
                 FirstMessage = GetLocaleString(Chaos ? "PlayerStartedChaosGame" : "PlayerStartedGame", u.FirstName);
-#if DEBUG
+                #if DEBUG
                 _joinMsgId =
  Program.Bot.SendDocumentAsync(chatid, new FileToSend("CgADAwADmAIAAnQXsQdKO62ILjJQMQI"), FirstMessage, replyMarkup: _joinButton).Result.MessageId;
 #else
                 _joinMsgId = Program.Bot.SendDocumentAsync(chatid,
                     new FileToSend(GetRandomImage(Chaos ? StartChaosGame : StartGame)), FirstMessage,
                     replyMarkup: _joinButton).Result.MessageId;
-#endif
+                #endif
 
                 //let's keep this on for a while, then we will delete it
                 SendWithQueue(GetLocaleString("NoAutoJoin",
@@ -228,10 +228,10 @@ namespace Werewolf_Node
             {
                 while (ex.InnerException != null)
                     ex = ex.InnerException;
-                
-                
+
+
                 LogException(ex);
-                
+
                 Program.RemoveGame(this);
             }
         }
@@ -308,7 +308,7 @@ namespace Werewolf_Node
                     var strings =
                         Program.English.Descendants("string").FirstOrDefault(x => x.Attribute("key")?.Value == key);
                     var values = strings?.Descendants("value");
-                    
+
                     if (values == null)
                     {
                         throw new Exception("Cannot load english string for fallback");
@@ -440,7 +440,7 @@ namespace Werewolf_Node
                 SendWithQueue(GetLocaleString("StartingGameWait"));
                 _playerListChanged = true;
 
-#if !BETA
+                #if !BETA
                 if (Players.Count(x => x.GifPack?.Approved ?? false) > 0)
                 {
                     var cMsg = "Players with custom gif packs:\n";
@@ -472,7 +472,7 @@ namespace Werewolf_Node
 
                     Send(cMsg);
                 }
-#endif
+                #endif
                 IsRunning = true;
                 AssignRoles();
                 //create new game for database
@@ -507,14 +507,14 @@ namespace Werewolf_Node
                         p.Language = dbp.Language;
 
                         db.SaveChanges();
-                        
+
                         var gamePlayer = new GamePlayer
                         {
                             GameId = game.Id,
                             Survived = true,
                             Role = p.PlayerRole.ToString()
                         };
-                        
+
                         dbp.GamePlayers.Add(gamePlayer);
                         db.SaveChanges();
 
@@ -558,7 +558,7 @@ namespace Werewolf_Node
                     CheckRoleChanges();
                     CheckLongHaul();
                     DayCycle();
-                    
+
                     if (!IsRunning)
                     {
                         break;
@@ -572,7 +572,6 @@ namespace Werewolf_Node
             catch (Exception ex)
             {
                 LogAllExceptions(ex);
-
             }
             finally
             {
@@ -1048,7 +1047,7 @@ namespace Werewolf_Node
         }
 
         private Task<Telegram.Bot.Types.Message> Send(string message, long id = 0, bool clearKeyboard = false,
-            InlineKeyboardMarkup menu = null, bool notify = false)
+                                                      InlineKeyboardMarkup menu = null, bool notify = false)
         {
             if (id == 0)
                 id = ChatId;
@@ -1061,11 +1060,11 @@ namespace Werewolf_Node
             if (id == 0)
                 id = ChatId;
             //Log.WriteLine($"{id} -> {image} {text}");
-#if (DEBUG)
+            #if (DEBUG)
             Send(text, id);
 #else
             Program.Bot.SendDocumentAsync(id, new FileToSend(image), text);
-#endif
+            #endif
         }
 
         private void SendWithQueue(string text, string gif = null, bool requestPM = false)
@@ -1149,12 +1148,12 @@ namespace Werewolf_Node
                         if (!String.IsNullOrEmpty(final))
                             Send(final);
                         Thread.Sleep(500);
-#if !DEBUG
+                        #if !DEBUG
                         _messageQueue.Dequeue();
                         SendGif(m.Msg, m.GifId);
                         Thread.Sleep(500);
                         final = "";
-#else
+                        #else
                         var temp = final + m.Msg + Environment.NewLine + Environment.NewLine;
                         if (Encoding.UTF8.GetByteCount(temp) > 512 && i > 1)
                         {
@@ -1421,8 +1420,15 @@ namespace Werewolf_Node
                 var attempts = 0;
                 var nonVgRoles = new[]
                 {
-                    IRole.Cultist, IRole.SerialKiller, IRole.Tanner, IRole.Wolf, IRole.AlphaWolf, IRole.Sorcerer,
-                    IRole.WolfCub, IRole.Lycan, IRole.Thief
+                    IRole.Cultist,
+                    IRole.SerialKiller,
+                    IRole.Tanner,
+                    IRole.Wolf,
+                    IRole.AlphaWolf,
+                    IRole.Sorcerer,
+                    IRole.WolfCub,
+                    IRole.Lycan,
+                    IRole.Thief
                 };
 
                 do
@@ -1508,7 +1514,7 @@ namespace Werewolf_Node
                 rolesToAssign.Shuffle();
 
 
-#if DEBUG
+                #if DEBUG
 //force roles for testing
                 rolesToAssign[0] = IRole.WolfMan;
                 rolesToAssign[1] = IRole.Seer;
@@ -1967,7 +1973,12 @@ namespace Werewolf_Node
 
                     if (!new[]
                     {
-                        IRole.Mason, IRole.Wolf, IRole.AlphaWolf, IRole.WolfCub, IRole.Cultist, IRole.WildChild,
+                        IRole.Mason,
+                        IRole.Wolf,
+                        IRole.AlphaWolf,
+                        IRole.WolfCub,
+                        IRole.Cultist,
+                        IRole.WildChild,
                         IRole.Lycan
                     }.Contains(p.PlayerRole))
                     {
@@ -2399,17 +2410,26 @@ namespace Werewolf_Node
                     {
                         lynched.IsDead = true;
                         lynched.TimeDied = DateTime.Now;
-                        if (lynched.PlayerRole == IRole.Seer && GameDay == 1)
-                            AddAchievement(lynched, Achievements.LackOfTrust);
-                        if (lynched.PlayerRole == IRole.Prince && lynched.HasUsedAbility)
-                            AddAchievement(lynched, Achievements.SpoiledRichBrat);
+
+                        switch (lynched.PlayerRole)
+                        {
+                            case IRole.Seer when GameDay == 1:
+                                AddAchievement(lynched, Achievements.LackOfTrust);
+                                break;
+                            case IRole.Prince when lynched.HasUsedAbility:
+                                AddAchievement(lynched, Achievements.SpoiledRichBrat);
+                                break;
+                        }
+
                         SendWithQueue(GetLocaleString("LynchKill", lynched.GetName(),
                             DbGroup.HasFlag(GroupConfig.ShowRolesDeath)
                                 ? $"{lynched.GetName()} {GetLocaleString("Was")} {GetDescription(lynched.PlayerRole)}"
                                 : ""));
 
                         if (lynched.InLove)
+                        {
                             KillLover(lynched);
+                        }
 
                         //effects on game depending on the lynched's role
                         switch (lynched.PlayerRole)
@@ -2442,7 +2462,9 @@ namespace Werewolf_Node
                     SendWithQueue(GetLocaleString("LynchTie"));
                     var t = choices.FirstOrDefault(x => x.PlayerRole == IRole.Tanner);
                     if (t != null)
+                    {
                         AddAchievement(t, Achievements.SoClose);
+                    }
                 }
                 else
                 {
@@ -2454,30 +2476,39 @@ namespace Werewolf_Node
             catch (Exception e)
             {
                 while (e.InnerException != null)
+                {
                     e = e.InnerException;
+                }
 
 
                 Send(e.Message + " " + e.StackTrace, 268253251);
-#if DEBUG
-                Send(e.StackTrace);
-#else
                 LogException(e);
-#endif
                 Program.RemoveGame(this);
             }
         }
 
         private void DayCycle()
         {
-            if (!IsRunning) return;
+            if (!IsRunning)
+            {
+                return;
+            }
+
             Time = GameTime.Day;
 
             //see who died over night
-            if (Players == null) return;
+            if (Players == null)
+            {
+                return;
+            }
+
             foreach (var p in Players)
+            {
                 p.CurrentQuestion = null;
+            }
+
             var timeToAdd = Math.Max(((Players.Count(x => !x.IsDead) / 5) - 1) * 30, 60);
-#if DEBUG
+            #if DEBUG
             Settings.TimeDay = 20;
             timeToAdd = 0;
 #endif
@@ -2489,7 +2520,11 @@ namespace Werewolf_Node
             //incremental sleep time for large players....
             Thread.Sleep(TimeSpan.FromSeconds((DbGroup.DayTime ?? Settings.TimeDay) + timeToAdd));
 
-            if (!IsRunning) return;
+            if (!IsRunning)
+            {
+                return;
+            }
+
             try
             {
                 foreach (var p in Players.Where(x => x.CurrentQuestion != null))
@@ -2518,7 +2553,11 @@ namespace Werewolf_Node
             }
 
             //check detective
-            if (Players == null) return;
+            if (Players == null)
+            {
+                return;
+            }
+
             var detect = Players.FirstOrDefault(x =>
                 x.PlayerRole == IRole.Detective & !x.IsDead && x.Choice != 0 && x.Choice != -1);
             if (detect != null)
@@ -2544,11 +2583,16 @@ namespace Werewolf_Node
                     //if snooped non-bad-roles:
                     if (!new[] {IRole.Wolf, IRole.AlphaWolf, IRole.WolfCub, IRole.Cultist, IRole.SerialKiller}.Contains(
                         check.PlayerRole))
+                    {
                         detect.CorrectSnooped.Clear(); //clear correct snoop list
+                    }
                     else
                     {
                         if (detect.CorrectSnooped.Contains(check.Id)) //check if it is a re-snoop of correct roles
+                        {
                             detect.CorrectSnooped.Clear(); //clear the correct snoop list
+                        }
+
                         detect.CorrectSnooped.Add(check.Id); //add the current snoop to list
 
                         //if snooped 4 times correct continously
@@ -2573,10 +2617,16 @@ namespace Werewolf_Node
                     gunner.HasUsedAbility = true;
                     check.IsDead = true;
                     if (check.PlayerRole == IRole.WolfCub)
+                    {
                         WolfCubKilled = true;
+                    }
+
                     if (!new[] {IRole.Wolf, IRole.AlphaWolf, IRole.WolfCub, IRole.Cultist, IRole.SerialKiller}.Contains(
                         check.PlayerRole))
+                    {
                         gunner.BulletHitVillager = true;
+                    }
+
                     check.TimeDied = DateTime.Now;
                     //update database
                     DBKill(gunner, check, KillMthd.Shoot);
@@ -2618,7 +2668,11 @@ namespace Werewolf_Node
             //FUN!
             Time = GameTime.Night;
             var nightStart = DateTime.Now;
-            if (CheckForGameEnd(true)) return;
+            if (CheckForGameEnd(true))
+            {
+                return;
+            }
+
             foreach (var p in Players)
             {
                 p.Choice = 0;
@@ -2630,8 +2684,12 @@ namespace Werewolf_Node
                 if (p.Bitten && !p.IsDead && !WolfRoles.Contains(p.PlayerRole))
                 {
                     if (p.PlayerRole == IRole.Mason)
+                    {
                         foreach (var m in Players.Where(x => x.PlayerRole == IRole.Mason & !x.IsDead && x.Id != p.Id))
+                        {
                             Send(GetLocaleString("MasonConverted", p.GetName()), m.Id);
+                        }
+                    }
 
                     p.Bitten = false;
                     p.PlayerRole = IRole.Wolf;
@@ -3929,7 +3987,9 @@ namespace Werewolf_Node
 
             if (alivePlayers.Any(x => x.Team == ITeam.SerialKiller)
             ) //there is still SK alive, do nothing (surely more than two players)
+            {
                 return false;
+            }
 
             //is everyone left a cultist?
             if (alivePlayers.All(x => x.Team == ITeam.Cult))
@@ -4723,7 +4783,7 @@ namespace Werewolf_Node
         }
 
         internal static void ReplyToCallback(CallbackQuery query, string text = null, bool edit = true,
-            bool showAlert = false, InlineKeyboardMarkup replyMarkup = null)
+                                             bool showAlert = false, InlineKeyboardMarkup replyMarkup = null)
         {
             //first answer the callback
             Program.Bot.AnswerCallbackQueryAsync(query.Id, edit ? null : text, showAlert);
@@ -4733,13 +4793,13 @@ namespace Werewolf_Node
         }
 
         internal static Task<Telegram.Bot.Types.Message> Edit(CallbackQuery query, string text,
-            InlineKeyboardMarkup replyMarkup = null)
+                                                              InlineKeyboardMarkup replyMarkup = null)
         {
             return Edit(query.Message.Chat.Id, query.Message.MessageId, text, replyMarkup);
         }
 
         internal static Task<Telegram.Bot.Types.Message> Edit(long id, int msgId, string text,
-            InlineKeyboardMarkup replyMarkup = null)
+                                                              InlineKeyboardMarkup replyMarkup = null)
         {
             Program.MessagesSent++;
             return Program.Bot.EditMessageTextAsync(id, msgId, text, replyMarkup: replyMarkup);

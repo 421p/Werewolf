@@ -203,9 +203,6 @@ namespace Werewolf_Control
         {
             //wait a bit to allow nodes to register
             Thread.Sleep(2000);
-            #if !DEBUG
-            Updater.MonitorUpdates();
-            #endif
             while (Running)
             {
                 try
@@ -281,7 +278,8 @@ namespace Werewolf_Control
 
                     if (!MaintMode)
                     {
-                        if (nodes.Where(x => !x.ShuttingDown).All(x => x.Games.Count >= Settings.NewNodeThreshhold) || nodes.All(x => x.ShuttingDown))
+                        if (nodes.Where(x => !x.ShuttingDown).All(x => x.Games.Count >= Settings.NewNodeThreshhold) ||
+                            nodes.All(x => x.ShuttingDown))
                         {
                             node = NewNode();
                             Thread.Sleep(5000); //give the node time to register
@@ -302,25 +300,8 @@ namespace Werewolf_Control
         {
             //all nodes have quite a few games, let's spin up another
             //this is a bit more tricky, we need to figure out which node folder has the latest version...
-            var baseDirectory = Path.Combine(Bot.RootDirectory, ".."); //go up one directory
-            var currentChoice = new NodeChoice();
 
-            foreach (var dir in Directory.GetDirectories(baseDirectory, "*Node*"))
-            {
-                //get the node exe in this directory
-                var file = Directory.GetFiles(dir, "Werewolf Node.exe").First();
-                var version = FileVersionInfo.GetVersionInfo(file).FileVersion;
-
-                var fvi = Version.Parse("1.0.0");
-                if (fvi > currentChoice.Version)
-                {
-                    currentChoice.Path = file;
-                    currentChoice.Version = fvi;
-                }
-            }
-
-            //now we have the most recent version, launch one
-            var process = Process.Start(currentChoice.Path);
+            var process = Process.Start(Path.Combine(Bot.RootDirectory, "../Node/WerewolfNode.exe"));
 
             Task.Run(() =>
             {
@@ -328,20 +309,18 @@ namespace Werewolf_Control
 
                 while ((ch = process.StandardOutput.Read()) != -1)
                 {
-                    Console.Write((char)ch);
+                    Console.Write((char) ch);
                 }
-
             });
-            
+
             Task.Run(() =>
             {
                 int ch;
 
                 while ((ch = process.StandardError.Read()) != -1)
                 {
-                    Console.Write((char)ch);
+                    Console.Write((char) ch);
                 }
-
             });
 
             return process;

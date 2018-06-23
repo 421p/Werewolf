@@ -21,7 +21,7 @@ namespace Werewolf_Control.Helpers
     internal static class Bot
     {
         internal static string TelegramApiKey;
-        public static HashSet<Node> Nodes = new HashSet<Node>();
+        public static readonly HashSet<Node> Nodes = new HashSet<Node>();
         public static Client Api;
 
         public static User Me;

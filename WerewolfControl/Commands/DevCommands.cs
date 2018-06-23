@@ -214,30 +214,7 @@ namespace Werewolf_Control
         //    new Task(Bot.SendOnline).Start();
         //}
 
-        [Attributes.Command(Trigger = "replacenodes", DevOnly = true)]
-        public static void ReplaceNodes(Update update, string[] args)
-        {
-            foreach (var n in Bot.Nodes)
-                n.ShutDown();
-            //get version
-            var baseDirectory = Path.Combine(Bot.RootDirectory, ".."); //go up one directory
-            var currentChoice = new NodeChoice();
-            foreach (var dir in Directory.GetDirectories(baseDirectory, "*Node*"))
-            {
-                //get the node exe in this directory
-                var file = Directory.GetFiles(dir, "Werewolf Node.exe").First();
-                Version fvi = System.Version.Parse(FileVersionInfo.GetVersionInfo(file).FileVersion);
-                if (fvi > currentChoice.Version)
-                {
-                    currentChoice.Path = file;
-                    currentChoice.Version = fvi;
-                }
-            }
-
-            Bot.Send($"Replacing nodes with latest version: {currentChoice.Version}", update.Message.Chat.Id);
-        }
-
-        [Attributes.Command(Trigger = "playtime", DevOnly = true)]
+       [Attributes.Command(Trigger = "playtime", DevOnly = true)]
         public static void PlayTime(Update update, string[] args)
         {
             if (args.Length > 1)
