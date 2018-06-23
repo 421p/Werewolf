@@ -153,10 +153,10 @@ namespace Werewolf_Control
             }
 
             //user wants to pick personal language
-            var langs = Directory.GetFiles(Bot.LanguageDirectory, "*.xml").Select(x => new LangFile(x)).ToList();
+            var langs = Directory.GetFiles(Bot.LanguageDirectory, "*.yaml").Select(x => new LangFile(x)).ToList();
 
 
-            List<InlineKeyboardCallbackButton> buttons = langs.Select(x => x.Base).Distinct().OrderBy(x => x)
+            var buttons = langs.Select(x => x.Base).Distinct().OrderBy(x => x)
                 .Select(x => new InlineKeyboardCallbackButton(x, $"setlang|{update.Message.From.Id}|{x}|null|base"))
                 .ToList();
 
@@ -377,7 +377,7 @@ namespace Werewolf_Control
         [Attributes.Command(Trigger = "getlang")]
         public static void GetLang(Update update, string[] args)
         {
-            var langs = Directory.GetFiles(Bot.LanguageDirectory, "*.xml").Select(x => new LangFile(x)).ToList();
+            var langs = Directory.GetFiles(Bot.LanguageDirectory, "*.yaml").Select(x => new LangFile(x)).ToList();
 
             List<InlineKeyboardCallbackButton> buttons = langs.Select(x => x.Base).Distinct().OrderBy(x => x)
                 .Select(x => new InlineKeyboardCallbackButton(x, $"getlang|{update.Message.From.Id}|{x}|null|base"))
@@ -477,31 +477,6 @@ namespace Werewolf_Control
                 });
                 var menu = new InlineKeyboardMarkup(buttons.ToArray());
                 Bot.Api.SendTextMessageAsync(u.Message.Chat.Id, "Stats", replyMarkup: menu);
-            }
-        }
-
-        [Attributes.Command(Trigger = "myidles")]
-        public static void MyIdles(Update update, string[] args)
-        {
-            var idles = 0;
-
-            using (var db = new WWContext())
-            {
-                idles = db.GetIdleKills24Hours(update.Message.From.Id).FirstOrDefault() ?? 0;
-            }
-
-            var str = $"{update.Message.From.Id} ({update.Message.From.FirstName})";
-            var reply = GetLocaleString("IdleCount", GetLanguage(update.Message.Chat.Id), str, idles);
-
-            try
-            {
-                var result = Bot.Api.SendTextMessageAsync(update.Message.From.Id, reply).Result;
-                if (update.Message.Chat.Type != ChatType.Private)
-                    Send(GetLocaleString("SentPrivate", GetLanguage(update.Message.From.Id)), update.Message.Chat.Id);
-            }
-            catch
-            {
-                RequestPM(update.Message.Chat.Id);
             }
         }
     }

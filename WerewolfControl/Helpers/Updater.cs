@@ -220,102 +220,12 @@ namespace Werewolf_Control.Helpers
             {
                 var t = e.GetType();
                 while (e.InnerException != null)
-                    e = e.InnerException;
-                return $"{e.Message}\n{e.StackTrace}";
-            }
-        }
-
-
-        internal static async Task MonitorUpdates()
-        {
-#if !DEBUG
-            try
-#endif
-            {
-                var baseDirectory = Path.Combine(Bot.RootDirectory, ".."); //go up one directory
-                var updateDirectory = Path.Combine(Bot.RootDirectory, "Update");
-                while (Bot.Nodes.Count == 0)
-                    await Task.Delay(500);
-                var currentVersion = Bot.Nodes.Max(x => Version.Parse(x.Version));
-                var currentChoice = new NodeChoice();
-                while (true)
                 {
-                    //check nodes first
-                    foreach (var dir in Directory.GetDirectories(baseDirectory, "*Node*"))
-                    {
-                        //get the node exe in this directory
-                        var file = Directory.GetFiles(dir, "Werewolf Node.exe").First();
-                        Version fvi = Version.Parse(FileVersionInfo.GetVersionInfo(file).FileVersion);
-                        if (fvi > currentChoice.Version)
-                        {
-                            currentChoice.Path = file;
-                            currentChoice.Version = fvi;
-                        }
-                    }
-
-                    if (currentChoice.Version > currentVersion)
-                    {
-                        currentVersion = currentChoice.Version;
-                        //alert dev group
-                        Bot.Send($"New node with version {currentVersion} found.  Stopping old nodes.", -1001077134233);
-                        //kill existing nodes
-                        foreach (var node in Bot.Nodes)
-                            node.ShutDown();
-                        await Task.Delay(500);
-                        foreach (var node in Bot.Nodes)
-                            node.ShutDown();
-                    }
-
-                    //now check for Control update
-                    if (Directory.GetFiles(updateDirectory).Count() > 1)
-                    {
-                        //update available
-                        //sleep 5 seconds to allow any nodes to connect and whatnot.
-                        await Task.Delay(5000);
-                        //await Bot.Send($"New control found.  Updating.", -1001077134233);
-                        //fire off the updater
-                        Process.Start(Path.Combine(Bot.RootDirectory, "Resources\\update.exe"), "-1001077134233");
-                        Bot.Running = false;
-                        Program.Running = false;
-                        Bot.Api.StopReceiving();
-                        //Thread.Sleep(500);
-                        using (var db = new WWContext())
-                        {
-                            var bot =
-#if DEBUG
-                                4;
-#elif BETA
-                        3;
-#elif RELEASE
-                                1;
-#elif RELEASE2
-                        2;
-#endif
-
-#if !DEBUG
-                            var status = await db.BotStatus.FindAsync(bot);
-                            status.BotStatus = "Updating";
-                            await db.SaveChangesAsync();
-#endif
-                        }
-
-                        Environment.Exit(1);
-                    }
-
-
-                    //check once every 5 seconds
-                    await Task.Delay(5000);
+                    e = e.InnerException;
                 }
 
-                //now we have the most recent version, launch one
+                return $"{e.Message}\n{e.StackTrace}";
             }
-#if !DEBUG
-            catch (Exception e)
-            {
-                Bot.Send($"Error in update monitor: {e.Message}\n{e.StackTrace}", -1001077134233,
-                    parseMode: ParseMode.Default);
-            }
-#endif
         }
     }
 

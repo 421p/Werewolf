@@ -32,7 +32,7 @@ namespace Werewolf_Control.Models
                 User = update.Message.From
             };
             this.Broadcast(JsonConvert.SerializeObject(info));
-            this.Games.Add(new GameInfo
+            Games.Add(new GameInfo
             {
                 ChatGroup = info.Chat.Title,
                 Language = "English",
@@ -59,7 +59,7 @@ namespace Werewolf_Control.Models
         public void ShutDown(bool kill = false)
         {
             ShuttingDown = true;
-            this.Broadcast(JsonConvert.SerializeObject(new UpdateNodeInfo() {Kill = kill}));
+            this.Broadcast(JsonConvert.SerializeObject(new UpdateNodeInfo {Kill = kill}));
         }
 
         public void SendReply(CallbackQuery query)

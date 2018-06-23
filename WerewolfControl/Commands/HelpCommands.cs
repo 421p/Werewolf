@@ -37,22 +37,17 @@ namespace Werewolf_Control
             //now determine what languages are available in public groups.
             try
             {
-                string[] disabledLangs = new string[] {"فارسی"}; // Language bases of which no grouplist is accessible
+                var disabledLangs = new[] {"فارسی"}; // Language bases of which no grouplist is accessible
                 var langs = PublicGroups.GetBaseLanguages()
                     .Where(x => !disabledLangs.Contains(x)); // do not fetch disabled langs
                 //create a menu out of this
-                List<InlineKeyboardCallbackButton> buttons = langs.OrderBy(x => x).Select(x =>
+                var buttons = langs.OrderBy(x => x).Select(x =>
                     new InlineKeyboardCallbackButton(x, $"groups|{update.Message.From.Id}|{x}|null")).ToList();
 
                 var baseMenu = new List<InlineKeyboardButton[]>();
                 for (var i = 0; i < buttons.Count; i++)
                 {
-                    if (buttons.Count - 1 == i)
-                    {
-                        baseMenu.Add(new[] {buttons[i]});
-                    }
-                    else
-                        baseMenu.Add(new[] {buttons[i], buttons[i + 1]});
+                    baseMenu.Add(buttons.Count - 1 == i ? new[] {buttons[i]} : new[] {buttons[i], buttons[i + 1]});
 
                     i++;
                 }
@@ -65,8 +60,10 @@ namespace Werewolf_Control
                         GetLocaleString("WhatLangGroup", GetLanguage(update.Message.From.Id)),
                         replyMarkup: menu).Result;
                     if (update.Message.Chat.Type != ChatType.Private)
+                    {
                         Send(GetLocaleString("SentPrivate", GetLanguage(update.Message.From.Id)),
                             update.Message.Chat.Id);
+                    }
                 }
                 catch
                 {
@@ -101,9 +98,11 @@ namespace Werewolf_Control
             {
                 var result = Bot.Api.SendTextMessageAsync(update.Message.From.Id, reply).Result;
                 if (update.Message.Chat.Type != ChatType.Private)
+                {
                     Send(GetLocaleString("SentPrivate", GetLanguage(update.Message.From.Id)), update.Message.Chat.Id);
+                }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 RequestPM(update.Message.Chat.Id);
                 return;

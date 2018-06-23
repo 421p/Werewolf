@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Werewolf_Node</RootNamespace>
-    <AssemblyName>Werewolf Node</AssemblyName>
+    <AssemblyName>WerewolfNode</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -27,11 +27,12 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
+    <Optimize>false</Optimize>
     <OutputPath>bin/Release/</OutputPath>
     <DefineConstants>TRACE;RELEASE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release 2|AnyCPU'">
     <OutputPath>bin/Release 2/</OutputPath>
@@ -54,9 +55,6 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Botan.IO, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>../packages/BotanIO.Net.1.1.0/lib/net40/Botan.IO.dll</HintPath>
-    </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>../packages/EntityFramework.6.1.3/lib/net45/EntityFramework.dll</HintPath>
       <Private>True</Private>
@@ -152,6 +150,10 @@
     <Reference Include="Telegram.Bot, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>../packages/Telegram.Bot.Core.13.2.0/lib/netstandard1.1/Telegram.Bot.dll</HintPath>
     </Reference>
+    <Reference Include="YamlDotNet, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\YamlDotNet.4.3.2\lib\net45\YamlDotNet.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helpers/Extensions.cs" />
@@ -184,6 +186,10 @@
     <ProjectReference Include="../TcpFramework/TcpFramework.csproj">
       <Project>{acb86d9a-837c-4bb6-83fa-99fe4dc7d3e4}</Project>
       <Name>TcpFramework</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LanguageFileConverter\LanguageFileConverter.csproj">
+      <Project>{fcd23604-bec8-49e7-b879-ac885865e74d}</Project>
+      <Name>LanguageFileConverter</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)/Microsoft.CSharp.targets" />

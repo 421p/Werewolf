@@ -12,10 +12,8 @@ namespace Werewolf_Control.Helpers
             268253251
         };
 
-        internal static bool IsGroupAdmin(Update update)
-        {
-            return IsGroupAdmin(update.Message.From.Id, update.Message.Chat.Id);
-        }
+        internal static bool IsGroupAdmin(Update update) =>
+            IsGroupAdmin(update.Message.From.Id, update.Message.Chat.Id);
 
         internal static bool IsGlobalAdmin(int id)
         {
@@ -32,7 +30,10 @@ namespace Werewolf_Control.Helpers
             {
                 //check all admins
                 if (Bot.Api.GetChatAsync(group).Result.AllMembersAreAdministrators)
+                {
                     return true;
+                }
+
                 var admin = Bot.Api.GetChatMemberAsync(group, user).Result;
                 return admin.Status == ChatMemberStatus.Administrator || admin.Status == ChatMemberStatus.Creator;
             }

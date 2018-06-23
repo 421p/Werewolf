@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Xml.Linq;
 using Database;
+using LanguageFileConverter;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineKeyboardButtons;
@@ -214,30 +215,7 @@ namespace Werewolf_Control
         //    new Task(Bot.SendOnline).Start();
         //}
 
-        [Attributes.Command(Trigger = "replacenodes", DevOnly = true)]
-        public static void ReplaceNodes(Update update, string[] args)
-        {
-            foreach (var n in Bot.Nodes)
-                n.ShutDown();
-            //get version
-            var baseDirectory = Path.Combine(Bot.RootDirectory, ".."); //go up one directory
-            var currentChoice = new NodeChoice();
-            foreach (var dir in Directory.GetDirectories(baseDirectory, "*Node*"))
-            {
-                //get the node exe in this directory
-                var file = Directory.GetFiles(dir, "Werewolf Node.exe").First();
-                Version fvi = System.Version.Parse(FileVersionInfo.GetVersionInfo(file).FileVersion);
-                if (fvi > currentChoice.Version)
-                {
-                    currentChoice.Path = file;
-                    currentChoice.Version = fvi;
-                }
-            }
-
-            Bot.Send($"Replacing nodes with latest version: {currentChoice.Version}", update.Message.Chat.Id);
-        }
-
-        [Attributes.Command(Trigger = "playtime", DevOnly = true)]
+       [Attributes.Command(Trigger = "playtime", DevOnly = true)]
         public static void PlayTime(Update update, string[] args)
         {
             if (args.Length > 1)
@@ -554,7 +532,7 @@ namespace Werewolf_Control
         [Attributes.Command(Trigger = "reloadenglish", DevOnly = true)]
         public static void ReloadEnglish(Update update, string[] args)
         {
-            Bot.English = XDocument.Load(Path.Combine(Bot.LanguageDirectory, "English.xml"));
+            Bot.English = LanguageConverter.Load(Path.Combine(Bot.LanguageDirectory, "English.yaml"));
         }
 
 
@@ -1312,17 +1290,17 @@ namespace Werewolf_Control
             //1. Ask for the langfile to move
             //2. Ask for new filename and langnode
             //3. Create the new langfile automagically
-            var match = new Regex(@"([\s\S]*).xml ([\s\S]*).xml").Match(args[1] ?? "");
+            var match = new Regex(@"([\s\S]*).yaml ([\s\S]*).yaml").Match(args[1] ?? "");
             if (!match.Success || match.Groups.Count != 3)
             {
-                Bot.Send("Fail. Use !movelang <oldfilename>.xml <newfilename>.xml", u.Message.Chat.Id,
+                Bot.Send("Fail. Use !movelang <oldfilename>.yaml <newfilename>.yaml", u.Message.Chat.Id,
                     parseMode: ParseMode.Markdown);
                 return;
             }
 
             var oldfilename = match.Groups[1].Value;
             var newfilename = match.Groups[2].Value;
-            var langs = Directory.GetFiles(Bot.LanguageDirectory).Where(x => x.EndsWith(".xml"))
+            var langs = Directory.GetFiles(Bot.LanguageDirectory).Where(x => x.EndsWith(".yaml"))
                 .Select(x => new LangFile(x)).ToList();
             var oldlang = langs.FirstOrDefault(x => x.FileName == oldfilename);
             var newlang = langs.FirstOrDefault(x => x.FileName == newfilename);

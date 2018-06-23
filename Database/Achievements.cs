@@ -219,7 +219,7 @@ namespace Database
     } // MAX VALUE: 9223372036854775807
     //            
 
-    public static partial class Extensions
+    public static class Extensions
     {
         public static string GetDescription(this Achievements value)
         {
@@ -230,11 +230,7 @@ namespace Database
                     typeof(DescriptionAttribute),
                     false);
 
-            if (attributes != null &&
-                attributes.Length > 0)
-                return attributes[0].Description;
-            else
-                return value.ToString();
+            return attributes.Length > 0 ? attributes[0].Description : value.ToString();
         }
 
         public static string GetName(this Achievements value)

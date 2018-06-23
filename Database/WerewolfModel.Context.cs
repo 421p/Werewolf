@@ -32,26 +32,15 @@ namespace Database
         public virtual DbSet<GameKill> GameKills { get; set; }
         public virtual DbSet<GamePlayer> GamePlayers { get; set; }
         public virtual DbSet<Group> Groups { get; set; }
-        public virtual DbSet<KillMethod> KillMethods { get; set; }
         public virtual DbSet<Player> Players { get; set; }
         public virtual DbSet<NotifyGame> NotifyGames { get; set; }
-        public virtual DbSet<v_NonDefaultGroups> v_NonDefaultGroups { get; set; }
-        public virtual DbSet<v_PreferredGroups> v_PreferredGroups { get; set; }
         public virtual DbSet<v_WaitList> v_WaitList { get; set; }
         public virtual DbSet<GlobalStat> GlobalStats { get; set; }
         public virtual DbSet<PlayerStat> PlayerStats { get; set; }
         public virtual DbSet<GroupStat> GroupStats { get; set; }
         public virtual DbSet<DailyCount> DailyCounts { get; set; }
-        public virtual DbSet<v_IdleKill24HoursMain> v_IdleKill24HoursMain { get; set; }
-        public virtual DbSet<v_PublicGroups> v_PublicGroups { get; set; }
         public virtual DbSet<GlobalBan> GlobalBans { get; set; }
-        public virtual DbSet<v_InactivePlayersMain> v_InactivePlayersMain { get; set; }
         public virtual DbSet<BotStatu> BotStatus { get; set; }
-        public virtual DbSet<ContestTerm> ContestTerms { get; set; }
-        public virtual DbSet<AspNetRole> AspNetRoles { get; set; }
-        public virtual DbSet<AspNetUserClaim> AspNetUserClaims { get; set; }
-        public virtual DbSet<AspNetUserLogin> AspNetUserLogins { get; set; }
-        public virtual DbSet<AspNetUser> AspNetUsers { get; set; }
         public virtual DbSet<C__MigrationHistory> C__MigrationHistory { get; set; }
         public virtual DbSet<GroupRanking> GroupRanking { get; set; }
         public virtual DbSet<RefreshDate> RefreshDate { get; set; }

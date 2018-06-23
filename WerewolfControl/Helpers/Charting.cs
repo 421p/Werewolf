@@ -18,7 +18,7 @@ namespace Werewolf_Control.Helpers
             //first we need to get the start date / timespan, otherwise default.
             var start = new DateTime(2016, 5, 15);
             var mode = "";
-            if (!String.IsNullOrWhiteSpace(input))
+            if (!string.IsNullOrWhiteSpace(input))
             {
                 var args = input.Split(' ');
                 if (int.TryParse(args[0], out var amount) && args.Length >= 2)
@@ -72,7 +72,7 @@ sum(count(x.Gameid)) over (partition by players) as Games
  ORDER BY x.Players, Wins DESC";
 
             List<TeamWinResult> result;
-            
+
             using (var db = new WWContext())
             {
                 result = db.Database.SqlQuery<TeamWinResult>(query).ToListAsync().Result;
@@ -184,7 +184,7 @@ sum(count(x.Gameid)) over (partition by players) as Games
             }
 
             //create chartareas...
-            ChartArea ca = new ChartArea();
+            var ca = new ChartArea();
             ca.Name = "ChartArea1";
             ca.BackColor = Color.White;
             ca.BorderColor = Color.FromArgb(26, 59, 105);
@@ -203,7 +203,7 @@ sum(count(x.Gameid)) over (partition by players) as Games
             chart.SaveImage(path, ChartImageFormat.Png);
             SendImage(path, u.Message.Chat.Id);
             UpdateHandler.Send(
-                result.Select(x => new {Players = x.Players, Games = x.Games}).Distinct()
+                result.Select(x => new {x.Players, x.Games}).Distinct()
                     .Aggregate("", (a, b) => $"{a}\n{b.Players}: {b.Games}"), u.Message.Chat.Id);
         }
 
@@ -214,10 +214,10 @@ sum(count(x.Gameid)) over (partition by players) as Games
         }
     }
 
-    class TeamWinResult
+    internal class TeamWinResult
     {
         public int Players { get; set; }
-        public Decimal Wins { get; set; }
+        public decimal Wins { get; set; }
         public int Games { get; set; }
         public string Team { get; set; }
     }
