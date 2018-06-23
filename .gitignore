@@ -7,6 +7,8 @@ packages/
 values.xml
 build/
 
+vendor/
+
 # User-specific files
 *.suo
 *.user
