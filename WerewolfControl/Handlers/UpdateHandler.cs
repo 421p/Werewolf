@@ -625,16 +625,16 @@ namespace Werewolf_Control.Handler
                     while (ex.InnerException != null)
                         ex = ex.InnerException;
 
-                    Send(ex.Message, id);
                     Send($"Error: {ex.Message}\n{update.Message?.Text}", Settings.ErrorGroup);
+                    Console.WriteLine(e.StackTrace);
                 }
                 catch (Exception ex)
                 {
                     while (ex.InnerException != null)
                         ex = ex.InnerException;
 
-                    Send(ex.Message, id);
                     Send($"Error: {ex.Message}\n{update.Message?.Text}", Settings.ErrorGroup);
+                    Console.WriteLine(ex.StackTrace);
                 }
 #endif
             }

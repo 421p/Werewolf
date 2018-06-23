@@ -44,12 +44,14 @@ CREATE TABLE `Group` (
 CREATE VIEW `v_BotInGroups`
   AS
     SELECT
-      COUNT(Id)        AS Groups,
+      COUNT(Id) AS `Groups`,
+
       CASE BotInGroup
       WHEN 0
         THEN 'No'
       WHEN 1
-        THEN 'Yes' END AS 'Has Bot?'
+        THEN 'Yes'
+      END       AS 'Has Bot?'
     FROM `Group`
     WHERE (BotInGroup IS NOT NULL)
     GROUP BY BotInGroup;
@@ -105,7 +107,7 @@ CREATE TABLE Player (
   `HasPM`         Tinyint            NULL,
   `BanReason`     text               NULL,
   `ImageFile`     text               NULL,
-  `Language`      text               NULL,
+  `Language`      varchar(128)       NULL,
   `TempBanCount`  int                NULL,
   `HasPM2`        Tinyint            NULL,
   `HasDebugPM`    Tinyint            NULL,
@@ -150,11 +152,11 @@ CREATE VIEW `v_InactivePlayersMain`
 CREATE VIEW `v_LanguageCounts`
   AS
     SELECT
-      COUNT(Id) AS Groups,
+      COUNT(Id) AS `Groups`,
       Language
     FROM `Group`
     GROUP BY Language
-    ORDER BY Groups DESC
+    ORDER BY `Groups` DESC
     limit 100;
 /****** Object:  View [db_owner].[v_NonDefaultGroups]    Script Date: 5/27/2018 10:01:49 AM ******/
 /* SET ANSI_NULLS ON */
@@ -250,7 +252,7 @@ CREATE VIEW `v_SummaryTotals`
       (SELECT COUNT(Id) AS Expr1
        FROM Game)                       AS Games,
       (SELECT COUNT(Id) AS Expr1
-       FROM `Group`)                    AS Groups,
+       FROM `Group`)                    AS `Groups`,
       (SELECT COUNT(Id) AS Expr1
        FROM GamePlayer
        WHERE (Survived = 0))            AS Deaths,
@@ -454,7 +456,7 @@ CREATE TABLE __MigrationHistory (
 
 /* SET QUOTED_IDENTIFIER ON */
 
-CREATE TABLE Admin (
+CREATE TABLE `Admin` (
   `UserId` int NOT NULL,
   CONSTRAINT `PK_Admin` PRIMARY KEY
     (
@@ -667,7 +669,7 @@ CREATE PROCEDURE getDailyCounts()
     FROM (SELECT
             SUM(games)     AS Games,
             Day,
-            COUNT(GroupId) AS Groups
+            COUNT(GroupId) AS `Groups`
           FROM (SELECT
                   COUNT(Id) AS games,
                   Day,
@@ -718,10 +720,10 @@ CREATE PROCEDURE GetIdleKills24Hours(
     -- interfering with SELECT statements.
 
     -- Insert statements for procedure here
-    select count(gameid)
+    select count(GameId)
     from
-      gamekill gk
-      join player p on p.Id = gk.VictimId
+      GameKill gk
+      join Player p on p.Id = gk.VictimId
     where p.TelegramId = p_userid
           and KillMethodId = 16
           and gk.TimeStamp > TIMESTAMPADD(day, -1, NOW());
@@ -797,9 +799,9 @@ CREATE PROCEDURE getRoles(
       name,
       role
     from GamePlayer gp
-      join player p on gp.PlayerId = p.Id
+      join Player p on gp.PlayerId = p.Id
     where gameid = (select max(id)
-                    from game
+                    from Game
                     where GroupName = p_groupName);
 
   END;
@@ -826,7 +828,7 @@ CREATE PROCEDURE GlobalDay1Death()
   BEGIN
 
     select
-     (day1death * 100 / games) as pct,
+      (day1death * 100 / games) as pct,
       p.Name,
       p.TelegramId
     from
@@ -847,10 +849,10 @@ CREATE PROCEDURE GlobalDay1Death()
              where Day = 1 and KillMethodId <> 8
              group by VictimId, GameId) x
           group by VictimId) y
-    on gp.PlayerId = y.VictimId
-    group by VictimId, day1death
-    having count(gp.id) > 99) as totals
-    join Player p on p.id = totals.VictimId
+           on gp.PlayerId = y.VictimId
+       group by VictimId, day1death
+       having count(gp.id) > 99) as totals
+      join Player p on p.id = totals.VictimId
     order by pct desc
     limit 1;
 
@@ -898,10 +900,10 @@ CREATE PROCEDURE GlobalDay1Lynch()
              where Day = 1 and KillMethodId = 1 and KillMethodId <> 8
              group by VictimId, GameId) x
           group by VictimId) y
-    on gp.PlayerId = y.VictimId
-    group by VictimId, day1death
-    having count(gp.Id) > 99) totals
-    join Player p on p.id = totals.VictimId
+           on gp.PlayerId = y.VictimId
+       group by VictimId, day1death
+       having count(gp.Id) > 99) totals
+      join Player p on p.id = totals.VictimId
     order by pct desc
     limit 1;
 
@@ -948,336 +950,356 @@ CREATE PROCEDURE GlobalNight1Death()
           from GameKill gk
           where Day = 1 and KillMethodId <> 1 and KillMethodId <> 8
           group by VictimId) as x
-    on gp.PlayerId = x.VictimId
-    group by VictimId, deaths) as y
-    join Player p on p.id = y.VictimId
+           on gp.PlayerId = x.VictimId
+       group by VictimId, deaths) as y
+      join Player p on p.id = y.VictimId
     where games > 99
     order by pct desc
     limit 1;
 
-    END;
-
-    //
-
-    DELIMITER ;
-
-
-    /****** Object:  StoredProcedure [GlobalSurvivor]    Script Date: 5/27/2018 10:01:51 AM ******/
-    /* SET ANSI_NULLS ON */
-
-    /* SET QUOTED_IDENTIFIER ON */
-
-    -- =============================================
-    -- Author:		<Author,,Name>
-    -- Create date: <Create Date,,>
-    -- Description:	<Description,,>
-    -- =============================================
-    DELIMITER //
-
-    CREATE PROCEDURE GlobalSurvivor()
-      BEGIN
-        -- SET NOCOUNT ON added to prevent extra result sets from
-        -- interfering with SELECT statements.
-
-        select
-          (survived * 100.0 / games) as pct,
-          p.Name,
-          p.TelegramId
-        from
-          (select
-             count(Id)       as games,
-             sum(case survived
-                 when 1
-                   then 1
-                 else 0 end) as survived,
-             PlayerId
-           from GamePlayer
-           group by PlayerId
-           having count(Id) > 99) as x
-          join Player p on p.id = x.PlayerId
-        order by pct desc;
-
-      END;
-
-    //
-
-    DELIMITER ;
-
-
-    /****** Object:  StoredProcedure [GroupDay1Death]    Script Date: 5/27/2018 10:01:51 AM ******/
-    /* SET ANSI_NULLS ON */
-
-    /* SET QUOTED_IDENTIFIER ON */
-
-    -- =============================================
-    -- Author:		<Author,,Name>
-    -- Create date: <Create Date,,>
-    -- Description:	<Description,,>
-    -- =============================================
-    DELIMITER //
-
-    CREATE PROCEDURE GroupDay1Death(
-      -- Add the parameters for the stored procedure here
-      p_groupid bigint)
-      BEGIN
-        -- SET NOCOUNT ON added to prevent extra result sets from
-        -- interfering with SELECT statements.
-
-        -- Insert statements for procedure here
-        select
-          (day1death * 100 / games) as pct,
-          p.Name,
-          p.TelegramId
-        from
-          (select
-             day1death,
-             VictimId,
-             count(gp.id) as games
-           from GamePlayer gp
-             join
-             (select
-                count(gameid) as day1death,
-                VictimId
-              from
-                (select
-                   VictimId,
-                   GameId
-                 from GameKill gk
-                 where Day = 1 and KillMethodId <> 8
-                 group by VictimId, GameId) as x
-                join Game g on g.Id = gameid
-              where g.GroupId = p_groupid
-              group by VictimId) as y
-        on gp.PlayerId = y.VictimId
-        group by VictimId, day1death
-        having count(gp.Id) > 19) as totals
-        join Player p on p.Id = totals.VictimId
-        order by pct desc limit 1;
-
-      END;
-
-    //
-
-    DELIMITER ;
-
-
-    /****** Object:  StoredProcedure [GroupDay1Lynch]    Script Date: 5/27/2018 10:01:51 AM ******/
-    /* SET ANSI_NULLS ON */
-
-    /* SET QUOTED_IDENTIFIER ON */
-
-    -- =============================================
-    -- Author:		<Author,,Name>
-    -- Create date: <Create Date,,>
-    -- Description:	<Description,,>
-    -- =============================================
-    DELIMITER //
-
-    CREATE PROCEDURE GroupDay1Lynch(
-      -- Add the parameters for the stored procedure here
-      p_groupid bigint)
-      BEGIN
-        -- SET NOCOUNT ON added to prevent extra result sets from
-        -- interfering with SELECT statements.
-
-        -- Insert statements for procedure here
-        select
-          (day1death * 100 / games) as pct,
-          p.Name,
-          p.TelegramId
-        from
-          (select
-             day1death,
-             VictimId,
-             count(gp.id) as games
-           from GamePlayer gp
-             join
-             (select
-                count(gameid) as day1death,
-                VictimId
-              from
-                (select
-                   VictimId,
-                   GameId
-                 from GameKill gk
-                 where Day = 1 and KillMethodId = 1 and KillMethodId <> 8
-                 group by VictimId, GameId) as x
-                join Game g on g.Id = gameid
-              where g.GroupId = p_groupid
-              group by VictimId) as y
-        on gp.PlayerId = y.VictimId
-        group by VictimId, day1death
-        having count (gp.Id) > 19) as totals
-        join Player p on p.Id = totals.VictimId
-        order by pct desc limit 1;
-
-      END;
-
-    //
-
-    DELIMITER ;
-
-
-    /****** Object:  StoredProcedure [GroupNight1Death]    Script Date: 5/27/2018 10:01:51 AM ******/
-    /* SET ANSI_NULLS ON */
-
-    /* SET QUOTED_IDENTIFIER ON */
-
-    -- =============================================
-    -- Author:		<Author,,Name>
-    -- Create date: <Create Date,,>
-    -- Description:	<Description,,>
-    -- =============================================
-    DELIMITER //
-
-    CREATE PROCEDURE GroupNight1Death(p_groupid bigint)
-
-      BEGIN
-        select
-          (day1death * 100 / games) as pct,
-          p.Name,
-          p.TelegramId
-        from
-          (select
-             day1death,
-             VictimId,
-             count(gp.id) as games
-           from GamePlayer gp
-             join
-             (select
-                count(GameId) as day1death,
-                VictimId
-              from
-                (select
-                   VictimId,
-                   GameId
-                 from GameKill gk
-                 where Day = 1 and KillMethodId <> 1 and KillMethodId <> 8
-                 group by VictimId, GameId) as x
-                join Game g on g.Id = gameid
-              where g.GroupId = p_groupid
-              group by VictimId) as y
-        on gp.PlayerId = y.VictimId
-        group by VictimId, day1death
-        having count(gp.Id) > 19) as totals
-        join Player p on p.Id = totals.VictimId
-        order by pct desc limit 1;
-
-      END;
-
-    //
-
-    DELIMITER ;
-
-
-    /****** Object:  StoredProcedure [GroupSurvivor]    Script Date: 5/27/2018 10:01:51 AM ******/
-    /* SET ANSI_NULLS ON */
-
-    /* SET QUOTED_IDENTIFIER ON */
-
-    -- =============================================
-    -- Author:		<Author,,Name>
-    -- Create date: <Create Date,,>
-    -- Description:	<Description,,>
-    -- =============================================
-    DELIMITER //
-
-    CREATE PROCEDURE GroupSurvivor (p_groupid bigint )
-  BEGIN
-    select (survived * 100 / games) as pct, p.Name, p.TelegramId from
-    ( select count (gp.Id) as games, sum( case survived when 1 then 1 else 0 end ) as survived, gp.PlayerId from GamePlayer gp
-    join Game g on gp.GameId = g.Id
-    where g.GroupId = p_groupid
-    group by gp.PlayerId
-    having count (gp.Id) > 19) as x
-    join Player p on x.PlayerId = p.Id
-    order by pct desc limit 1;
   END;
 
-    //
+//
 
-    DELIMITER ;
+DELIMITER ;
 
 
-    /****** Object:  StoredProcedure [PlayerMostKilled]    Script Date: 5/27/2018 10:01:51 AM ******/
-    /* SET ANSI_NULLS ON */
+/****** Object:  StoredProcedure [GlobalSurvivor]    Script Date: 5/27/2018 10:01:51 AM ******/
+/* SET ANSI_NULLS ON */
 
-    /* SET QUOTED_IDENTIFIER ON */
+/* SET QUOTED_IDENTIFIER ON */
 
-    -- =============================================
-    -- Author:		<Author,,Name>
-    -- Create date: <Create Date,,>
-    -- Description:	<Description,,>
-    -- =============================================
-    DELIMITER //
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+DELIMITER //
 
-    CREATE PROCEDURE PlayerMostKilled (p_pid int )
+CREATE PROCEDURE GlobalSurvivor()
   BEGIN
-    select p.Name, p.TelegramId, count (gk.Id) as times from GameKill gk
-    join Player p on gk.VictimId = p.Id
-    join Player p2 on gk.KillerId = p2.Id
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
+
+    select
+      (survived * 100.0 / games) as pct,
+      p.Name,
+      p.TelegramId
+    from
+      (select
+         count(Id)       as games,
+         sum(case survived
+             when 1
+               then 1
+             else 0 end) as survived,
+         PlayerId
+       from GamePlayer
+       group by PlayerId
+       having count(Id) > 99) as x
+      join Player p on p.id = x.PlayerId
+    order by pct desc;
+
+  END;
+
+//
+
+DELIMITER ;
+
+
+/****** Object:  StoredProcedure [GroupDay1Death]    Script Date: 5/27/2018 10:01:51 AM ******/
+/* SET ANSI_NULLS ON */
+
+/* SET QUOTED_IDENTIFIER ON */
+
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+DELIMITER //
+
+CREATE PROCEDURE GroupDay1Death(
+  -- Add the parameters for the stored procedure here
+  p_groupid bigint)
+  BEGIN
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
+
+    -- Insert statements for procedure here
+    select
+      (day1death * 100 / games) as pct,
+      p.Name,
+      p.TelegramId
+    from
+      (select
+         day1death,
+         VictimId,
+         count(gp.id) as games
+       from GamePlayer gp
+         join
+         (select
+            count(gameid) as day1death,
+            VictimId
+          from
+            (select
+               VictimId,
+               GameId
+             from GameKill gk
+             where Day = 1 and KillMethodId <> 8
+             group by VictimId, GameId) as x
+            join Game g on g.Id = gameid
+          where g.GroupId = p_groupid
+          group by VictimId) as y
+           on gp.PlayerId = y.VictimId
+       group by VictimId, day1death
+       having count(gp.Id) > 19) as totals
+      join Player p on p.Id = totals.VictimId
+    order by pct desc
+    limit 1;
+
+  END;
+
+//
+
+DELIMITER ;
+
+
+/****** Object:  StoredProcedure [GroupDay1Lynch]    Script Date: 5/27/2018 10:01:51 AM ******/
+/* SET ANSI_NULLS ON */
+
+/* SET QUOTED_IDENTIFIER ON */
+
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+DELIMITER //
+
+CREATE PROCEDURE GroupDay1Lynch(
+  -- Add the parameters for the stored procedure here
+  p_groupid bigint)
+  BEGIN
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
+
+    -- Insert statements for procedure here
+    select
+      (day1death * 100 / games) as pct,
+      p.Name,
+      p.TelegramId
+    from
+      (select
+         day1death,
+         VictimId,
+         count(gp.id) as games
+       from GamePlayer gp
+         join
+         (select
+            count(gameid) as day1death,
+            VictimId
+          from
+            (select
+               VictimId,
+               GameId
+             from GameKill gk
+             where Day = 1 and KillMethodId = 1 and KillMethodId <> 8
+             group by VictimId, GameId) as x
+            join Game g on g.Id = gameid
+          where g.GroupId = p_groupid
+          group by VictimId) as y
+           on gp.PlayerId = y.VictimId
+       group by VictimId, day1death
+       having count(gp.Id) > 19) as totals
+      join Player p on p.Id = totals.VictimId
+    order by pct desc
+    limit 1;
+
+  END;
+
+//
+
+DELIMITER ;
+
+
+/****** Object:  StoredProcedure [GroupNight1Death]    Script Date: 5/27/2018 10:01:51 AM ******/
+/* SET ANSI_NULLS ON */
+
+/* SET QUOTED_IDENTIFIER ON */
+
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+DELIMITER //
+
+CREATE PROCEDURE GroupNight1Death(p_groupid bigint)
+
+  BEGIN
+    select
+      (day1death * 100 / games) as pct,
+      p.Name,
+      p.TelegramId
+    from
+      (select
+         day1death,
+         VictimId,
+         count(gp.id) as games
+       from GamePlayer gp
+         join
+         (select
+            count(GameId) as day1death,
+            VictimId
+          from
+            (select
+               VictimId,
+               GameId
+             from GameKill gk
+             where Day = 1 and KillMethodId <> 1 and KillMethodId <> 8
+             group by VictimId, GameId) as x
+            join Game g on g.Id = gameid
+          where g.GroupId = p_groupid
+          group by VictimId) as y
+           on gp.PlayerId = y.VictimId
+       group by VictimId, day1death
+       having count(gp.Id) > 19) as totals
+      join Player p on p.Id = totals.VictimId
+    order by pct desc
+    limit 1;
+
+  END;
+
+//
+
+DELIMITER ;
+
+
+/****** Object:  StoredProcedure [GroupSurvivor]    Script Date: 5/27/2018 10:01:51 AM ******/
+/* SET ANSI_NULLS ON */
+
+/* SET QUOTED_IDENTIFIER ON */
+
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+DELIMITER //
+
+CREATE PROCEDURE GroupSurvivor(p_groupid bigint)
+  BEGIN
+    select
+      (survived * 100 / games) as pct,
+      p.Name,
+      p.TelegramId
+    from
+      (select
+         count(gp.Id)    as games,
+         sum(case survived
+             when 1
+               then 1
+             else 0 end) as survived,
+         gp.PlayerId
+       from GamePlayer gp
+         join Game g on gp.GameId = g.Id
+       where g.GroupId = p_groupid
+       group by gp.PlayerId
+       having count(gp.Id) > 19) as x
+      join Player p on x.PlayerId = p.Id
+    order by pct desc
+    limit 1;
+  END;
+
+//
+
+DELIMITER ;
+
+
+/****** Object:  StoredProcedure [PlayerMostKilled]    Script Date: 5/27/2018 10:01:51 AM ******/
+/* SET ANSI_NULLS ON */
+
+/* SET QUOTED_IDENTIFIER ON */
+
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+DELIMITER //
+
+CREATE PROCEDURE PlayerMostKilled(p_pid int)
+  BEGIN
+    select
+      p.Name,
+      p.TelegramId,
+      count(gk.Id) as times
+    from GameKill gk
+      join Player p on gk.VictimId = p.Id
+      join Player p2 on gk.KillerId = p2.Id
     where p2.TelegramId = p_pid and gk.KillMethodId <> 8
     group by p.Name, p.TelegramId
-    order by count (gk.Id) desc limit 1;
+    order by count(gk.Id) desc
+    limit 1;
   END;
 
-    //
+//
 
-    DELIMITER ;
+DELIMITER ;
 
 
-    /****** Object:  StoredProcedure [PlayerMostKilledBy]    Script Date: 5/27/2018 10:01:51 AM ******/
-    /* SET ANSI_NULLS ON */
+/****** Object:  StoredProcedure [PlayerMostKilledBy]    Script Date: 5/27/2018 10:01:51 AM ******/
+/* SET ANSI_NULLS ON */
 
-    /* SET QUOTED_IDENTIFIER ON */
+/* SET QUOTED_IDENTIFIER ON */
 
-    -- =============================================
-    -- Author:		<Author,,Name>
-    -- Create date: <Create Date,,>
-    -- Description:	<Description,,>
-    -- =============================================
-    DELIMITER //
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+DELIMITER //
 
-    CREATE PROCEDURE PlayerMostKilledBy(
-      -- Add the parameters for the stored procedure here
-      p_pid int)
-      BEGIN
-        -- SET NOCOUNT ON added to prevent extra result sets from
-        -- interfering with SELECT statements.
+CREATE PROCEDURE PlayerMostKilledBy(
+  -- Add the parameters for the stored procedure here
+  p_pid int)
+  BEGIN
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
 
-        -- Insert statements for procedure here
-        select
-          p.Name,
-          p.TelegramId,
-          count(gk.Id) as times
-        from GameKill gk
-          join Player p on gk.KillerId = p.Id
-          join Player p2 on gk.VictimId = p2.Id
-        where p2.TelegramId = p_pid and gk.KillMethodId <> 8
-        group by p.Name, p.TelegramId
-        order by count(gk.Id) desc;
+    -- Insert statements for procedure here
+    select
+      p.Name,
+      p.TelegramId,
+      count(gk.Id) as times
+    from GameKill gk
+      join Player p on gk.KillerId = p.Id
+      join Player p2 on gk.VictimId = p2.Id
+    where p2.TelegramId = p_pid and gk.KillMethodId <> 8
+    group by p.Name, p.TelegramId
+    order by count(gk.Id) desc;
 
-      END;
+  END;
 
-    //
+//
 
-    CREATE PROCEDURE PlayerRoles(
-      -- Add the parameters for the stored procedure here
-      p_pid int)
-      BEGIN
-        -- SET NOCOUNT ON added to prevent extra result sets from
-        -- interfering with SELECT statements.
+CREATE PROCEDURE PlayerRoles(
+  -- Add the parameters for the stored procedure here
+  p_pid int)
+  BEGIN
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
 
-        -- Insert statements for procedure here
-        select
-          count(gp.Id) as times,
-          role
-        from GamePlayer gp
-          join Player p on p.Id = gp.PlayerId
-        where p.TelegramId = p_pid
-        group by role
-        order by count(gp.id) desc;
+    -- Insert statements for procedure here
+    select
+      count(gp.Id) as times,
+      role
+    from GamePlayer gp
+      join Player p on p.Id = gp.PlayerId
+    where p.TelegramId = p_pid
+    group by role
+    order by count(gp.id) desc;
 
-      END;
+  END;
 
-    //
+//

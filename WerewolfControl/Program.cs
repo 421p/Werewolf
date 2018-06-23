@@ -34,6 +34,8 @@ namespace Werewolf_Control
         public static DateTime MaxTime = DateTime.MinValue;
         public static bool MaintMode = false;
 
+        private static Process node;
+
         private static void Main(string[] args)
         {
             AppDomain.CurrentDomain.UnhandledException += (sender, eventArgs) =>
@@ -261,7 +263,7 @@ namespace Werewolf_Control
                     Console.CursorLeft = 0;
                     Console.Clear();
                     //write the info
-                    Console.WriteLine(msg);
+                    //Console.WriteLine(msg);
                     //put the cursor back;
                     //Console.CursorTop = ypos;
                     //Console.CursorLeft = xpos;
@@ -279,15 +281,9 @@ namespace Werewolf_Control
 
                     if (!MaintMode)
                     {
-                        if (nodes.Where(x => !x.ShuttingDown).All(x => x.Games.Count >= Settings.NewNodeThreshhold))
+                        if (nodes.Where(x => !x.ShuttingDown).All(x => x.Games.Count >= Settings.NewNodeThreshhold) || nodes.All(x => x.ShuttingDown))
                         {
-                            NewNode();
-                            Thread.Sleep(5000); //give the node time to register
-                        }
-
-                        if (nodes.All(x => x.ShuttingDown)) //replace nodes
-                        {
-                            NewNode();
+                            node = NewNode();
                             Thread.Sleep(5000); //give the node time to register
                         }
                     }
@@ -302,7 +298,7 @@ namespace Werewolf_Control
             }
         }
 
-        private static void NewNode()
+        private static Process NewNode()
         {
             //all nodes have quite a few games, let's spin up another
             //this is a bit more tricky, we need to figure out which node folder has the latest version...
@@ -324,7 +320,31 @@ namespace Werewolf_Control
             }
 
             //now we have the most recent version, launch one
-            Process.Start(currentChoice.Path);
+            var process = Process.Start(currentChoice.Path);
+
+            Task.Run(() =>
+            {
+                int ch;
+
+                while ((ch = process.StandardOutput.Read()) != -1)
+                {
+                    Console.Write((char)ch);
+                }
+
+            });
+            
+            Task.Run(() =>
+            {
+                int ch;
+
+                while ((ch = process.StandardError.Read()) != -1)
+                {
+                    Console.Write((char)ch);
+                }
+
+            });
+
+            return process;
         }
     }
 

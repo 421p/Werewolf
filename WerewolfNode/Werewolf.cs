@@ -222,22 +222,16 @@ namespace Werewolf_Node
                     u.Username != null ? ("@" + u.Username) : u.FirstName.ToBold()));
                 SendPlayerList(true);
 
-                new Thread(GameTimer).Start();
+                Task.Run(() => GameTimer());
             }
             catch (Exception ex)
             {
                 while (ex.InnerException != null)
                     ex = ex.InnerException;
-                Program.Send("Hmm.. something went wrong, please try starting the game again...\n" + ex.Message,
-                    chatid);
-#if DEBUG
-                Send(ex.StackTrace);
-#else
-                Send(
-                    Program.Version.FileVersion +
-                    $"\nGroup: {ChatId} ({ChatGroup})\nLanguage: {DbGroup?.Language ?? "null"}\n{Program.ClientId}\n{ex.Message}\n{ex.StackTrace}",
-                    Program.ErrorGroup);
-#endif
+                
+                
+                LogException(ex);
+                
                 Program.RemoveGame(this);
             }
         }
@@ -348,11 +342,13 @@ namespace Werewolf_Node
                 //Send($"{Settings.GameJoinTime} seconds to join!");
                 //start with the joining time
                 var count = Players.Count;
-                int secondsElapsed = 0;
+                var secondsElapsed = 0;
                 for (var i = 0; i < Settings.GameJoinTime; i++)
                 {
                     if (Players == null) //killed extra game
+                    {
                         return;
+                    }
 
                     if (KillTimer) //forcestart
                     {
@@ -492,7 +488,6 @@ namespace Werewolf_Node
                         Mode = Chaos ? "Chaos" : "Normal"
                     };
 
-                    db.SaveChanges();
                     db.Games.Add(game);
                     db.SaveChanges();
 
@@ -512,12 +507,14 @@ namespace Werewolf_Node
                         p.Language = dbp.Language;
 
                         db.SaveChanges();
+                        
                         var gamePlayer = new GamePlayer
                         {
                             GameId = game.Id,
                             Survived = true,
                             Role = p.PlayerRole.ToString()
                         };
+                        
                         dbp.GamePlayers.Add(gamePlayer);
                         db.SaveChanges();
 
@@ -545,54 +542,37 @@ namespace Werewolf_Node
                 while (IsRunning)
                 {
                     GameDay++;
-                    if (!IsRunning) break;
+                    if (!IsRunning)
+                    {
+                        break;
+                    }
+
                     CheckRoleChanges();
                     CheckLongHaul();
                     NightCycle();
-                    if (!IsRunning) break;
+                    if (!IsRunning)
+                    {
+                        break;
+                    }
+
                     CheckRoleChanges();
                     CheckLongHaul();
                     DayCycle();
-                    if (!IsRunning) break;
+                    
+                    if (!IsRunning)
+                    {
+                        break;
+                    }
+
                     CheckRoleChanges();
                     CheckLongHaul();
                     LynchCycle();
                 }
             }
-            catch (DbEntityValidationException ex)
-            {
-                var msg = "";
-                if (ex.InnerException != null)
-                    msg += ex.InnerException.Message;
-                foreach (var ves in ex.EntityValidationErrors)
-                {
-                    foreach (var ve in ves.ValidationErrors)
-                    {
-                        msg += $"{ves.Entry.Entity}:{ve.ErrorMessage}\n";
-                    }
-                }
-
-
-                Send("Something just went terribly wrong, I had to cancel the game....");
-                Send(
-                    Program.Version.FileVersion +
-                    $"\nGroup: {ChatId} ({ChatGroup})\nLanguage: {DbGroup?.Language ?? "null"}\n{Program.ClientId}\n{ex.Message}\n{msg}\n{ex.StackTrace}",
-                    Program.ErrorGroup);
-            }
             catch (Exception ex)
             {
                 LogAllExceptions(ex);
-                Send("Something just went terribly wrong, I had to cancel the game....\n" + ex.Message);
-                Send(
-                    Program.Version.FileVersion +
-                    $"\nGroup: {ChatId} ({ChatGroup})\nLanguage: {DbGroup?.Language ?? "null"}\n{Program.ClientId}\n{ex.Message}\n{ex.StackTrace}",
-                    Program.ErrorGroup);
-#if DEBUG
-                Send(ex.StackTrace);
-#else
-                //this would be a duplicate
-                //Send(Program.Version.FileVersion + $"\nGroup: {ChatId} ({ChatGroup})\nLanguage: {DbGroup?.Language ?? "null"}\n{Program.ClientId}\n{ex.Message}\n{ex.StackTrace}", Program.ErrorGroup);
-#endif
+
             }
             finally
             {
@@ -1561,7 +1541,9 @@ namespace Werewolf_Node
                 }
 
                 foreach (var p in Players)
+                {
                     p.OriginalRole = p.PlayerRole;
+                }
             }
             catch (Exception ex)
             {
@@ -2387,7 +2369,7 @@ namespace Werewolf_Node
             {
                 var maxVotes = Players.Max(x => x.Votes);
                 var choices = Players.Where(x => x.Votes == maxVotes).ToList();
-                IPlayer lynched = new IPlayer() {Votes = -1};
+                var lynched = new IPlayer() {Votes = -1};
                 if (choices.Count > 1)
                 {
                     //Log.WriteLine("Lynch tie");
@@ -3793,7 +3775,9 @@ namespace Werewolf_Node
 
                 if (bloodyVictims.Count() >= 4)
                     foreach (var p in bloodyVictims)
+                    {
                         AddAchievement(p, Achievements.BloodyNight);
+                    }
             }
             else
             {
@@ -3967,7 +3951,10 @@ namespace Werewolf_Node
                     {
                         // do nothing, gunner can still make VGs win
                         foreach (var p in alivePlayers.Where(x => x.Team == ITeam.Village))
+                        {
                             AddAchievement(p, Achievements.GunnerSaves);
+                        }
+
                         return false;
                     }
                 }
@@ -3979,8 +3966,12 @@ namespace Werewolf_Node
                     !WolfRoles.Contains(x.PlayerRole) && x.PlayerRole != IRole.Cultist &&
                     x.PlayerRole != IRole.SerialKiller)) //checks for cult and SK are actually useless...
                 //no wolf, no cult, no SK... VG wins!
+            {
                 if (!checkbitten || alivePlayers.All(x => !x.Bitten)) //unless bitten is about to turn into a wolf
+                {
                     return DoGameEnd(ITeam.Village);
+                }
+            }
 
 
             return false;
@@ -4398,9 +4389,9 @@ namespace Werewolf_Node
                 string msg = "";
                 var targetBase = Players.Where(x => !x.IsDead && x.Id != player.Id).ToList();
 
-                List<IPlayer> targets = new List<IPlayer>();
+                var targets = new List<IPlayer>();
 
-                QuestionType qtype = QuestionType.Lynch;
+                var qtype = QuestionType.Lynch;
                 switch (player.PlayerRole)
                 {
                     case IRole.SerialKiller:
@@ -4773,10 +4764,9 @@ namespace Werewolf_Node
 
         internal void LogException(Exception e)
         {
-            Send(
-                Program.Version.FileVersion +
-                $"\nGroup: {ChatId} ({ChatGroup})\nLanguage: {DbGroup?.Language ?? "null"}\n{Program.ClientId}\n{e.Message}\n{e.StackTrace}",
-                Program.ErrorGroup);
+            Console.WriteLine("\nException:\n");
+            Console.WriteLine($"Group: {ChatId} ({ChatGroup})\nLanguage: {DbGroup?.Language ?? "null"}\n{e.Message}");
+            Console.WriteLine(e.StackTrace);
         }
 
         #endregion
@@ -4834,16 +4824,23 @@ namespace Werewolf_Node
                 }
                 catch (Exception e)
                 {
-                    Send("Exception during save game kill:\n" + e.Message + "\n" + e.StackTrace, 268253251);
+                    Console.WriteLine("Exception during save game kill:");
+                    LogException(e);
                 }
             }
 
-            if (victim.LoverId == killer.Id && Time == GameTime.Night && method != KillMthd.LoverDied)
+            if (victim.LoverId != killer.Id || Time != GameTime.Night || method == KillMthd.LoverDied)
             {
-                if (GameDay == 1) //killed lover on first night
-                    AddAchievement(killer, Achievements.OhShi);
-                else if (WolfRoles.Contains(killer.PlayerRole)) //wolf pack killed lover, not on first night
-                    AddAchievement(killer, Achievements.ShouldveMentioned);
+                return;
+            }
+
+            if (GameDay == 1) //killed lover on first night
+            {
+                AddAchievement(killer, Achievements.OhShi);
+            }
+            else if (WolfRoles.Contains(killer.PlayerRole)) //wolf pack killed lover, not on first night
+            {
+                AddAchievement(killer, Achievements.ShouldveMentioned);
             }
         }
 
@@ -4891,7 +4888,9 @@ namespace Werewolf_Node
         private void DBKill(IEnumerable<IPlayer> killers, IPlayer victim, KillMthd method)
         {
             foreach (var killer in killers)
+            {
                 DBKill(killer, victim, method);
+            }
         }
 
         private Player GetDBPlayer(IPlayer player, WWContext db)
