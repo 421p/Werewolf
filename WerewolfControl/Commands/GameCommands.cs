@@ -6,6 +6,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Werewolf_Control.Attributes;
 using Werewolf_Control.Helpers;
+using WWContext = Storage.WWContext;
 
 namespace Werewolf_Control
 {
@@ -80,7 +81,7 @@ namespace Werewolf_Control
                         if (game.GroupId != update.Message.Chat.Id)
                         {
                             //player is already in a game (in another group), and alive
-                            var grp = db.Groups.FirstOrDefault(x => x.GroupId == id);
+                            var grp = db.Group.FirstOrDefault(x => x.GroupId == id);
                             Send(GetLocaleString("AlreadyInGame", grp?.Language ?? "English", game.ChatGroup.ToBold()),
                                 update.Message.Chat.Id);
                             return;
@@ -106,11 +107,11 @@ namespace Werewolf_Control
 
                 if (game == null)
                 {
-                    var grp = db.Groups.FirstOrDefault(x => x.GroupId == id);
+                    var grp = db.Group.FirstOrDefault(x => x.GroupId == id);
                     if (grp == null)
                     {
                         grp = MakeDefaultGroup(id, update.Message.Chat.Title, "join");
-                        db.Groups.Add(grp);
+                        db.Group.Add(grp);
                         db.SaveChanges();
                     }
 
@@ -125,11 +126,11 @@ namespace Werewolf_Control
             var id = update.Message.Chat.Id;
             using (var db = new WWContext())
             {
-                var grp = db.Groups.FirstOrDefault(x => x.GroupId == id);
+                var grp = db.Group.FirstOrDefault(x => x.GroupId == id);
                 if (grp == null)
                 {
                     grp = MakeDefaultGroup(id, update.Message.Chat.Title, "forcestart");
-                    db.Groups.Add(grp);
+                    db.Group.Add(grp);
                     db.SaveChanges();
                 }
 
@@ -229,7 +230,7 @@ namespace Werewolf_Control
                 {
                     using (var db = new WWContext())
                     {
-                        var grp = db.Groups.FirstOrDefault(x => x.GroupId == update.Message.Chat.Id);
+                        var grp = db.Group.FirstOrDefault(x => x.GroupId == update.Message.Chat.Id);
                         if (isadmin || grp.HasFlag(GroupConfig.AllowExtend))
                         {
                             var maxextend = grp.MaxExtend ?? Settings.MaxExtend;

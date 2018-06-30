@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Xml.Linq;
-using Database;
+using Storage;
 using LanguageFileConverter;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -65,7 +65,7 @@ namespace Werewolf_Control
             {
                 using (var db = new WWContext())
                 {
-                    var g = db.Groups.FirstOrDefault(x => x.GroupId == groupid);
+                    var g = db.Group.FirstOrDefault(x => x.GroupId == groupid);
                     if (g != null)
                     {
                         g.CreatedBy = "BAN";
@@ -128,7 +128,7 @@ namespace Werewolf_Control
 #elif RELEASE2
                         2;
 #endif
-                    db.BotStatus.Find(bot).BotStatus = "Updating";
+                    db.BotStatus.Find(bot).Status = "Updating";
                     db.SaveChanges();
                 }
 
@@ -409,7 +409,7 @@ namespace Werewolf_Control
             {
                 Bot.Send("Please hold, searching....", update.Message.Chat.Id);
 
-                var groups = db.Groups
+                var groups = db.Group
                     .Where(x => x.Preferred != false && x.GroupLink != null && x.GroupId != -1001030085238)
                     .Select(x => new PossibleGroup()
                     {
@@ -708,7 +708,7 @@ namespace Werewolf_Control
                                     BannedBy = u.Message.From.FirstName,
                                     Name = player.Name
                                 };
-                                db.GlobalBans.Add(ban);
+                                db.GlobalBan.Add(ban);
                                 UpdateHandler.BanList.Add(ban);
                                 db.SaveChanges();
                                 Send("User has been banned", u.Message.Chat.Id);
@@ -736,7 +736,7 @@ namespace Werewolf_Control
                                     BannedBy = u.Message.From.FirstName,
                                     Name = player.Name
                                 };
-                                db.GlobalBans.Add(ban);
+                                db.GlobalBan.Add(ban);
                                 UpdateHandler.BanList.Add(ban);
                                 db.SaveChanges();
                                 Send("User has been banned", u.Message.Chat.Id);
@@ -788,7 +788,7 @@ namespace Werewolf_Control
                                 BannedBy = u.Message.From.FirstName,
                                 Name = player.Name
                             };
-                            db.GlobalBans.Add(ban);
+                            db.GlobalBan.Add(ban);
                             UpdateHandler.BanList.Add(ban);
                             db.SaveChanges();
                             Send($"User {player.Name} (@{player.UserName}) has been banned", u.Message.Chat.Id);
@@ -817,13 +817,13 @@ namespace Werewolf_Control
                             var player = db.Players.FirstOrDefault(x => x.UserName == username);
                             if (player != null)
                             {
-                                var ban = db.GlobalBans.FirstOrDefault(x => x.TelegramId == player.TelegramId);
+                                var ban = db.GlobalBan.FirstOrDefault(x => x.TelegramId == player.TelegramId);
                                 if (ban != null)
                                 {
                                     var localban = UpdateHandler.BanList.FirstOrDefault(x => x.Id == ban.Id);
                                     if (localban != null)
                                         UpdateHandler.BanList.Remove(localban);
-                                    db.GlobalBans.Remove(ban);
+                                    db.GlobalBan.Remove(ban);
                                     db.SaveChanges();
                                     Send("User has been unbanned.", u.Message.Chat.Id);
                                 }
@@ -837,13 +837,13 @@ namespace Werewolf_Control
                             var player = db.Players.FirstOrDefault(x => x.TelegramId == e.User.Id);
                             if (player != null)
                             {
-                                var ban = db.GlobalBans.FirstOrDefault(x => x.TelegramId == player.TelegramId);
+                                var ban = db.GlobalBan.FirstOrDefault(x => x.TelegramId == player.TelegramId);
                                 if (ban != null)
                                 {
                                     var localban = UpdateHandler.BanList.FirstOrDefault(x => x.Id == ban.Id);
                                     if (localban != null)
                                         UpdateHandler.BanList.Remove(localban);
-                                    db.GlobalBans.Remove(ban);
+                                    db.GlobalBan.Remove(ban);
                                     db.SaveChanges();
                                     Send("User has been unbanned.", u.Message.Chat.Id);
                                 }
@@ -862,13 +862,13 @@ namespace Werewolf_Control
 
                     using (var db = new WWContext())
                     {
-                        var ban = db.GlobalBans.FirstOrDefault(x => x.TelegramId == id);
+                        var ban = db.GlobalBan.FirstOrDefault(x => x.TelegramId == id);
                         if (ban != null)
                         {
                             var localban = UpdateHandler.BanList.FirstOrDefault(x => x.Id == ban.Id);
                             if (localban != null)
                                 UpdateHandler.BanList.Remove(localban);
-                            db.GlobalBans.Remove(ban);
+                            db.GlobalBan.Remove(ban);
                             db.SaveChanges();
                             Send("User has been unbanned.", u.Message.Chat.Id);
                         }
@@ -947,7 +947,7 @@ namespace Werewolf_Control
 
                             //get latest game player, check within 2 weeks
                             var gp =
-                                p?.GamePlayers.Join(db.Games.Where(x => x.GroupId == Settings.PrimaryChatId),
+                                p?.GamePlayer.Join(db.Game.Where(x => x.GroupId == Settings.PrimaryChatId),
                                         x => x.GameId, y => y.Id, (gamePlayer, game) => new {game.TimeStarted, game.Id})
                                     .OrderByDescending(x => x.Id)
                                     .FirstOrDefault();
@@ -1079,9 +1079,12 @@ namespace Werewolf_Control
                 return;
             }
 
-            Group grp;
+            Storage.Group grp;
             using (var db = new WWContext())
+            {
                 grp = GetGroup(args[1], db);
+            }
+
             var grpid = grp?.GroupId ?? (long) 0;
             var grpname = grp?.Name ?? "";
 
@@ -1124,7 +1127,7 @@ namespace Werewolf_Control
 
             using (var db = new WWContext())
             {
-                Group grp = GetGroup(group, db);
+                var grp = GetGroup(group, db);
                 if (grp == null)
                 {
                     Send("Group not found.", update.Message.Chat.Id);
@@ -1339,7 +1342,7 @@ namespace Werewolf_Control
             {
                 using (var db = new WWContext())
                 {
-                    Group grp = GetGroup(link, db);
+                    var grp = GetGroup(link, db);
 
                     if (grp == null)
                         Send($"Group not found.", u.Message.Chat.Id);
@@ -1439,9 +1442,9 @@ namespace Werewolf_Control
                 if (!String.IsNullOrEmpty(t.UserName))
                     result += $"@{t.UserName}\n";
                 result +=
-                    $"------------------\nGames Played: {t.GamePlayers.Count}\nLanguage: {t.Language.FormatHTML()}\nDonation Level: {t.DonationLevel ?? 0}\n";
-                if (t.GamePlayers.Any())
-                    result += $"Played first game: {t.GamePlayers.OrderBy(x => x.Id).First().Game.TimeStarted}\n";
+                    $"------------------\nGames Played: {t.GamePlayer.Count}\nLanguage: {t.Language.FormatHTML()}\nDonation Level: {t.DonationLevel ?? 0}\n";
+                if (t.GamePlayer.Any())
+                    result += $"Played first game: {t.GamePlayer.OrderBy(x => x.Id).First().Game.TimeStarted}\n";
                 var spamBans = t.TempBanCount;
                 if (spamBans > 0)
                 {
@@ -1449,7 +1452,7 @@ namespace Werewolf_Control
                 }
 
                 //check if currently banned
-                var banned = db.GlobalBans.FirstOrDefault(x => x.TelegramId == t.TelegramId);
+                var banned = db.GlobalBan.FirstOrDefault(x => x.TelegramId == t.TelegramId);
                 if (banned != null)
                 {
                     result +=
