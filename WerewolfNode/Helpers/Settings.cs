@@ -21,7 +21,7 @@ namespace Werewolf_Node
 
         public static int
 
-            MinPlayers = 3,
+            MinPlayers = 4,
 
             MaxPlayers = 35,
             TimeDay = 60,
