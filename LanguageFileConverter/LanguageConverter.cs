@@ -11,27 +11,18 @@ namespace LanguageFileConverter
 {
     public static class LanguageConverter
     {
-        private static readonly HttpClient client = new HttpClient();
-
-        public static async Task<XDocument> LoadAsync(string path)
-        {
-            return await Task.Run(()=>Load(path));
-        }
-
         public static XDocument Load(string path)
         {
-
-            var r = new StringReader(File.ReadAllText(path));
+            StreamReader r = File.OpenText(path);
 
             var deserializer = new Deserializer();
 
-            Dictionary<object, object> yamlObject = (Dictionary<object, object>)deserializer.Deserialize(r);
+            var yamlObject = (Dictionary<object, object>)deserializer.Deserialize(r);
 
-            var serializer = new SerializerBuilder().JsonCompatible().Build();
+            r.Close();
 
             var language = (Dictionary<object, object>) yamlObject["language"];
 
-            // XAttribute object array content:
             XAttribute[] attArray = {
                 new XAttribute("name", (string)language["name"]),
                 new XAttribute("base", (string)language["base"]),
@@ -40,46 +31,29 @@ namespace LanguageFileConverter
 
             var str = (Dictionary<object, object>) yamlObject["strings"];
 
-            //Dictionary<string, List<string>> strings = new Dictionary<string, List<string>>();
-
-            //List<string> s;
-
             XElement xStrings = new XElement("Root");
 
-            str.Keys.ToList().ForEach(x =>
+            foreach (var x in str.Keys)
             {
-                //s = new List<string>();
-                XElement xValues = new XElement("Root");
-
-                if (str[x].GetType().Name == "List`1") { 
-                    ((List<object>)str[x]).ForEach(y =>
-                    {
-                        //s.Add((string)y);
-                        xValues.Add(new XElement("value", y));
-                    });
-                }
-
-                else if(str[x].GetType().Name == "Dictionary`2"){
-                    //s.Add("");
-                    xValues.Add(new XElement("value", ""));
-                }
-                else
+                if (!(str[x] is IList<object>))
                 {
-                    //s.Add("");
-                    xValues.Add(new XElement("value", ""));
+                    throw new Exception(str[x].GetType().Name + " is not a list");
                 }
 
-                //strings.Add((string)x, s);
+                XElement xValues = new XElement("Root");
+                foreach (var y in (List<object>)str[x])
+                {
+                    xValues.Add(new XElement("value", y));
+                }
 
-                xStrings.Add(new XElement("string", new[] {new XAttribute("key", x)}, xValues.Elements().Select(el=>el)));
-            });
+                xStrings.Add(new XElement("string", new[] { new XAttribute("key", x) }, xValues.Elements()));
 
+            }
 
             XDocument document = new XDocument(
-                new XComment("This is a comment"),
                 new XElement("strings",
                         new XElement("language", attArray),
-                        xStrings.Elements().Select(el => el)
+                        xStrings.Elements()
                     )
                 );
 

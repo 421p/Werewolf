@@ -881,15 +881,10 @@ strings:
         - 'the Sandman 💤'
     AboutSandman:
         - ' Once per game, the sandman can make all players sleep so deeply that nobody can use their night actions'
-    RoleInfoPacifist: {  }
     Pacifist:
         - 'the Pacifist ☮️'
-    AboutPacifist: {  }
-    RoleInfoWiseElder: {  }
     WiseElder:
         - 'the Wise Elder 📚'
-    AboutWiseElder: {  }
-    RoleInfoThief: {  }
     Thief:
         - 'the Thief 😈'
-    AboutThief: {  }
+    
