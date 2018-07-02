@@ -24,8 +24,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LanguageFileConverter", "La
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Storage", "Storage\Storage.csproj", "{5881728C-CF06-47B9-BA19-89DB18590422}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Testimoni", "Testimoni\Testimoni.csproj", "{DC8080F1-9B00-4AFF-8D25-897CAFBF1C87}"
-EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Languages\Languages.projitems*{594fdc40-26dc-4edd-9c16-c79b3ad35e9d}*SharedItemsImports = 13
@@ -94,14 +92,6 @@ Global
 		{5881728C-CF06-47B9-BA19-89DB18590422}.Release 2|Any CPU.Build.0 = Release|Any CPU
 		{5881728C-CF06-47B9-BA19-89DB18590422}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5881728C-CF06-47B9-BA19-89DB18590422}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DC8080F1-9B00-4AFF-8D25-897CAFBF1C87}.Beta|Any CPU.ActiveCfg = Debug|Any CPU
-		{DC8080F1-9B00-4AFF-8D25-897CAFBF1C87}.Beta|Any CPU.Build.0 = Debug|Any CPU
-		{DC8080F1-9B00-4AFF-8D25-897CAFBF1C87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DC8080F1-9B00-4AFF-8D25-897CAFBF1C87}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DC8080F1-9B00-4AFF-8D25-897CAFBF1C87}.Release 2|Any CPU.ActiveCfg = Debug|Any CPU
-		{DC8080F1-9B00-4AFF-8D25-897CAFBF1C87}.Release 2|Any CPU.Build.0 = Debug|Any CPU
-		{DC8080F1-9B00-4AFF-8D25-897CAFBF1C87}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DC8080F1-9B00-4AFF-8D25-897CAFBF1C87}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
