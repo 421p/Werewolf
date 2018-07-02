@@ -47,7 +47,7 @@ namespace Werewolf_Control
                 var baseMenu = new List<InlineKeyboardButton[]>();
                 for (var i = 0; i < buttons.Count; i++)
                 {
-                    baseMenu.Add(buttons.Count - 1 == i ? new[] {buttons[i]} : new[] {buttons[i], buttons[i + 1]});
+                    baseMenu.Add(buttons.Count - 1 == i ? new InlineKeyboardButton[] {buttons[i]} : new InlineKeyboardButton[] {buttons[i], buttons[i + 1]});
 
                     i++;
                 }
