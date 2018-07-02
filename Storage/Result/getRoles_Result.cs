@@ -7,13 +7,13 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Database
+namespace Storage.Result
 {
     using System;
     
-    public partial class GroupDay1Death_Result
+    public partial class getRoles_Result
     {
-        public Nullable<int> pct { get; set; }
-        public int victimid { get; set; }
+        public string name { get; set; }
+        public string role { get; set; }
     }
 }

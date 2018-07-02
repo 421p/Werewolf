@@ -7,14 +7,13 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Database
+namespace Storage.Result
 {
     using System;
-    using System.Collections.Generic;
     
-    public partial class ContestTerm
+    public partial class GlobalNight1Death_Result
     {
-        public int TelegramId { get; set; }
-        public bool AgreedTerms { get; set; }
+        public Nullable<int> pct { get; set; }
+        public int victimid { get; set; }
     }
 }

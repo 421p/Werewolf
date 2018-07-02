@@ -7,13 +7,14 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Database
+namespace Storage.Result
 {
     using System;
     
-    public partial class getRoles_Result
+    public partial class getPlayTime_Result
     {
-        public string name { get; set; }
-        public string role { get; set; }
+        public Nullable<int> Average { get; set; }
+        public Nullable<int> Minimum { get; set; }
+        public Nullable<int> Maximum { get; set; }
     }
 }

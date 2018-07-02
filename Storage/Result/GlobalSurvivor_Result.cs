@@ -7,13 +7,13 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Database
+namespace Storage.Result
 {
     using System;
     
-    public partial class GroupNight1Death_Result
+    public partial class GlobalSurvivor_Result
     {
-        public Nullable<int> pct { get; set; }
-        public int victimid { get; set; }
+        public Nullable<decimal> pct { get; set; }
+        public int playerid { get; set; }
     }
 }

@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
-using Database;
 using Newtonsoft.Json;
+using Storage;
 using Telegram.Bot.Types;
 using Werewolf_Control.Helpers;
 
@@ -44,7 +44,7 @@ namespace Werewolf_Control.Models
                         return;
                     }
 
-                    var gamesPlayed = p.GamePlayers.Count();
+                    var gamesPlayed = p.GamePlayers.Count;
                     var won = p.GamePlayers.Count(x => x.Won);
                     var lost = gamesPlayed - won;
                     var survived = p.GamePlayers.Count(x => x.Survived);
@@ -54,7 +54,7 @@ namespace Werewolf_Control.Models
                     var ach = (Achievements) (p.Achievements ?? 0);
                     var count = ach.GetUniqueFlags().Count();
 
-                    Content = String.IsNullOrWhiteSpace(u.Username)
+                    Content = string.IsNullOrWhiteSpace(u.Username)
                         ? $"{u.FirstName.FormatHTML()} the {roleInfo.OrderByDescending(x => x.times).FirstOrDefault()?.role ?? "Noob"}"
                         : $"<a href=\"https://telegram.me/{u.Username}\">{u.FirstName.FormatHTML()} the {roleInfo.OrderByDescending(x => x.times).FirstOrDefault()?.role ?? "Noob"}</a>";
                     Content += $"\n{count.Pad()}Achievements Unlocked!\n" +

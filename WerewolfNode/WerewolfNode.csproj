@@ -191,6 +191,10 @@
       <Project>{fcd23604-bec8-49e7-b879-ac885865e74d}</Project>
       <Name>LanguageFileConverter</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Storage\Storage.csproj">
+      <Project>{5881728c-cf06-47b9-ba19-89db18590422}</Project>
+      <Name>Storage</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)/Microsoft.CSharp.targets" />
   <PropertyGroup>

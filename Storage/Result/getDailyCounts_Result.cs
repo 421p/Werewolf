@@ -7,13 +7,15 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Database
+namespace Storage.Result
 {
     using System;
-    using System.Collections.Generic;
     
-    public partial class Admin
+    public partial class getDailyCounts_Result
     {
-        public int UserId { get; set; }
+        public Nullable<System.DateTime> Day { get; set; }
+        public Nullable<int> Games { get; set; }
+        public Nullable<int> Groups { get; set; }
+        public Nullable<int> players { get; set; }
     }
 }

@@ -4,8 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
-using Database;
 using Newtonsoft.Json;
+using Storage;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -14,7 +14,6 @@ using Telegram.Bot.Types.ReplyMarkups;
 using Werewolf_Control.Handler;
 using Werewolf_Control.Helpers;
 using Werewolf_Control.Models;
-using WWContext = Storage.WWContext;
 
 namespace Werewolf_Control
 {
@@ -74,11 +73,11 @@ namespace Werewolf_Control
             //make sure the group is in the database
             using (var db = new WWContext())
             {
-                var grp = db.Group.FirstOrDefault(x => x.GroupId == id);
+                var grp = db.Groups.FirstOrDefault(x => x.GroupId == id);
                 if (grp == null)
                 {
                     grp = MakeDefaultGroup(id, update.Message.Chat.Title, "config");
-                    db.Group.Add(grp);
+                    db.Groups.Add(grp);
                 }
 
                 grp.BotInGroup = true;
@@ -100,7 +99,7 @@ namespace Werewolf_Control
             using (var db = new WWContext())
             {
                 var p = u.GetTarget(db);
-                var ban = db.GlobalBan.FirstOrDefault(x => x.TelegramId == p.TelegramId);
+                var ban = db.GlobalBans.FirstOrDefault(x => x.TelegramId == p.TelegramId);
                 string status;
                 if (ban != null)
                 {
@@ -121,7 +120,7 @@ namespace Werewolf_Control
                     status = "Not banned (in Werewolf)";
                 }
 
-                var firstSeen = p.GamePlayer?.OrderBy(x => x.GameId).FirstOrDefault()?.Game?.TimeStarted;
+                var firstSeen = p.GamePlayers?.OrderBy(x => x.GameId).FirstOrDefault()?.Game?.TimeStarted;
 
                 Bot.Api.SendTextMessageAsync(u.Message.Chat.Id,
                     $"Player: {p.Name.FormatHTML()}\nCurrent Status: {status}\nPlayer first seen: {firstSeen?.ToString("ddMMMyyyy H:mm:ss zzz").ToUpper() ?? "Hasn't played ever!"}",
@@ -250,7 +249,7 @@ namespace Werewolf_Control
         {
             using (var db = new WWContext())
             {
-                var grp = db.Group.FirstOrDefault(x => x.GroupId == u.Message.Chat.Id) ??
+                var grp = db.Groups.FirstOrDefault(x => x.GroupId == u.Message.Chat.Id) ??
                           MakeDefaultGroup(u.Message.Chat.Id, u.Message.Chat.Title, "setlink");
                 grp.GroupLink = null;
                 db.SaveChanges();
@@ -288,7 +287,7 @@ namespace Werewolf_Control
 
             using (var db = new WWContext())
             {
-                var grp = db.Group.FirstOrDefault(x => x.GroupId == update.Message.Chat.Id) ??
+                var grp = db.Groups.FirstOrDefault(x => x.GroupId == update.Message.Chat.Id) ??
                           MakeDefaultGroup(update.Message.Chat.Id, update.Message.Chat.Title, "setlink");
                 grp.GroupLink = link;
                 db.SaveChanges();
@@ -520,7 +519,7 @@ namespace Werewolf_Control
                     return;
                 }
 
-                if (db.GlobalBan.Any(x => x.TelegramId == oldid))
+                if (db.GlobalBans.Any(x => x.TelegramId == oldid))
                 {
                     Send("Old account was global banned!", u.Message.Chat.Id);
                     return;
@@ -532,22 +531,22 @@ namespace Werewolf_Control
                     result += "Old account given is newer than new account\n";
                 }
 
-                if (oldP.GamePlayer.Max(x => x.GameId) > newP.GamePlayer.Min(x => x.GameId))
+                if (oldP.GamePlayers.Max(x => x.GameId) > newP.GamePlayers.Min(x => x.GameId))
                 {
                     score -= 30;
                     result += "Account games overlap - old account has played a game since new account started\n";
                 }
 
                 //TODO Check groups played on old account vs new account
-                var oldGrp = (from grp in db.Group
-                    join g in db.Game on grp.Id equals g.GrpId
-                    join gp in db.GamePlayer on g.Id equals gp.GameId
+                var oldGrp = (from grp in db.Groups
+                    join g in db.Games on grp.Id equals g.GrpId
+                    join gp in db.GamePlayers on g.Id equals gp.GameId
                     where gp.PlayerId == oldP.Id
                     select grp).Distinct();
 
-                var newGrp = (from grp in db.Group
-                    join g in db.Game on grp.Id equals g.GrpId
-                    join gp in db.GamePlayer on g.Id equals gp.GameId
+                var newGrp = (from grp in db.Groups
+                    join g in db.Games on grp.Id equals g.GrpId
+                    join gp in db.GamePlayers on g.Id equals gp.GameId
                     where gp.PlayerId == newP.Id
                     select grp).Distinct();
 

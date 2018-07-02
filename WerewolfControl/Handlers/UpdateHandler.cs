@@ -6,9 +6,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Database;
 using LanguageFileConverter;
 using Newtonsoft.Json;
+using Storage;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -20,10 +20,6 @@ using Telegram.Bot.Types.ReplyMarkups;
 using Werewolf_Control.Helpers;
 using Werewolf_Control.Models;
 using File = System.IO.File;
-using GlobalBan = Storage.GlobalBan;
-using Group = Storage.Group;
-using Player = Storage.Player;
-using WWContext = Storage.WWContext;
 
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 namespace Werewolf_Control.Handler
@@ -103,7 +99,7 @@ namespace Werewolf_Control.Handler
                                     break;
                             }
 
-                            db.GlobalBan.Add(new GlobalBan
+                            db.GlobalBans.Add(new GlobalBan
                             {
                                 BannedBy = "Moderator",
                                 Expires = expireTime,
@@ -118,12 +114,12 @@ namespace Werewolf_Control.Handler
                         db.SaveChanges();
 
                         //now refresh the list
-                        var list = db.GlobalBan.ToList();
+                        var list = db.GlobalBans.ToList();
 #if RELEASE
                         for (var i = list.Count - 1; i >= 0; i--)
                         {
                             if (list[i].Expires > DateTime.UtcNow) continue;
-                            db.GlobalBan.Remove(db.GlobalBan.Find(list[i].Id));
+                            db.GlobalBans.Remove(db.GlobalBans.Find(list[i].Id));
                             list.RemoveAt(i);
                         }
 
@@ -482,7 +478,7 @@ namespace Werewolf_Control.Handler
                                 var m = update.Message;
                                 if (m.MigrateFromChatId != 0)
                                 {
-                                    grp = DB.Group.FirstOrDefault(x => x.GroupId == m.MigrateFromChatId);
+                                    grp = DB.Groups.FirstOrDefault(x => x.GroupId == m.MigrateFromChatId);
                                     if (grp == null) return;
                                     grp.GroupId = m.Chat.Id;
                                     DB.SaveChanges();
@@ -494,7 +490,7 @@ namespace Werewolf_Control.Handler
                                     if (m.LeftChatMember.Id == Bot.Me.Id)
                                     {
                                         //removed from group
-                                        var grps = DB.Group.Where(x => x.GroupId == id);
+                                        var grps = DB.Groups.Where(x => x.GroupId == id);
                                         if (!grps.Any())
                                         {
                                             return;
@@ -519,13 +515,13 @@ namespace Werewolf_Control.Handler
                                 if (m.NewChatMember?.Id == Bot.Me.Id)
                                 {
                                     //added to a group
-                                    grp = DB.Group.FirstOrDefault(x => x.GroupId == id);
+                                    grp = DB.Groups.FirstOrDefault(x => x.GroupId == id);
                                     if (grp == null)
                                     {
                                         grp = Commands.MakeDefaultGroup(id, update.Message.Chat.Title, "NewChatMember");
-                                        DB.Group.Add(grp);
+                                        DB.Groups.Add(grp);
                                         DB.SaveChanges();
-                                        grp = DB.Group.FirstOrDefault(x => x.GroupId == id);
+                                        grp = DB.Groups.FirstOrDefault(x => x.GroupId == id);
                                     }
 
                                     grp.BotInGroup = true;
@@ -552,7 +548,7 @@ namespace Werewolf_Control.Handler
                                     var uid = m.NewChatMember.Id;
                                     //check that they are allowed to join.
                                     var p = DB.Players.FirstOrDefault(x => x.TelegramId == uid);
-                                    var gamecount = p?.GamePlayer.Count ?? 0;
+                                    var gamecount = p?.GamePlayers.Count ?? 0;
                                     if (gamecount >= 500)
                                     {
                                         Send($"{m.NewChatMember.FirstName} has played {gamecount} games", m.Chat.Id);
@@ -570,7 +566,7 @@ namespace Werewolf_Control.Handler
                                     var uid = m.NewChatMember.Id;
                                     //check that they are allowed to join.
                                     var p = DB.Players.FirstOrDefault(x => x.TelegramId == uid);
-                                    var gamecount = p?.GamePlayer.Count ?? 0;
+                                    var gamecount = p?.GamePlayers.Count ?? 0;
                                     if (gamecount >= 500)
                                     {
                                         Send($"{m.NewChatMember.FirstName.FormatHTML()} has played {gamecount} games",
@@ -587,7 +583,7 @@ namespace Werewolf_Control.Handler
                                 else if (m.NewChatMember != null && m.Chat.Id == Settings.SupportChatId)
                                 {
                                     var uid = m.NewChatMember.Id;
-                                    var p = DB.GlobalBan.FirstOrDefault(x => x.TelegramId == uid);
+                                    var p = DB.GlobalBans.FirstOrDefault(x => x.TelegramId == uid);
                                     if (p != null)
                                     {
                                         var result =
@@ -994,7 +990,7 @@ namespace Werewolf_Control.Handler
                     //get group and player
                     long groupid = 0;
                     if (args.Length > 1 && long.TryParse(args[1], out groupid))
-                        grp = DB.Group.FirstOrDefault(x => x.GroupId == groupid);
+                        grp = DB.Groups.FirstOrDefault(x => x.GroupId == groupid);
                     Player p = DB.Players.FirstOrDefault(x => x.TelegramId == query.From.Id);
 
                     //some variable helpers
@@ -1086,9 +1082,9 @@ namespace Werewolf_Control.Handler
                                 var para = DB.Players.FirstOrDefault(x => x.Id == userid);
 
                                 //get all the players Para has played with
-                                var ohaiplayers = (from g in DB.Game
-                                    join gp in DB.GamePlayer on g.Id equals gp.GameId
-                                    join gp2 in DB.GamePlayer on g.Id equals gp2.GameId
+                                var ohaiplayers = (from g in DB.Games
+                                    join gp in DB.GamePlayers on g.Id equals gp.GameId
+                                    join gp2 in DB.GamePlayers on g.Id equals gp2.GameId
                                     join pl in DB.Players on gp2.PlayerId equals pl.Id
                                     where gp.PlayerId == para.Id
                                     select pl).Distinct();
@@ -1150,7 +1146,7 @@ namespace Werewolf_Control.Handler
                             var newfilename = args[3];
                             int grpcount = 0, plcount = 0, grprcount = 0;
 
-                            var groupsmoved = (from g in DB.Group where g.Language == oldfilename select g).ToList();
+                            var groupsmoved = (from g in DB.Groups where g.Language == oldfilename select g).ToList();
                             var players = (from pl in DB.Players where pl.Language == oldfilename select pl).ToList();
                             var grouprankings = (from gr in DB.GroupRanking where gr.Language == oldfilename select gr)
                                 .ToList();
@@ -1341,7 +1337,7 @@ namespace Werewolf_Control.Handler
                                     buttons.AddRange(variants.OrderBy(x => x).Select(x =>
                                         new InlineKeyboardCallbackButton(x, $"groups|{query.From.Id}|{choice}|{x}")));
                                     var playersGames = DB.Players.FirstOrDefault(x => x.TelegramId == query.From.Id);
-                                    var gamecount = playersGames?.GamePlayer.Count ?? 0;
+                                    var gamecount = playersGames?.GamePlayers.Count ?? 0;
                                     var message = "";
                                     if (gamecount >= 500 && choice.Equals("English"))
                                     {

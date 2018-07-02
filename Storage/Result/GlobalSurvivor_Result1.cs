@@ -7,13 +7,14 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Database
+namespace Storage.Result
 {
     using System;
     
-    public partial class GlobalNight1Death_Result
+    public partial class GlobalSurvivor_Result1
     {
-        public Nullable<int> pct { get; set; }
-        public int victimid { get; set; }
+        public Nullable<decimal> pct { get; set; }
+        public string Name { get; set; }
+        public int TelegramId { get; set; }
     }
 }

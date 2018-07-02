@@ -1,11 +1,8 @@
+using System;
+using System.ComponentModel.DataAnnotations;
+
 namespace Storage
 {
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel.DataAnnotations;
-    using System.ComponentModel.DataAnnotations.Schema;
-    using System.Data.Entity.Spatial;
-
     public partial class PlayerStats
     {
         public int Id { get; set; }

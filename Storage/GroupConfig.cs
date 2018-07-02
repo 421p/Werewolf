@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 
-namespace Database
+namespace Storage
 {
     [Flags]
     public enum GroupConfig : long

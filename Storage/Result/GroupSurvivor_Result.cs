@@ -7,17 +7,13 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Database
+namespace Storage.Result
 {
     using System;
-    using System.Collections.Generic;
     
-    public partial class DailyCount
+    public partial class GroupSurvivor_Result
     {
-        public int Id { get; set; }
-        public System.DateTime Day { get; set; }
-        public int Groups { get; set; }
-        public int Games { get; set; }
-        public int Users { get; set; }
+        public Nullable<int> pct { get; set; }
+        public int playerid { get; set; }
     }
 }

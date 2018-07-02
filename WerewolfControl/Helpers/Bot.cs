@@ -6,9 +6,9 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Database;
 using LanguageFileConverter;
 using Microsoft.Win32;
+using Storage;
 using Telegram.Bot;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types;
@@ -158,8 +158,8 @@ namespace Werewolf_Control.Helpers
                 var id = 1;
 
                 var b = db.BotStatus.Find(id);
-                b.BotStatus = statusChangeEventArgs.Status.ToString();
-                CurrentStatus = b.BotStatus;
+                b.Status = statusChangeEventArgs.Status.ToString();
+                CurrentStatus = b.Status;
                 db.SaveChanges();
             }
         }

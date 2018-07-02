@@ -4,17 +4,14 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Database;
 using LanguageFileConverter;
+using Storage;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineKeyboardButtons;
 using Telegram.Bot.Types.ReplyMarkups;
 using Werewolf_Control.Helpers;
 using Werewolf_Control.Models;
-using Group = Storage.Group;
-using Player = Storage.Player;
-using WWContext = Storage.WWContext;
 
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 namespace Werewolf_Control
@@ -68,11 +65,11 @@ namespace Werewolf_Control
             Group grp;
             using (var db = new WWContext())
             {
-                grp = db.Group.FirstOrDefault(x => x.GroupId == update.Message.Chat.Id);
+                grp = db.Groups.FirstOrDefault(x => x.GroupId == update.Message.Chat.Id);
                 if (grp == null)
                 {
                     grp = MakeDefaultGroup(update.Message.Chat.Id, update.Message.Chat.Title, "StartGame");
-                    db.Group.Add(grp);
+                    db.Groups.Add(grp);
                 }
 
                 grp.Name = update.Message.Chat.Title;
@@ -97,7 +94,7 @@ namespace Werewolf_Control
                 //remove usernames & links from the other groups that have the same username in the db
                 if (grp.UserName != null)
                 {
-                    var sameusername = db.Group.Where(x =>
+                    var sameusername = db.Groups.Where(x =>
                         x.UserName == update.Message.Chat.Username && x.GroupId != update.Message.Chat.Id);
                     foreach (var g in sameusername)
                     {
@@ -293,7 +290,7 @@ namespace Werewolf_Control
             using (var db = new WWContext())
             {
                 Player p = null;
-                var grp = db.Group.FirstOrDefault(x => x.GroupId == id);
+                var grp = db.Groups.FirstOrDefault(x => x.GroupId == id);
                 if (grp == null)
                 {
                     p = db.Players.FirstOrDefault(x => x.TelegramId == id);
@@ -455,13 +452,13 @@ namespace Werewolf_Control
             long id = 0;
             if (long.TryParse(str, out id))
             {
-                return db.Group.FirstOrDefault(x => x.GroupId == id);
+                return db.Groups.FirstOrDefault(x => x.GroupId == id);
             }
 
             //try with username
             if (str.StartsWith("@"))
             {
-                return db.Group.FirstOrDefault(x => x.UserName == str.Substring(1));
+                return db.Groups.FirstOrDefault(x => x.UserName == str.Substring(1));
             }
 
             //hope str is a link, and compare the hash part
@@ -472,7 +469,7 @@ namespace Werewolf_Control
             }
 
             var hash = str.Substring(index); //dummy variable becase LINQ to Entity doesn't like it.
-            return db.Group.FirstOrDefault(x => x.GroupLink.EndsWith(hash));
+            return db.Groups.FirstOrDefault(x => x.GroupLink.EndsWith(hash));
         }
     }
 }

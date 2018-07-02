@@ -328,11 +328,11 @@ namespace Werewolf_Control
             var id = update.Message.Chat.Id;
             using (var db = new WWContext())
             {
-                var grp = db.Group.FirstOrDefault(x => x.GroupId == id);
+                var grp = db.Groups.FirstOrDefault(x => x.GroupId == id);
                 if (grp == null)
                 {
                     grp = MakeDefaultGroup(id, update.Message.Chat.Title, "nextgame");
-                    db.Group.Add(grp);
+                    db.Groups.Add(grp);
                     db.SaveChanges();
                 }
 

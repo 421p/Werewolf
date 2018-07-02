@@ -7,11 +7,11 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Database
+namespace Storage.Result
 {
     using System;
     
-    public partial class GlobalDay1Lynch_Result1
+    public partial class GroupNight1Death_Result1
     {
         public Nullable<int> pct { get; set; }
         public string Name { get; set; }

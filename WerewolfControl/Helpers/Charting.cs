@@ -5,7 +5,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms.DataVisualization.Charting;
-using Database;
+using Storage;
 using Telegram.Bot.Types;
 using Werewolf_Control.Handler;
 

@@ -7,16 +7,14 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Database
+namespace Storage.Result
 {
     using System;
-    using System.Collections.Generic;
     
-    public partial class BotStatu
+    public partial class GroupDay1Lynch_Result1
     {
-        public int Id { get; set; }
-        public string BotName { get; set; }
-        public string BotStatus { get; set; }
-        public string BotLink { get; set; }
+        public Nullable<int> pct { get; set; }
+        public string Name { get; set; }
+        public int TelegramId { get; set; }
     }
 }

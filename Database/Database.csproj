@@ -70,22 +70,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Achievements.cs" />
-    <Compile Include="Admin.cs">
-      <DependentUpon>WerewolfModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="BotStatu.cs">
-      <DependentUpon>WerewolfModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="ContestTerm.cs">
-      <DependentUpon>WerewolfModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="C__MigrationHistory.cs">
-      <DependentUpon>WerewolfModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="DailyCount.cs">
-      <DependentUpon>WerewolfModel.tt</DependentUpon>
-    </Compile>
     <Compile Include="Game.cs">
       <DependentUpon>WerewolfModel.tt</DependentUpon>
     </Compile>
@@ -95,65 +79,13 @@
     <Compile Include="GamePlayer.cs">
       <DependentUpon>WerewolfModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="getDailyCounts_Result.cs">
-      <DependentUpon>WerewolfModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="getPlayTime_Result.cs">
-      <DependentUpon>WerewolfModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="getRoles_Result.cs">
-      <DependentUpon>WerewolfModel.tt</DependentUpon>
-    </Compile>
     <Compile Include="GlobalBan.cs">
-      <DependentUpon>WerewolfModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="GlobalDay1Death_Result.cs">
-      <DependentUpon>WerewolfModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="GlobalDay1Death_Result1.cs">
-      <DependentUpon>WerewolfModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="GlobalDay1Lynch_Result.cs">
-      <DependentUpon>WerewolfModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="GlobalDay1Lynch_Result1.cs">
-      <DependentUpon>WerewolfModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="GlobalNight1Death_Result.cs">
-      <DependentUpon>WerewolfModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="GlobalNight1Death_Result1.cs">
       <DependentUpon>WerewolfModel.tt</DependentUpon>
     </Compile>
     <Compile Include="GlobalStat.cs">
       <DependentUpon>WerewolfModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="GlobalSurvivor_Result.cs">
-      <DependentUpon>WerewolfModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="GlobalSurvivor_Result1.cs">
-      <DependentUpon>WerewolfModel.tt</DependentUpon>
-    </Compile>
     <Compile Include="Group.cs">
-      <DependentUpon>WerewolfModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="GroupConfig.cs" />
-    <Compile Include="GroupDay1Death_Result.cs">
-      <DependentUpon>WerewolfModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="GroupDay1Death_Result1.cs">
-      <DependentUpon>WerewolfModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="GroupDay1Lynch_Result.cs">
-      <DependentUpon>WerewolfModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="GroupDay1Lynch_Result1.cs">
-      <DependentUpon>WerewolfModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="GroupNight1Death_Result.cs">
-      <DependentUpon>WerewolfModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="GroupNight1Death_Result1.cs">
       <DependentUpon>WerewolfModel.tt</DependentUpon>
     </Compile>
     <Compile Include="GroupRanking.cs">
@@ -162,29 +94,13 @@
     <Compile Include="GroupStat.cs">
       <DependentUpon>WerewolfModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="GroupSurvivor_Result.cs">
-      <DependentUpon>WerewolfModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="GroupSurvivor_Result1.cs">
-      <DependentUpon>WerewolfModel.tt</DependentUpon>
-    </Compile>
     <Compile Include="KillMethod.cs">
       <DependentUpon>WerewolfModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="ModelExtensions/Group.cs" />
     <Compile Include="NotifyGame.cs">
       <DependentUpon>WerewolfModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Player.cs">
-      <DependentUpon>WerewolfModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="PlayerMostKilledBy_Result.cs">
-      <DependentUpon>WerewolfModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="PlayerMostKilled_Result.cs">
-      <DependentUpon>WerewolfModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="PlayerRoles_Result.cs">
       <DependentUpon>WerewolfModel.tt</DependentUpon>
     </Compile>
     <Compile Include="PlayerStat.cs">
@@ -215,11 +131,6 @@
     <Compile Include="v_WaitList.cs">
       <DependentUpon>WerewolfModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="WerewolfModel.Context.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>WerewolfModel.Context.tt</DependentUpon>
-    </Compile>
     <Compile Include="WerewolfModel.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -243,11 +154,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="WerewolfModel.Context.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>WerewolfModel.edmx</DependentUpon>
-      <LastGenOutput>WerewolfModel.Context.cs</LastGenOutput>
-    </Content>
     <Content Include="WerewolfModel.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>WerewolfModel.edmx</DependentUpon>

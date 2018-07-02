@@ -6,7 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Database;
+using Storage;
 using Werewolf_Control.Handler;
 using Werewolf_Control.Helpers;
 using Timer = System.Timers.Timer;
