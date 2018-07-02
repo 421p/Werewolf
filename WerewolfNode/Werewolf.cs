@@ -1,22 +1,20 @@
 using System;
 using System.Collections.Generic;
-using System.Data.Entity.Validation;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Linq;
-using Database;
 using LanguageFileConverter;
 using Newtonsoft.Json;
+using Storage;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineKeyboardButtons;
 using Telegram.Bot.Types.ReplyMarkups;
 using Werewolf_Node.Helpers;
 using Werewolf_Node.Models;
-using Game = Database.Game;
+using Game = Storage.Game;
 
 // ReSharper disable PossibleMultipleEnumeration warning
 #pragma warning disable 4014
@@ -48,7 +46,7 @@ namespace Werewolf_Node
         public Group DbGroup;
         private bool _playerListChanged = true, _silverSpread, _sandmanSleep;
         private DateTime _timeStarted;
-        private Nullable<TimeSpan> _timePlayed = null;
+        private TimeSpan? _timePlayed = null;
         public readonly IRole[] WolfRoles = {IRole.Wolf, IRole.AlphaWolf, IRole.WolfCub, IRole.Lycan};
         public List<long> HaveExtended = new List<long>();
         private List<IPlayer> _joined = new List<IPlayer>();
@@ -522,10 +520,7 @@ namespace Werewolf_Node
                         //new Task(() => { ImageHelper.GetUserImage(p.TeleUser.Id); }).Start();
                     }
 
-                    GameId =
-                        db.Games.Where(x => x.GroupId == ChatId).OrderByDescending(x => x.Id).FirstOrDefault()?.Id ?? 0;
-
-                    db.Database.ExecuteSqlCommand($"DELETE FROM NotifyGame WHERE GroupId = {ChatId}");
+                    GameId = db.Games.Where(x => x.GroupId == ChatId).OrderByDescending(x => x.Id).FirstOrDefault()?.Id ?? 0;
                 }
 
                 IsInitializing = false;
@@ -534,7 +529,9 @@ namespace Werewolf_Node
                 if (Players.Count < 20)
                 {
                     foreach (var p in Players.Where(x => x != null))
+                    {
                         p.HasBeenVoted = true;
+                    }
                 }
 
                 NotifyRoles();
@@ -4826,7 +4823,7 @@ namespace Werewolf_Node
         internal void LogException(Exception e)
         {
             Console.WriteLine("\nException:\n");
-            Console.WriteLine($"Group: {ChatId} ({ChatGroup})\nLanguage: {DbGroup?.Language ?? "null"}\n{e.Message}");
+            Console.WriteLine(e.Message);
             Console.WriteLine(e.StackTrace);
         }
 

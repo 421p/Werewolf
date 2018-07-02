@@ -8,9 +8,8 @@ using System.IO.Compression;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Xml.Linq;
-using Database;
 using LanguageFileConverter;
+using Storage;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineKeyboardButtons;
@@ -19,7 +18,7 @@ using Werewolf_Control.Handler;
 using Werewolf_Control.Helpers;
 using Werewolf_Control.Models;
 using File = System.IO.File;
-using Group = Database.Group;
+using Group = Storage.Group;
 
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 namespace Werewolf_Control
@@ -128,7 +127,7 @@ namespace Werewolf_Control
 #elif RELEASE2
                         2;
 #endif
-                    db.BotStatus.Find(bot).BotStatus = "Updating";
+                    db.BotStatus.Find(bot).Status = "Updating";
                     db.SaveChanges();
                 }
 
@@ -1079,9 +1078,12 @@ namespace Werewolf_Control
                 return;
             }
 
-            Group grp;
+            Storage.Group grp;
             using (var db = new WWContext())
+            {
                 grp = GetGroup(args[1], db);
+            }
+
             var grpid = grp?.GroupId ?? (long) 0;
             var grpname = grp?.Name ?? "";
 
@@ -1124,7 +1126,7 @@ namespace Werewolf_Control
 
             using (var db = new WWContext())
             {
-                Group grp = GetGroup(group, db);
+                var grp = GetGroup(group, db);
                 if (grp == null)
                 {
                     Send("Group not found.", update.Message.Chat.Id);
@@ -1339,7 +1341,7 @@ namespace Werewolf_Control
             {
                 using (var db = new WWContext())
                 {
-                    Group grp = GetGroup(link, db);
+                    var grp = GetGroup(link, db);
 
                     if (grp == null)
                         Send($"Group not found.", u.Message.Chat.Id);

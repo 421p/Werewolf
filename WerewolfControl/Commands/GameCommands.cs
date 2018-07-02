@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading;
-using Database;
+using Storage;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Werewolf_Control.Attributes;
@@ -248,37 +248,41 @@ namespace Werewolf_Control
         [Command(Trigger = "stopwaiting", Blockable = true)]
         public static void StopWaiting(Update update, string[] args)
         {
-            long groupid = 0;
-            var groupname = "";
-            if (update.Message.Chat.Id < 0) //it's a group
+            using (var db = new WWContext())
             {
-                groupid = update.Message.Chat.Id;
-                groupname = update.Message.Chat.Title;
-            }
-            else if (args.Length >= 2 && !string.IsNullOrEmpty(args[1]))
-            {
-                using (var db = new WWContext())
+                long groupid = 0;
+                var groupname = "";
+                
+                if (update.Message.Chat.Id < 0) //it's a group
+                {
+                    groupid = update.Message.Chat.Id;
+                    groupname = update.Message.Chat.Title;
+                }
+                else if (args.Length >= 2 && !string.IsNullOrEmpty(args[1]))
                 {
                     var grp = GetGroup(args[1], db);
                     groupid = grp?.GroupId ?? 0;
                     groupname = grp?.Name ?? "";
                 }
-            }
 
-            if (groupid == 0)
-            {
-                Send(GetLocaleString("GroupNotFound", GetLanguage(update.Message.From.Id)), update.Message.Chat.Id);
-                return;
-            }
+                if (groupid == 0)
+                {
+                    Send(GetLocaleString("GroupNotFound", GetLanguage(update.Message.From.Id)), update.Message.Chat.Id);
+                    return;
+                }
 
-            using (var db = new WWContext())
-            {
-                db.Database.ExecuteSqlCommand(
-                    $"DELETE FROM NotifyGame WHERE GroupId = {groupid} AND UserId = {update.Message.From.Id}");
-            }
+                var notifier =
+                    db.NotifyGame.FirstOrDefault(x => x.GroupId == groupid && x.UserId == update.Message.From.Id);
 
-            Send(GetLocaleString("DeletedFromWaitList", GetLanguage(update.Message.From.Id), groupname.ToBold()),
-                update.Message.From.Id);
+                if (notifier != null)
+                {
+                    db.NotifyGame.Remove(notifier);
+                    db.SaveChanges();
+                }
+
+                Send(GetLocaleString("DeletedFromWaitList", GetLanguage(update.Message.From.Id), groupname.ToBold()),
+                    update.Message.From.Id);
+            }
         }
     }
 }

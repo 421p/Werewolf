@@ -6,9 +6,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Database;
 using LanguageFileConverter;
 using Newtonsoft.Json;
+using Storage;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -281,7 +281,7 @@ namespace Werewolf_Control.Handler
                 //        {
                 //            using (var db = new WWContext())
                 //            {
-                //                var grps = db.Groups.Where(x => x.GroupId == id);
+                //                var grps = db.Group.Where(x => x.GroupId == id);
                 //                if (!grps.Any())
                 //                {
                 //                    return;
@@ -1171,7 +1171,7 @@ namespace Werewolf_Control.Handler
 
                             DB.SaveChanges();
                             var msg =
-                                $"Groups changed: {grpcount}\nPlayers changed: {plcount}\nTotal rows changed: {grpcount + plcount}";
+                                $"Group changed: {grpcount}\nPlayers changed: {plcount}\nTotal rows changed: {grpcount + plcount}";
                             try
                             {
                                 File.Delete(Path.Combine(Bot.LanguageDirectory, oldfilename + ".yaml"));
@@ -1207,7 +1207,7 @@ namespace Werewolf_Control.Handler
                                 var bot = DB.BotStatus.FirstOrDefault(x => x.BotName == choice);
                                 if (bot != null)
                                 {
-                                    bot.BotStatus = args[3];
+                                    bot.Status = args[3];
                                     DB.SaveChanges();
                                 }
 
@@ -1430,8 +1430,16 @@ namespace Werewolf_Control.Handler
                             break;
                         case "stopwaiting":
                             using (var db = new WWContext())
-                                db.Database.ExecuteSqlCommand(
-                                    $"DELETE FROM NotifyGame WHERE GroupId = {groupid} AND UserId = {query.From.Id}");
+                            {
+                                var notifier = db.NotifyGame.FirstOrDefault(x => x.GroupId == groupid && x.UserId == query.From.Id);
+
+                                if (notifier != null)
+                                {
+                                    db.NotifyGame.Remove(notifier);
+                                    db.SaveChanges();
+                                }
+                            }
+
                             Bot.ReplyToCallback(query, GetLocaleString("DeletedFromWaitList", grp.Language, grp.Name));
                             break;
 

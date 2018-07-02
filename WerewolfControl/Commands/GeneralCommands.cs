@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Database;
+using Storage;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -28,7 +28,7 @@ namespace Werewolf_Control
             message += "\n" + GetLocaleString("Ping2", GetLanguage(update.Message.From.Id), $"{ts:mm\\:ss\\.ff}");
             Bot.Api.EditMessageTextAsync(update.Message.Chat.Id, result.MessageId, message);
         }
-#if (BETA || DEBUG)
+        #if (BETA || DEBUG)
         [Attributes.Command(Trigger = "achv")]
         public static void GetAchievements(Update u, string[] args)
         {
@@ -79,7 +79,7 @@ namespace Werewolf_Control
             {
                 var msg =
                     db.BotStatus.ToList().Where(x => x.BotName != "Bot 2").Select(x =>
-                            $"[{x.BotName.Replace("Bot 1", "Moderator")}](https://t.me/{x.BotLink}): *{x.BotStatus}* ")
+                            $"[{x.BotName.Replace("Bot 1", "Moderator")}](https://t.me/{x.BotLink}): *{x.Status}* ")
                         .ToList()
                         .Aggregate((a, b) => a + "\n" + b);
                 Bot.Api.SendTextMessageAsync(u.Message.Chat.Id, msg, parseMode: ParseMode.Markdown,
@@ -122,9 +122,9 @@ namespace Werewolf_Control
                     {
                         TelegramId = update.Message.From.Id,
                         Language = "English",
-#if RELEASE
+                        #if RELEASE
                         HasPM = update.Message.Chat.Type == ChatType.Private
-#elif RELEASE2
+                        #elif RELEASE2
                         HasPM2 = update.Message.Chat.Type == ChatType.Private
 #elif DEBUG
                         HasDebugPM = update.Message.Chat.Type == ChatType.Private
@@ -138,9 +138,9 @@ namespace Werewolf_Control
 
                     db.SaveChanges();
                     //user obvious has no PM status, notify them
-#if RELEASE
+                    #if RELEASE
                     if (p.HasPM != true)
-#elif RELEASE2
+                        #elif RELEASE2
                     if (p.HasPM2 != true)
 #elif DEBUG
                     if (p.HasDebugPM != true)
@@ -206,16 +206,12 @@ namespace Werewolf_Control
                         db.SaveChanges();
                         p = GetDBPlayer(u.Message.From.Id, db);
                     }
-#if RELEASE
+
                     p.HasPM = true;
-#elif RELEASE2
-                        p.HasPM2 = true;
-#elif BETA
-                        p.HasDebugPM = true;
-#endif
+
                     db.SaveChanges();
 
-                    if (String.IsNullOrEmpty(args[1]))
+                    if (string.IsNullOrEmpty(args[1]))
                     {
                         var msg = $"Hi there! I'm @{Bot.Me.Username}, and I moderate games of Werewolf." +
                                   $"\nFor role information, use /rolelist." +
@@ -330,13 +326,13 @@ namespace Werewolf_Control
         [Attributes.Command(Trigger = "nextgame", Blockable = true, InGroupOnly = true)]
         public static void NextGame(Update update, string[] args)
         {
-            var id = update.Message.Chat.Id;
+            var groupId = update.Message.Chat.Id;
             using (var db = new WWContext())
             {
-                var grp = db.Groups.FirstOrDefault(x => x.GroupId == id);
+                var grp = db.Groups.FirstOrDefault(x => x.GroupId == groupId);
                 if (grp == null)
                 {
-                    grp = MakeDefaultGroup(id, update.Message.Chat.Title, "nextgame");
+                    grp = MakeDefaultGroup(groupId, update.Message.Chat.Title, "nextgame");
                     db.Groups.Add(grp);
                     db.SaveChanges();
                 }
@@ -354,20 +350,26 @@ namespace Werewolf_Control
                     return;
                 }
 
-                var button = new InlineKeyboardMarkup(new[]
+                var button = new InlineKeyboardMarkup(new InlineKeyboardButton[]
                 {
-                    new InlineKeyboardCallbackButton(GetLocaleString("Cancel", grp.Language), $"stopwaiting|{id}")
+                    new InlineKeyboardCallbackButton(GetLocaleString("Cancel", grp.Language), $"stopwaiting|{groupId}")
                 });
-                if (db.NotifyGames.Any(x => x.GroupId == id && x.UserId == update.Message.From.Id))
+                
+                if (db.NotifyGame.Any(x => x.GroupId == groupId && x.UserId == update.Message.From.Id))
                 {
                     Send(GetLocaleString("AlreadyOnWaitList", grp.Language, grp.Name.ToBold()),
                         update.Message.From.Id, customMenu: button);
                 }
                 else
                 {
-                    db.Database.ExecuteSqlCommand(
-                        $"INSERT INTO NotifyGame VALUES ({update.Message.From.Id}, {id})");
+                    db.NotifyGame.Add(new NotifyGame
+                    {
+                        UserId = update.Message.From.Id,
+                        GroupId = groupId
+                    });
+
                     db.SaveChanges();
+
                     Send(GetLocaleString("AddedToWaitList", grp.Language, grp.Name.ToBold()),
                         update.Message.From.Id, customMenu: button);
                 }
@@ -388,12 +390,9 @@ namespace Werewolf_Control
             var baseMenu = new List<InlineKeyboardButton[]>();
             for (var i = 0; i < buttons.Count; i++)
             {
-                if (buttons.Count - 1 == i)
-                {
-                    baseMenu.Add(new[] {buttons[i]});
-                }
-                else
-                    baseMenu.Add(new[] {buttons[i], buttons[i + 1]});
+                baseMenu.Add(buttons.Count - 1 == i
+                    ? new InlineKeyboardButton[] {buttons[i]}
+                    : new InlineKeyboardButton[] {buttons[i], buttons[i + 1]});
 
                 i++;
             }

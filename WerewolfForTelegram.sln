@@ -8,26 +8,24 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Achievements.txt = Achievements.txt
 	EndProjectSection
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Languages", "Languages/Languages.shproj", "{594FDC40-26DC-4EDD-9C16-C79B3AD35E9D}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Languages", "Languages\Languages.shproj", "{594FDC40-26DC-4EDD-9C16-C79B3AD35E9D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WerewolfControl", "WerewolfControl/WerewolfControl.csproj", "{F2D299CD-68DB-4A67-B786-C486A4BCCEFC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WerewolfControl", "WerewolfControl\WerewolfControl.csproj", "{F2D299CD-68DB-4A67-B786-C486A4BCCEFC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WerewolfNode", "WerewolfNode/WerewolfNode.csproj", "{07443B36-6D32-4333-A857-C0CF906096FA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WerewolfNode", "WerewolfNode\WerewolfNode.csproj", "{07443B36-6D32-4333-A857-C0CF906096FA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TcpFramework", "TcpFramework/TcpFramework.csproj", "{ACB86D9A-837C-4BB6-83FA-99FE4DC7D3E4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TcpFramework", "TcpFramework\TcpFramework.csproj", "{ACB86D9A-837C-4BB6-83FA-99FE4DC7D3E4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Database", "Database/Database.csproj", "{A5E58EAB-3171-4859-8FD5-D61E78CBDC93}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Telegram.Bot", "Telegram.Bot/Telegram.Bot.csproj", "{5436A4DF-7B54-41D3-855F-AD3F516AE377}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegistrySaver", "RegistrySaver\RegistrySaver.csproj", "{46778EC5-A29A-4CBC-BC65-1681382401A8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Telegram.Bot", "Telegram.Bot\Telegram.Bot.csproj", "{5436A4DF-7B54-41D3-855F-AD3F516AE377}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LanguageFileConverter", "LanguageFileConverter\LanguageFileConverter.csproj", "{FCD23604-BEC8-49E7-B879-AC885865E74D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Storage", "Storage\Storage.csproj", "{5881728C-CF06-47B9-BA19-89DB18590422}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		Languages/Languages.projitems*{594fdc40-26dc-4edd-9c16-c79b3ad35e9d}*SharedItemsImports = 13
-		Languages/Languages.projitems*{f2d299cd-68db-4a67-b786-c486a4bccefc}*SharedItemsImports = 4
+		Languages\Languages.projitems*{594fdc40-26dc-4edd-9c16-c79b3ad35e9d}*SharedItemsImports = 13
+		Languages\Languages.projitems*{f2d299cd-68db-4a67-b786-c486a4bccefc}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Beta|Any CPU = Beta|Any CPU
@@ -60,14 +58,6 @@ Global
 		{ACB86D9A-837C-4BB6-83FA-99FE4DC7D3E4}.Release 2|Any CPU.Build.0 = Release 2|Any CPU
 		{ACB86D9A-837C-4BB6-83FA-99FE4DC7D3E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ACB86D9A-837C-4BB6-83FA-99FE4DC7D3E4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A5E58EAB-3171-4859-8FD5-D61E78CBDC93}.Beta|Any CPU.ActiveCfg = Beta|Any CPU
-		{A5E58EAB-3171-4859-8FD5-D61E78CBDC93}.Beta|Any CPU.Build.0 = Beta|Any CPU
-		{A5E58EAB-3171-4859-8FD5-D61E78CBDC93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A5E58EAB-3171-4859-8FD5-D61E78CBDC93}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A5E58EAB-3171-4859-8FD5-D61E78CBDC93}.Release 2|Any CPU.ActiveCfg = Release 2|Any CPU
-		{A5E58EAB-3171-4859-8FD5-D61E78CBDC93}.Release 2|Any CPU.Build.0 = Release 2|Any CPU
-		{A5E58EAB-3171-4859-8FD5-D61E78CBDC93}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A5E58EAB-3171-4859-8FD5-D61E78CBDC93}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5436A4DF-7B54-41D3-855F-AD3F516AE377}.Beta|Any CPU.ActiveCfg = Beta|Any CPU
 		{5436A4DF-7B54-41D3-855F-AD3F516AE377}.Beta|Any CPU.Build.0 = Beta|Any CPU
 		{5436A4DF-7B54-41D3-855F-AD3F516AE377}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -76,14 +66,6 @@ Global
 		{5436A4DF-7B54-41D3-855F-AD3F516AE377}.Release 2|Any CPU.Build.0 = Release|Any CPU
 		{5436A4DF-7B54-41D3-855F-AD3F516AE377}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5436A4DF-7B54-41D3-855F-AD3F516AE377}.Release|Any CPU.Build.0 = Release|Any CPU
-		{46778EC5-A29A-4CBC-BC65-1681382401A8}.Beta|Any CPU.ActiveCfg = Debug|Any CPU
-		{46778EC5-A29A-4CBC-BC65-1681382401A8}.Beta|Any CPU.Build.0 = Debug|Any CPU
-		{46778EC5-A29A-4CBC-BC65-1681382401A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{46778EC5-A29A-4CBC-BC65-1681382401A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{46778EC5-A29A-4CBC-BC65-1681382401A8}.Release 2|Any CPU.ActiveCfg = Debug|Any CPU
-		{46778EC5-A29A-4CBC-BC65-1681382401A8}.Release 2|Any CPU.Build.0 = Debug|Any CPU
-		{46778EC5-A29A-4CBC-BC65-1681382401A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{46778EC5-A29A-4CBC-BC65-1681382401A8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FCD23604-BEC8-49E7-B879-AC885865E74D}.Beta|Any CPU.ActiveCfg = Debug|Any CPU
 		{FCD23604-BEC8-49E7-B879-AC885865E74D}.Beta|Any CPU.Build.0 = Debug|Any CPU
 		{FCD23604-BEC8-49E7-B879-AC885865E74D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -92,6 +74,14 @@ Global
 		{FCD23604-BEC8-49E7-B879-AC885865E74D}.Release 2|Any CPU.Build.0 = Debug|Any CPU
 		{FCD23604-BEC8-49E7-B879-AC885865E74D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FCD23604-BEC8-49E7-B879-AC885865E74D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5881728C-CF06-47B9-BA19-89DB18590422}.Beta|Any CPU.ActiveCfg = Release|Any CPU
+		{5881728C-CF06-47B9-BA19-89DB18590422}.Beta|Any CPU.Build.0 = Release|Any CPU
+		{5881728C-CF06-47B9-BA19-89DB18590422}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5881728C-CF06-47B9-BA19-89DB18590422}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5881728C-CF06-47B9-BA19-89DB18590422}.Release 2|Any CPU.ActiveCfg = Release|Any CPU
+		{5881728C-CF06-47B9-BA19-89DB18590422}.Release 2|Any CPU.Build.0 = Release|Any CPU
+		{5881728C-CF06-47B9-BA19-89DB18590422}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5881728C-CF06-47B9-BA19-89DB18590422}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

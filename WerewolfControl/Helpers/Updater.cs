@@ -1,15 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Database;
 using Microsoft.TeamFoundation.Build.WebApi;
 using Microsoft.VisualStudio.Services.Common;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
 using File = System.IO.File;
 
 namespace Werewolf_Control.Helpers
