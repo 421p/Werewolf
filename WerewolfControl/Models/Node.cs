@@ -31,7 +31,9 @@ namespace Werewolf_Control.Models
                 Chaos = chaos,
                 User = update.Message.From
             };
+            
             this.Broadcast(JsonConvert.SerializeObject(info));
+            
             Games.Add(new GameInfo
             {
                 ChatGroup = info.Chat.Title,

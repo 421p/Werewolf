@@ -111,14 +111,17 @@ namespace Werewolf_Control
 
             //no game found, start one
             node = Bot.GetBestAvailableNode();
+            
             if (node != null)
             {
                 node.StartGame(update, chaos);
                 //notify waiting players
                 using (var db = new WWContext())
                 {
-                    var notify = db.NotifyGame.Where(x => x.GroupId == update.Message.Chat.Id);
+                    var notify = db.NotifyGame.Where(x => x.GroupId == update.Message.Chat.Id).ToList();
 
+                    Console.WriteLine($"Sending notifications to {notify.Count} users.");
+                    
                     var groupName = update.Message.Chat.Title.ToBold();
 
                     if (update.Message.Chat.Username != null)
@@ -137,10 +140,9 @@ namespace Werewolf_Control
                     {
                         if (n.UserId != update.Message.From.Id)
                         {
+                            Console.WriteLine($"Sending game notification to user {n.UserId}");
                             Send(GetLocaleString("NotifyNewGame", grp.Language, groupName), n.UserId);
                         }
-
-                        db.NotifyGame.Remove(n);
 
                         Thread.Sleep(500);
                     }
@@ -215,40 +217,18 @@ namespace Werewolf_Control
                 customMenu: new InlineKeyboardMarkup(new[] {button}));
         }
 
-        private static Node GetPlayerNode(int id)
-        {
-            var node = Bot.Nodes.ToList().FirstOrDefault(n => n.Games.Any(g => g.Users.Contains(id)));
-            if (node == null)
-            {
-                node = Bot.Nodes.ToList().FirstOrDefault(n => n.Games.Any(g => g.Users.Contains(id)));
-            }
+        private static Node GetPlayerNode(int id) =>
+            (Bot.Nodes.ToList().FirstOrDefault(n => n.Games.Any(g => g.Users.Contains(id))) ??
+             Bot.Nodes.ToList().FirstOrDefault(n => n.Games.Any(g => g.Users.Contains(id)))) ??
+            Bot.Nodes.ToList().FirstOrDefault(n => n.Games.Any(g => g.Users.Contains(id)));
 
-            if (node == null)
-            {
-                node = Bot.Nodes.ToList().FirstOrDefault(n => n.Games.Any(g => g.Users.Contains(id)));
-            }
-
-            return node;
-        }
-
-        private static GameInfo GetGroupNodeAndGame(long id)
-        {
-            var node = Bot.Nodes.ToList().FirstOrDefault(n => n.Games.Any(g => g.GroupId == id))?.Games
+        private static GameInfo GetGroupNodeAndGame(long id) =>
+            (Bot.Nodes.ToList().FirstOrDefault(n => n.Games.Any(g => g.GroupId == id))?.Games
+                 .FirstOrDefault(x => x.GroupId == id) ?? Bot.Nodes.ToList()
+                 .FirstOrDefault(n => n.Games.Any(g => g.GroupId == id))?.Games
+                 .FirstOrDefault(x => x.GroupId == id)) ?? Bot.Nodes.ToList()
+                .FirstOrDefault(n => n.Games.Any(g => g.GroupId == id))?.Games
                 .FirstOrDefault(x => x.GroupId == id);
-            if (node == null)
-            {
-                node = Bot.Nodes.ToList().FirstOrDefault(n => n.Games.Any(g => g.GroupId == id))?.Games
-                    .FirstOrDefault(x => x.GroupId == id);
-            }
-
-            if (node == null)
-            {
-                node = Bot.Nodes.ToList().FirstOrDefault(n => n.Games.Any(g => g.GroupId == id))?.Games
-                    .FirstOrDefault(x => x.GroupId == id);
-            }
-
-            return node;
-        }
 
         /// <summary>
         ///     Gets the language for the group, defaulting to English
