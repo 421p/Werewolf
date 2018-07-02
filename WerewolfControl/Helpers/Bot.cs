@@ -61,11 +61,8 @@ namespace Werewolf_Control.Helpers
         public static void Initialize(string updateid = null)
         {
             //get api token from registry
-            var key =
-                RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64)
-                    .OpenSubKey("SOFTWARE\\Werewolf");
 
-            TelegramApiKey = key.GetValue("ProductionAPI").ToString();
+            TelegramApiKey = Environment.GetEnvironmentVariable("TELEGRAM_TOKEN");
 
             Api = new Client(TelegramApiKey, LogDirectory);
 

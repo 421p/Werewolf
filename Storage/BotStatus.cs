@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Storage
 {
-    [Table("db_owner.BotStatus")]
+    [Table("BotStatus")]
     public partial class BotStatus
     {
         public int Id { get; set; }

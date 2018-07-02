@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Storage
 {
-    [Table("db_owner.v_WaitList")]
+    [Table("v_WaitList")]
     public partial class v_WaitList
     {
         [Key]

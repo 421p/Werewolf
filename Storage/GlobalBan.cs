@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Storage
 {
-    [Table("db_owner.GlobalBan")]
+    [Table("GlobalBan")]
     public partial class GlobalBan
     {
         public int Id { get; set; }

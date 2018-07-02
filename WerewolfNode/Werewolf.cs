@@ -520,10 +520,7 @@ namespace Werewolf_Node
                         //new Task(() => { ImageHelper.GetUserImage(p.TeleUser.Id); }).Start();
                     }
 
-                    GameId =
-                        db.Games.Where(x => x.GroupId == ChatId).OrderByDescending(x => x.Id).FirstOrDefault()?.Id ?? 0;
-
-                    db.Database.ExecuteSqlCommand($"DELETE FROM NotifyGame WHERE GroupId = {ChatId}");
+                    GameId = db.Games.Where(x => x.GroupId == ChatId).OrderByDescending(x => x.Id).FirstOrDefault()?.Id ?? 0;
                 }
 
                 IsInitializing = false;
@@ -532,7 +529,9 @@ namespace Werewolf_Node
                 if (Players.Count < 20)
                 {
                     foreach (var p in Players.Where(x => x != null))
+                    {
                         p.HasBeenVoted = true;
+                    }
                 }
 
                 NotifyRoles();
@@ -4824,7 +4823,7 @@ namespace Werewolf_Node
         internal void LogException(Exception e)
         {
             Console.WriteLine("\nException:\n");
-            Console.WriteLine($"Group: {ChatId} ({ChatGroup})\nLanguage: {DbGroup?.Language ?? "null"}\n{e.Message}");
+            Console.WriteLine(e.Message);
             Console.WriteLine(e.StackTrace);
         }
 

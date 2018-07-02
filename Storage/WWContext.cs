@@ -3,18 +3,23 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Core.Objects;
 using System.Data.Entity.Infrastructure;
+using System.Linq;
+using System.Net;
+using System.Net.Sockets;
+using System.Text.RegularExpressions;
 using Storage.Result;
+using MySql.Data.Entity;
 
 namespace Storage
 {
+    [DbConfigurationType(typeof(MySqlEFConfiguration))]
     public partial class WWContext : DbContext
     {
         public WWContext()
-            : base("data source=localhost;initial catalog=werewolf;user id=sa;password=zaqwsxA111111") { }
+            : base(ConnectionString) { }
 
         public virtual DbSet<BotStatus> BotStatus { get; set; }
         public virtual DbSet<GlobalBan> GlobalBans { get; set; }
-        public virtual DbSet<C__MigrationHistory> C__MigrationHistory { get; set; }
         public virtual DbSet<Admin> Admins { get; set; }
         public virtual DbSet<DailyCount> DailyCount { get; set; }
         public virtual DbSet<Game> Games { get; set; }
@@ -32,6 +37,24 @@ namespace Storage
         public virtual DbSet<v_WaitList> WaitListView { get; set; }
         public virtual DbSet<v_GroupRanking> v_GroupRanking { get; set; }
         public virtual DbSet<v_IdleKill24HoursMain> VIdleKill24HoursMain { get; set; }
+
+        private static string ConnectionString
+        {
+            get
+            {
+                var cs = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+
+                return Regex.Replace(cs, "server=(?<host>[^;]+);",
+                    match =>
+                    {
+                        var host = match.Groups["host"].Value;
+                        var ip = Dns.GetHostEntry(host).AddressList
+                            .First(x => x.AddressFamily == AddressFamily.InterNetwork).ToString();
+
+                        return $"server={ip};";
+                    });
+            }
+        }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -154,7 +177,7 @@ namespace Storage
                 "GlobalSurvivor");
         }
 
-        public virtual ObjectResult<GroupDay1Death_Result1> GroupDay1Death(Nullable<long> groupid)
+        public virtual ObjectResult<GroupDay1Death_Result1> GroupDay1Death(long? groupid)
         {
             var groupidParameter = groupid.HasValue
                 ? new ObjectParameter("groupid", groupid)
@@ -164,7 +187,7 @@ namespace Storage
                 "GroupDay1Death", groupidParameter);
         }
 
-        public virtual ObjectResult<GroupDay1Lynch_Result1> GroupDay1Lynch(Nullable<long> groupid)
+        public virtual ObjectResult<GroupDay1Lynch_Result1> GroupDay1Lynch(long? groupid)
         {
             var groupidParameter = groupid.HasValue
                 ? new ObjectParameter("groupid", groupid)
@@ -174,7 +197,7 @@ namespace Storage
                 "GroupDay1Lynch", groupidParameter);
         }
 
-        public virtual ObjectResult<GroupNight1Death_Result1> GroupNight1Death(Nullable<long> groupid)
+        public virtual ObjectResult<GroupNight1Death_Result1> GroupNight1Death(long? groupid)
         {
             var groupidParameter = groupid.HasValue
                 ? new ObjectParameter("groupid", groupid)
@@ -184,7 +207,7 @@ namespace Storage
                 "GroupNight1Death", groupidParameter);
         }
 
-        public virtual ObjectResult<GroupSurvivor_Result1> GroupSurvivor(Nullable<long> groupid)
+        public virtual ObjectResult<GroupSurvivor_Result1> GroupSurvivor(long? groupid)
         {
             var groupidParameter = groupid.HasValue
                 ? new ObjectParameter("groupid", groupid)

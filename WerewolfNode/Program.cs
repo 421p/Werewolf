@@ -68,13 +68,7 @@ namespace Werewolf_Node
                 }
             };
             English = LanguageConverter.Load(Path.Combine(LanguageDirectory, "English.yaml"));
-
-
-            //get api token from registry
-            var key = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64)
-                .OpenSubKey("SOFTWARE\\Werewolf");
-
-            APIToken = key.GetValue("ProductionAPI").ToString();
+            APIToken = Environment.GetEnvironmentVariable("TELEGRAM_TOKEN");
 
             Bot = new TelegramBotClient(APIToken);
             Me = Bot.GetMeAsync().Result;

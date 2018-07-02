@@ -79,6 +79,8 @@ namespace Werewolf_Control
             Thread.Sleep(1000);
 
             //initialize EF before we start receiving
+
+
             using (var db = new WWContext())
             {
                 var count = db.GlobalBans.Count();
@@ -251,6 +253,7 @@ namespace Werewolf_Control
                     msg += new string(' ', Console.WindowWidth);
                     msg += Environment.NewLine + new string(' ', Console.WindowWidth);
 
+                    
                     _writingInfo = true;
                     //var ypos = Math.Max(Console.CursorTop, 30);
                     //if (ypos >= 60)
@@ -325,7 +328,32 @@ namespace Werewolf_Control
 
             return process;
         }
+
+        internal static void LogException(AggregateException ae)
+        {
+            foreach (var e in ae.InnerExceptions)
+                LogAllExceptions(e);
+        }
+
+        internal static void LogAllExceptions(Exception e)
+        {
+            do
+            {
+                LogException(e);
+                e = e.InnerException;
+            } while (e != null);
+
+            return;
+        }
+
+        internal static void LogException(Exception e)
+        {
+            Console.WriteLine("\nException:\n");
+            Console.WriteLine(e.Message);
+            Console.WriteLine(e.StackTrace);
+        }
     }
+
 
     internal class NodeChoice
     {

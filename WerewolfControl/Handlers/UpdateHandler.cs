@@ -1430,8 +1430,16 @@ namespace Werewolf_Control.Handler
                             break;
                         case "stopwaiting":
                             using (var db = new WWContext())
-                                db.Database.ExecuteSqlCommand(
-                                    $"DELETE FROM NotifyGame WHERE GroupId = {groupid} AND UserId = {query.From.Id}");
+                            {
+                                var notifier = db.NotifyGame.FirstOrDefault(x => x.GroupId == groupid && x.UserId == query.From.Id);
+
+                                if (notifier != null)
+                                {
+                                    db.NotifyGame.Remove(notifier);
+                                    db.SaveChanges();
+                                }
+                            }
+
                             Bot.ReplyToCallback(query, GetLocaleString("DeletedFromWaitList", grp.Language, grp.Name));
                             break;
 

@@ -18,18 +18,6 @@ namespace Werewolf_Control
 {
     public static partial class Commands
     {
-        #if BETA
-        internal static long[] BetaGroups = new[]
-            {
-                -1001056839438, 
-                -1001062784541, -1001030085238,
-                -1001052793672, -1001066860506, -1001038785894,
-                -1001094614730, -1001066860506,
-                -1001080774621, -1001036952250, -1001082421542, -1001073943101, -1001071193124,
-                -1001094155678, -1001077134233, -1001229366250
-            };
-#endif
-
         private static Player GetDBPlayer(int id, WWContext db) => db.Players.FirstOrDefault(x => x.TelegramId == id);
 
         private static void StartGame(bool chaos, Update update)
@@ -40,27 +28,6 @@ namespace Werewolf_Control
                 Send(GetLocaleString("StartFromGroup", GetLanguage(update.Message.From.Id)), update.Message.Chat.Id);
                 return;
             }
-
-            //-1001052326089,
-            #if BETA
-            if (!BetaGroups.Contains(update.Message.Chat.Id) & !UpdateHelper.Devs.Contains(update.Message.From.Id))
-            {
-                Bot.Api.LeaveChatAsync(update.Message.Chat.Id);
-                return;
-            }
-#endif
-
-
-            #if RELEASE2
-
-//retiring bot 2
-            Send($"Bot 2 is retiring.  Please switch to @werewolfbot", update.Message.Chat.Id);
-            Thread.Sleep(1000);
-            Bot.Api.LeaveChat(update.Message.Chat.Id);
-            
-            return;
-
-#endif
 
             Group grp;
             using (var db = new WWContext())
@@ -150,8 +117,10 @@ namespace Werewolf_Control
                 //notify waiting players
                 using (var db = new WWContext())
                 {
-                    var notify = db.NotifyGame.Where(x => x.GroupId == update.Message.Chat.Id).ToList();
+                    var notify = db.NotifyGame.Where(x => x.GroupId == update.Message.Chat.Id);
+
                     var groupName = update.Message.Chat.Title.ToBold();
+
                     if (update.Message.Chat.Username != null)
                     {
                         groupName += $" @{update.Message.Chat.Username}";
@@ -161,6 +130,9 @@ namespace Werewolf_Control
                         groupName = $"<a href=\"{grp.GroupLink}\">{update.Message.Chat.Title}</a>";
                     }
 
+                    db.NotifyGame.RemoveRange(notify);
+                    db.SaveChanges();
+
                     foreach (var n in notify)
                     {
                         if (n.UserId != update.Message.From.Id)
@@ -168,12 +140,10 @@ namespace Werewolf_Control
                             Send(GetLocaleString("NotifyNewGame", grp.Language, groupName), n.UserId);
                         }
 
+                        db.NotifyGame.Remove(n);
+
                         Thread.Sleep(500);
                     }
-
-                    //just to be sure...
-                    //db.Database.ExecuteSqlCommand($"DELETE FROM NotifyGame WHERE GroupId = {update.Message.Chat.Id}");
-                    db.SaveChanges();
                 }
             }
             else
