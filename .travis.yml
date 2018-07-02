@@ -9,7 +9,7 @@ notifications:
   webhooks: https://fathomless-fjord-24024.herokuapp.com/notify
 deploy:
   provider: script
-  script: docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD" && docker push 421p/werewolf-linux
+  script: docker login -u "$DOCKER_LOGIN" -p "$DOCKER_PASSWORD" && docker push 421p/werewolf-linux
   on:
     branch: master
 env:
