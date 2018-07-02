@@ -1,0 +1,10 @@
+sudo: required
+
+services:
+  - docker
+
+before_install:
+  - docker pull mono
+
+script:
+  - docker build . -t 421p/werewolf-linux -f build/Dockerfile
